@@ -1,0 +1,9 @@
+./nogit/*
+*.h5
+*.pickle
+*.hdf
+*.png
+*.swp
+.ipynb_checkpoints/*
+*.csv
+*.txt
