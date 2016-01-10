@@ -1,9 +1,11 @@
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
 ./nogit/*
 *.h5
 *.pickle
 *.hdf
 *.png
 *.swp
-.ipynb_checkpoints/*
 *.csv
 *.txt
