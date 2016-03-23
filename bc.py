@@ -48,6 +48,7 @@ def to_carrays(df, path, format_categories=['bcolz'], format_codes=['bcolz'], fo
                 format_values=format_values) # , cparams=bcolz.cparams(clevel=9, shuffle=True, cname='blosclz'))
 
 def from_carrays(path, format_categories='bcolz', format_codes='bcolz', format_values='bcolz', parallel=True):
+    assert os.path.exists(path)
     df_columns = glob.glob(os.path.join(path, '*'))
     df = dict()
     if parallel:
