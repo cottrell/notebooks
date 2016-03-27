@@ -48,7 +48,7 @@ def to_carrays(df, path, format_categories=['bcolz'], format_codes=['bcolz'], fo
                 format_values=format_values) # , cparams=bcolz.cparams(clevel=9, shuffle=True, cname='blosclz'))
 
 def from_carrays(path, format_categories='bcolz', format_codes='bcolz', format_values='bcolz', parallel=True):
-    assert os.path.exists(path)
+    assert os.path.exists(path), 'No path {}'.format(path)
     df_columns = glob.glob(os.path.join(path, '*'))
     df = dict()
     if parallel:
@@ -172,7 +172,7 @@ def _from_carray(path, format_categories=None, format_codes=None, format_values=
         if format_codes == 'bcolz':
             rootdir = os.path.join(path, 'codes.bcolz')
             with log.timedlogger("reading [%s] %s" % (meta['name'], rootdir)):
-                codes_values = bcolz.carray(rootdir=rootdir, mode='r')[:] # , categories=categories_values)
+                codes_values = bcolz.open(rootdir=rootdir, mode='r')[:] # , categories=categories_values)
                 # codes_values = FakeCarrayAsNumpyArray(rootdir=rootdir, mode='r') # , categories=categories_values)
         elif format_codes == 'npy':
             filename = os.path.join(path, 'codes.npy')
@@ -188,7 +188,7 @@ def _from_carray(path, format_categories=None, format_codes=None, format_values=
             rootdir = os.path.join(path, 'values.bcolz')
             with log.timedlogger("reading [%s] %s" % (meta['name'], rootdir)):
                 # values = FakeCarrayAsNumpyArray(rootdir=rootdir, mode='r')
-                s = bcolz.carray(rootdir=rootdir, mode='r')[:]
+                s = bcolz.open(rootdir=rootdir, mode='r')[:]
         elif format_values == 'npy':
             filename = os.path.join(path, 'values.npy')
             with log.timedlogger("reading [%s] %s with mmap_mode" % (meta['name'], filename)):
@@ -241,6 +241,29 @@ def _move_and_remove_nonblocking(path):
 def _rmdir(path):
     logging.warning("rmdir %s" % path)
     shutil.rmtree(path)
+
+def to_dict_of_blocks(d, rootdir):
+    """ for pure numpy things like {'X_train': X_train, 'X_test': X_test} """
+    if os.path.exists(rootdir):
+        _move_and_remove_nonblocking(rootdir)
+    _mkdir(rootdir)
+    meta = {'keys': list(d.keys())}
+    json.dump(meta, open(os.path.join(rootdir, 'meta'), 'w'))
+    for i, k in enumerate(meta['keys']):
+        filename = os.path.join(rootdir, str(i))
+        with log.timedlogger('writing {} ({}.shape = {})'.format(filename, k, d[k].shape)):
+            bcolz.carray(d[k], rootdir=filename)
+
+def from_dict_of_blocks(rootdir, mode='r'):
+    meta = json.load(open(os.path.join(rootdir, 'meta')))
+    d = dict()
+    for i, k in enumerate(meta['keys']):
+        filename = os.path.join(rootdir, str(i))
+        with log.timedlogger('reading {} ({})'.format(filename, k)):
+            d[k] = bcolz.open(filename, mode=mode)
+            print('... d[{}].shape = {}'.format(k, d[k].shape))
+    return d
+
 
 # ######################
 # def get_carray_monkeypatched(rootdir=None, categories=None):
