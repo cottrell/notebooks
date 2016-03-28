@@ -72,12 +72,33 @@ for k in d:
     d[k] = d[k][:].astype(np.float64)
 globals().update(d)
 
+import sklearn.preprocessing as preproc
+scaler = preproc.StandardScaler(with_mean=False) # hmm
+scaler.fit(X_train)
+
+def transx(X):
+    return scipy.sparse.csr_matrix(scaler.transform(X))
+def transy(y):
+    return np.where(y==0.0, -1.0, y)
+def transy_inv(y):
+    return np.where(y==-1.0, 0.0, y)
+
+def patched_factory(klass, *args, **kwargs):
+    fm = klass(*args, **kwargs)
+    fm._fit_old = fm.fit
+    fm.fit = lambda X_train, y_train: fm._fit_old(transx(X_train), transy(y_train))
+    fm.fit(X_train, y_train)
+    fm._predict_old = fm.predict
+    fm.predict = lambda x: transy_inv(fm._predict_old(transx(x)))
+    fm._predict_proba_old = fm.predict_proba
+    fm.predict_proba = lambda x: transy_inv(fm._predict_proba_old(transx(x)))
+    return fm
+
 def dofit_fastfm():
-    # fm = sgd.FMClassification(init_stdev=0.1, l2_reg=None, l2_reg_V=0.1, l2_reg_w=0.1, n_iter=100, random_state=123, rank=8)
-    fm = sgd.FMClassification(n_iter=1000, init_stdev=0.1, l2_reg_w=0, l2_reg_V=0, rank=2, step_size=0.1)
-    y = np.where(y_train==0.0, -1.0, y_train)
-    print(X_train.shape, y_train.shape, X_train.dtype, y_train.dtype, type(X_train))
-    fm.fit(scipy.sparse.csr_matrix(X_train, dtype=np.float64), y)
+    """ unstable/not working for predict_proba ... not sure if worth it to dig through problems """
+    # method does not work with some combination of arguments (ls_reg=None for example)
+    fm = patched_factory(sgd.FMClassification, n_iter=1000, init_stdev=0.1, l2_reg_w=0, l2_reg_V=0, rank=2, step_size=0.1)
+    fm.fit(X_train, y_train)
     return fm
 
 def dofit_xgb():
@@ -85,10 +106,19 @@ def dofit_xgb():
     clf = xgb.XGBClassifier(missing=np.nan, max_depth=5, n_estimators=350, learning_rate=0.03, nthread=4, subsample=0.95, colsample_bytree=0.85, seed=4242)
     # fitting
     clf.fit(X_train, y_train, early_stopping_rounds=20, eval_metric="auc", eval_set=[(X_eval, y_eval)])
-    print('Overall AUC:', roc_auc_score(y_train, clf.predict_proba(X_train)[:,1]))
+    # print('Overall AUC:', roc_auc_score(y_train, clf.predict_proba(X_train)[:,1]))
     # # predicting
     # y_pred = clf.predict_proba(X_test)[:,1]
     # submission = pd.DataFrame({"ID":id_test, "TARGET":y_pred})
     # submission.to_csv("submission.csv", index=False)
     # print('Completed!')
     return clf
+
+trained_models = dict()
+# trained_models['fm'] = dofit_fastfm()
+# fm = trained_models['fm']
+# trained_models['xgb'] = dofit_xgb()
+
+# for k, clf in trained_models.items():
+#     # print('Overall AUC:', roc_auc_score(y_train, clf.predict_proba(X_train)[:,1]))
+#     # y_pred = clf.predict_proba(X_test)[:,1]
