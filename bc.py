@@ -15,10 +15,13 @@ import multiprocessing.pool
 
 from pandas.core.internals import SingleBlockManager
 
+
 class TimeLogger():
+
     def __init__(self, log=logging.warning):
         self.d = dict()
         self.log = log
+
     @contextlib.contextmanager
     def timedlogger(self, *name):
         start = time.time()
@@ -28,24 +31,28 @@ class TimeLogger():
         interval = end - start
         self.log("%s took %f s" % (name, interval))
         self.d[name] = [start, end, interval]
+
     def get_frame(self):
         return pandas.DataFrame(self.d, index=['start', 'stop', 'ellapsed']).T
+
     def clear(self):
         self.d = dict()
 
 
 log = TimeLogger()
 
+
 def to_carrays(df, path, format_categories=['bcolz'], format_codes=['bcolz'], format_values=['bcolz']):
     # using format_categories as list for testing
     # TODO: appears to be bug or problem with bcolz categories blowing up in storage
     if os.path.exists(path):
-        _move_and_remove_nonblocking(path) # TODO move/raise only
+        _move_and_remove_nonblocking(path)  # TODO move/raise only
     _mkdir(path)
     for i, k in enumerate(df):
         _to_carray(df[k], k, os.path.join(path, str(i)),
-                format_categories=format_categories, format_codes=format_codes,
-                format_values=format_values) # , cparams=bcolz.cparams(clevel=9, shuffle=True, cname='blosclz'))
+                   format_categories=format_categories, format_codes=format_codes,
+                   format_values=format_values)  # , cparams=bcolz.cparams(clevel=9, shuffle=True, cname='blosclz'))
+
 
 def from_carrays(path, format_categories='bcolz', format_codes='bcolz', format_values='bcolz', parallel=True):
     assert os.path.exists(path), 'No path {}'.format(path)
@@ -69,9 +76,10 @@ def from_carrays(path, format_categories='bcolz', format_codes='bcolz', format_v
 
     # # # this is slow when we have non categoricals as series for some reason
     with log.timedlogger('constructing dataframe from %s column dict' % len(df)):
-        df = pandas.DataFrame(df) # TODO: fast DataFrame constructor
+        df = pandas.DataFrame(df)  # TODO: fast DataFrame constructor
 
     return df
+
 
 def _to_carray(s, name, path, cparams=None, format_categories=None, format_codes=None, format_values=None):
     if type(format_categories) is str:
@@ -102,8 +110,8 @@ def _to_carray(s, name, path, cparams=None, format_categories=None, format_codes
             with log.timedlogger("writing [%s] %s" % (meta['name'], filename)):
                 numpy.save(filename, codes)
 
-        if categories.dtype == 'O': # not robust
-            categories = categories.astype(str) # undo pandas convert to object
+        if categories.dtype == 'O':  # not robust
+            categories = categories.astype(str)  # undo pandas convert to object
             # print('here', categories.dtype)
         if 'npy' in format_categories:
             filename = os.path.join(path, 'categories.npy')
@@ -121,7 +129,7 @@ def _to_carray(s, name, path, cparams=None, format_categories=None, format_codes
             rootdir = os.path.join(path, 'categories.bcolz')
             with log.timedlogger("writing [%s] %s" % (meta['name'], rootdir)):
                 bcolz.carray(categories, rootdir=rootdir, cparams=cparams)
-    else: # try
+    else:  # try
         if 'bcolz' in format_values:
             rootdir = os.path.join(path, 'values.bcolz')
             with log.timedlogger("writing [%s] %s dtype=%s" % (meta['name'], rootdir, s.dtype)):
@@ -135,17 +143,23 @@ def _to_carray(s, name, path, cparams=None, format_categories=None, format_codes
             with log.timedlogger("writing [%s] %s" % (meta['name'], filename)):
                 pickle.dump(s.values, open(filename, 'wb'))
 
+
 class AttrDict(dict):
+
     def __init__(self, *args, **kwargs):
         super(AttrDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
 
+
 class FakeCarrayAsNumpyArray(bcolz.carray):
+
     def view(self):
         return FakeCarrayAsNumpyArray(super().view())
+
     @property
     def flags(self):
         return AttrDict({'writeable': False})
+
 
 def _from_carray(path, format_categories=None, format_codes=None, format_values=None):
     meta = json.load(open(os.path.join(path, 'meta'), 'r'))
@@ -154,7 +168,7 @@ def _from_carray(path, format_categories=None, format_codes=None, format_values=
         if format_categories in ['npz', 'npy']:
             filename = os.path.join(path, 'categories.%s' % format_categories)
             with log.timedlogger("reading [%s] %s with mmap_mode" % (meta['name'], filename)):
-                categories_values = numpy.load(filename, mmap_mode='r+') # TODO npz not memmap?
+                categories_values = numpy.load(filename, mmap_mode='r+')  # TODO npz not memmap?
                 if format_categories == 'npz':
                     categories_values = categories_values['arr_0']
         elif format_categories == 'pickle':
@@ -172,7 +186,7 @@ def _from_carray(path, format_categories=None, format_codes=None, format_values=
         if format_codes == 'bcolz':
             rootdir = os.path.join(path, 'codes.bcolz')
             with log.timedlogger("reading [%s] %s" % (meta['name'], rootdir)):
-                codes_values = bcolz.open(rootdir=rootdir, mode='r')[:] # , categories=categories_values)
+                codes_values = bcolz.open(rootdir=rootdir, mode='r')[:]  # , categories=categories_values)
                 # codes_values = FakeCarrayAsNumpyArray(rootdir=rootdir, mode='r') # , categories=categories_values)
         elif format_codes == 'npy':
             filename = os.path.join(path, 'codes.npy')
@@ -204,7 +218,8 @@ def _from_carray(path, format_categories=None, format_codes=None, format_values=
         # s = values # [:]
     # logging.warning('Constructing categorical for %s' % meta['name'])
     # s = pandas.Categorical.from_codes(codes_values, categories_values, name=meta['name'])
-    return meta, s # codes_values, categories_values
+    return meta, s  # codes_values, categories_values
+
 
 @contextlib.contextmanager
 def timedlogger(name, log=logging.warning):
@@ -215,22 +230,28 @@ def timedlogger(name, log=logging.warning):
     interval = end - start
     log("%s took %f s" % (name, interval))
 
+
 class FastCat(pandas.Categorical):
+
     def __init__(self, codes, categories, ordered=False):
         self._categories = None
         self._codes = None
         self.set_cod(codes)
         self.set_cat(categories, ordered)
+
     def set_cod(self, codes):
-        self._codes = codes # [:]
+        self._codes = codes  # [:]
+
     def set_cat(self, categories, ordered):
         # self._categories = self._validate_categories(categories)
         self._categories = pandas.Index(categories)
         self._ordered = ordered
 
+
 def _mkdir(path):
     logging.warning("mkdir %s" % path)
     os.mkdir(path)
+
 
 def _move_and_remove_nonblocking(path):
     tempdir = tempfile.mkdtemp()
@@ -238,9 +259,11 @@ def _move_and_remove_nonblocking(path):
     shutil.move(path, tempdir)
     threading.Thread(target=shutil.rmtree, args=[tempdir]).start()
 
+
 def _rmdir(path):
     logging.warning("rmdir %s" % path)
     shutil.rmtree(path)
+
 
 def to_dict_of_blocks(d, rootdir):
     """ for pure numpy things like {'X_train': X_train, 'X_test': X_test} """
@@ -253,6 +276,7 @@ def to_dict_of_blocks(d, rootdir):
         filename = os.path.join(rootdir, str(i))
         with log.timedlogger('writing {} ({}.shape = {})'.format(filename, k, d[k].shape)):
             bcolz.carray(d[k], rootdir=filename)
+
 
 def from_dict_of_blocks(rootdir, mode='r'):
     meta = json.load(open(os.path.join(rootdir, 'meta')))
@@ -273,7 +297,7 @@ def from_dict_of_blocks(rootdir, mode='r'):
 #     ca.max = lambda : len(categories) - 1
 #     ca.min = lambda : 0
 #     return ca
-# 
+#
 # def fast_cat_constructor(codes, categories, ordered=False):
 #     c = pandas.Categorical(codes, categories=categories, ordered=False,
 #             use_values_as_codes_directly=True)
@@ -281,8 +305,7 @@ def from_dict_of_blocks(rootdir, mode='r'):
 #     # c._codes = codes
 #     # c._ordered = ordered
 #     return c
-# 
+#
 # def _carray_to_series(c):
 #     ind = pandas.Index(np.arange(c.shape[0]), dtype=int)
 #     return pandas.Series(data=c, index=ind, fastpath=True)
-
