@@ -30,7 +30,7 @@ class TimeLogger():
         yield
         end = time.time()
         interval = end - start
-        self.log("%s took %f s" % (name, interval))
+        self.log("%s took %f s" % ('-'.join(name), interval))
         self.d[name] = [start, end, interval]
 
     def get_frame(self):
@@ -50,7 +50,7 @@ def cachecalc(path=None):
         @functools.wraps(fun)
         def _inner(*args, **kwargs):
             if os.path.exists(path):
-                logging.warning("Reading from cache {}".format(path))
+                logging.warning("reading from cache {}".format(path))
                 d = from_dict_of_things(path)
             else:
                 logging.warning("Computing new {}".format(path))
@@ -64,22 +64,26 @@ def to_dict_of_things(d, path):
     if os.path.exists(path):
         _move_and_remove_nonblocking(path)
     _mkdir(path)
-    meta = {'keys': list(d.keys())}
-    t = dict()
-    for i, k in enumerate(meta['keys']):
-        if type(d[k]) is pd.core.frame.DataFrame:
-            t[k] = 'carrays'
-            to_carrays(d[k], os.path.join(path, str(i)) + '.carrays')
-        elif type(d[k]) in [np.ndarray, bcolz.carray_ext.carray]:
-            t[k] = 'block'
-            to_block(d[k], os.path.join(path, str(i)) + '.block')
-        elif type(d[k]) is pd.core.series.Series:
-            raise Exception('TODO')
-        else:
-            t[k] = 'pickle'
-            to_pickle(d[k], os.path.join(path, str(i)) + '.pickle')
-    meta['types'] = t
-    json.dump(meta, open(os.path.join(path, 'meta'), 'w'))
+    try:
+        meta = {'keys': list(d.keys())}
+        t = dict()
+        for i, k in enumerate(meta['keys']):
+            if type(d[k]) is pd.core.frame.DataFrame:
+                t[k] = 'carrays'
+                to_carrays(d[k], os.path.join(path, str(i)) + '.carrays')
+            elif type(d[k]) in [np.ndarray, bcolz.carray_ext.carray]:
+                t[k] = 'block'
+                to_block(d[k], os.path.join(path, str(i)) + '.block')
+            elif type(d[k]) is pd.core.series.Series:
+                raise Exception('TODO')
+            else:
+                t[k] = 'pickle'
+                to_pickle(d[k], os.path.join(path, str(i)) + '.pickle')
+        meta['types'] = t
+        json.dump(meta, open(os.path.join(path, 'meta'), 'w'))
+    except Exception as e:
+        logging.error("Failed creating {} for reason {}. Cleaning up.".format(path, e))
+        _move_and_remove_nonblocking(path)
 
 def from_dict_of_things(path):
     meta = json.load(open(os.path.join(path, 'meta')))
@@ -96,7 +100,7 @@ def from_dict_of_things(path):
 
 def to_pickle(d, filename):
     with log.timedlogger('writing {} (type = {})'.format(filename, type(d))):
-        pickle.dump(open(filename, 'wb'))
+        pickle.dump(d, open(filename, 'wb'))
 
 def to_block(d, filename):
     with log.timedlogger('writing {} (shape = {})'.format(filename, d.shape)):
