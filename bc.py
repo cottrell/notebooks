@@ -1,9 +1,11 @@
 import pandas
+import pandas as pd
+import numpy
+import numpy as np
 import pickle
 import threading
 import tempfile
 import glob
-import numpy
 import shutil
 import logging
 import json
@@ -12,9 +14,8 @@ import os
 import time
 import contextlib
 import multiprocessing.pool
-
+import functools
 from pandas.core.internals import SingleBlockManager
-
 
 class TimeLogger():
 
@@ -25,7 +26,7 @@ class TimeLogger():
     @contextlib.contextmanager
     def timedlogger(self, *name):
         start = time.time()
-        self.log("%s ..." % (name,))
+        # self.log("%s ..." % (name,))
         yield
         end = time.time()
         interval = end - start
@@ -41,6 +42,65 @@ class TimeLogger():
 
 log = TimeLogger()
 
+def cachecalc(path=None):
+    """ super basic bundler and serializer of flattish outputs. """
+    def inner(fun, path=path):
+        if path is None:
+            path = fun.__name__ + '.things' # save locally, could get weird with this default
+        @functools.wraps(fun)
+        def _inner(*args, **kwargs):
+            if os.path.exists(path):
+                logging.warning("Reading from cache {}".format(path))
+                d = from_dict_of_things(path)
+            else:
+                logging.warning("Computing new {}".format(path))
+                d = fun(*args, **kwargs)
+                to_dict_of_things(d, path)
+            return d
+        return _inner
+    return inner
+
+def to_dict_of_things(d, path):
+    if os.path.exists(path):
+        _move_and_remove_nonblocking(path)
+    _mkdir(path)
+    meta = {'keys': list(d.keys())}
+    t = dict()
+    for i, k in enumerate(meta['keys']):
+        if type(d[k]) is pd.core.frame.DataFrame:
+            t[k] = 'carrays'
+            to_carrays(d[k], os.path.join(path, str(i)) + '.carrays')
+        elif type(d[k]) in [np.ndarray, bcolz.carray_ext.carray]:
+            t[k] = 'block'
+            to_block(d[k], os.path.join(path, str(i)) + '.block')
+        elif type(d[k]) is pd.core.series.Series:
+            raise Exception('TODO')
+        else:
+            t[k] = 'pickle'
+            to_pickle(d[k], os.path.join(path, str(i)) + '.pickle')
+    meta['types'] = t
+    json.dump(meta, open(os.path.join(path, 'meta'), 'w'))
+
+def from_dict_of_things(path):
+    meta = json.load(open(os.path.join(path, 'meta')))
+    funs = {'pickle': from_pickle,
+            'carrays': from_carrays,
+            'block': lambda x: from_block(x)[:] # return numpy to avoid confusion
+            }
+    d = dict()
+    for i, k in enumerate(meta['keys']):
+        t = meta['types'][k]
+        filename = os.path.join(path, '{}.{}'.format(i, t))
+        d[k] = funs[t](filename)
+    return d
+
+def to_pickle(d, filename):
+    with log.timedlogger('writing {} (type = {})'.format(filename, type(d))):
+        pickle.dump(open(filename, 'wb'))
+
+def to_block(d, filename):
+    with log.timedlogger('writing {} (shape = {})'.format(filename, d.shape)):
+        bcolz.carray(d, rootdir=filename)
 
 def to_carrays(df, path, format_categories=['bcolz'], format_codes=['bcolz'], format_values=['bcolz']):
     # using format_categories as list for testing
@@ -53,6 +113,13 @@ def to_carrays(df, path, format_categories=['bcolz'], format_codes=['bcolz'], fo
                    format_categories=format_categories, format_codes=format_codes,
                    format_values=format_values)  # , cparams=bcolz.cparams(clevel=9, shuffle=True, cname='blosclz'))
 
+def from_pickle(filename):
+    with log.timedlogger('reading {}'.format(filename)):
+        return pickle.load(open(filename, 'rb'))
+
+def from_block(filename, mode='r'):
+    with log.timedlogger('reading {}'.format(filename)):
+        return bcolz.open(filename, mode=mode)
 
 def from_carrays(path, format_categories='bcolz', format_codes='bcolz', format_values='bcolz', parallel=True):
     assert os.path.exists(path), 'No path {}'.format(path)
@@ -264,9 +331,20 @@ def _rmdir(path):
     logging.warning("rmdir %s" % path)
     shutil.rmtree(path)
 
+################################################################################
+def from_dict_of_blocks(rootdir, mode='r'):
+    """ deprecated """
+    meta = json.load(open(os.path.join(rootdir, 'meta')))
+    d = dict()
+    for i, k in enumerate(meta['keys']):
+        filename = os.path.join(rootdir, str(i))
+        with log.timedlogger('reading {} ({})'.format(filename, k)):
+            d[k] = bcolz.open(filename, mode=mode)
+            print('... d[{}].shape = {}'.format(k, d[k].shape))
+    return d
 
 def to_dict_of_blocks(d, rootdir):
-    """ for pure numpy things like {'X_train': X_train, 'X_test': X_test} """
+    """ deprecated. for pure numpy things like {'X_train': X_train, 'X_test': X_test} """
     if os.path.exists(rootdir):
         _move_and_remove_nonblocking(rootdir)
     _mkdir(rootdir)
@@ -277,16 +355,6 @@ def to_dict_of_blocks(d, rootdir):
         with log.timedlogger('writing {} ({}.shape = {})'.format(filename, k, d[k].shape)):
             bcolz.carray(d[k], rootdir=filename)
 
-
-def from_dict_of_blocks(rootdir, mode='r'):
-    meta = json.load(open(os.path.join(rootdir, 'meta')))
-    d = dict()
-    for i, k in enumerate(meta['keys']):
-        filename = os.path.join(rootdir, str(i))
-        with log.timedlogger('reading {} ({})'.format(filename, k)):
-            d[k] = bcolz.open(filename, mode=mode)
-            print('... d[{}].shape = {}'.format(k, d[k].shape))
-    return d
 
 
 # ######################
