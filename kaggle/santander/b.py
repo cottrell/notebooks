@@ -59,13 +59,15 @@ def get_data():
     y_train = df_train['TARGET'].values
     X_train = df_train.drop(['ID','TARGET'], axis=1).values
 
-    id_test = df_test['ID']
+    id_test = df_test['ID'].values
     X_test = df_test.drop(['ID'], axis=1).values
     X_fit, X_eval, y_fit, y_eval = train_test_split(X_train, y_train, test_size=0.3)
 
     X_train = scipy.sparse.csr_matrix(X_train)
     X_test = scipy.sparse.csr_matrix(X_test)
-    d = dict(zip(['X_train', 'X_test', 'X_eval', 'y_train', 'y_eval'], [X_train, X_test, X_eval, y_train, y_eval]))
+    d = dict()
+    for k in ['X_train', 'X_test', 'X_fit', 'X_eval', 'y_train', 'y_fit', 'y_eval', 'id_test']:
+        d[k] = locals()[k]
     return d
 
 @bc.cachecalc()
@@ -84,7 +86,7 @@ get_the_data = get_data
 def dofit_xgb():
     globals().update(get_the_data())
     clf = xgb.XGBClassifier(missing=np.nan, max_depth=5, n_estimators=350, learning_rate=0.03, nthread=4, subsample=0.95, colsample_bytree=0.85, seed=242)
-    clf.fit(X_train, y_train, early_stopping_rounds=40, eval_metric="auc", eval_set=[(X_eval, y_eval)])
+    clf.fit(X_fit, y_fit, early_stopping_rounds=40, eval_metric="auc", eval_set=[(X_eval, y_eval)])
     return {'clf': clf}
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -109,9 +111,9 @@ class FM(pylibfm.FM):
 def dofit_pyfm():
     globals().update(get_the_data())
     ss = preproc.StandardScaler(with_mean=False) # hmm
-    fm = FM(num_factors=8, num_iter=100, verbose=True, task="classification", initial_learning_rate=0.00001, learning_rate_schedule="optimal")
-    clf = Pipeline(steps=[('scale_and_sparse', ss), ('fm', fm)])
-    clf.fit(X_train, y_train)
+    fm = FM(num_factors=8, num_iter=3, verbose=True, task="classification", initial_learning_rate=0.000001, learning_rate_schedule="optimal")
+    clf = Pipeline(steps=[('scaler', ss), ('fm', fm)])
+    clf.fit(X_fit, y_fit)
     return {'clf': clf}
 
 @bc.cachecalc()
@@ -122,41 +124,54 @@ def predict():
     for k in models:
         clf = models[k]['clf']
         pred['test'][k] = clf.predict_proba(X_test)
-        pred['train'][k] = clf.predict_proba(X_train)
+        pred['fit'][k] = clf.predict_proba(X_fit)
+        pred['eval'][k] = clf.predict_proba(X_eval)
+        filename = 'submission_b_{}.csv'.format(k)
+        y_prob_test = pred['test'][k][:,1]
+        submission = pd.DataFrame({"ID": id_test, "TARGET": y_prob_test})
+        print("writing {}".format(filename))
+        submission.to_csv(filename, index=False)
     return pred
+
+# workflow beyond here is dumb
 
 @bc.cachecalc()
 def get_augmented_data():
     globals().update(get_the_data())
     pred = predict()
-    X = X_train.toarray()
+    X = X_fit.toarray()
+    Xe = X_eval.toarray()
     Xt = X_test.toarray()
-    for k in sorted(list(pred['train'].keys())): # same order
-        X = np.hstack([X, pred['train'][k][:,0:1]]) # don't need both
+    for k in sorted(list(pred['fit'].keys())): # same order
+        X = np.hstack([X, pred['fit'][k][:,0:1]]) # don't need both
+        Xe = np.hstack([Xe, pred['eval'][k][:,0:1]]) # don't need both
         Xt = np.hstack([Xt, pred['test'][k][:,0:1]]) # don't need both
-    return {'X_train': X, 'X_test': Xt, 'y_train': y_train}
+    return {'X_fit': X, 'X_eval': Xe, 'X_test': Xt}
 
 @bc.cachecalc()
 def dofit_ensemble():
     # TODO: use eval split and use some simpler model that has predict_proba
+    globals().update(get_the_data())
     globals().update(get_augmented_data())
     clf = xgb.XGBClassifier(missing=np.nan, max_depth=5, n_estimators=350, learning_rate=0.03, nthread=4, subsample=0.95, colsample_bytree=0.85, seed=4242)
-    clf.fit(X_train, y_train, early_stopping_rounds=20, eval_metric="auc", eval_set=[(X_eval, y_eval)])
+    clf.fit(X_fit, y_fit, early_stopping_rounds=20, eval_metric="auc", eval_set=[(X_eval, y_eval)])
     # rc = sklearn.linear_model.RidgeClassifier(alpha=1.0, class_weight=None, copy_X=True,
     #         fit_intercept=True, max_iter=None, normalize=False, random_state=None, solver='auto', tol=0.001)
     # rc.fit(X_train, y_train)
     return {'clf': clf}
 
 def finalize():
+    id_test = get_the_data()['id_test']
     globals().update(get_augmented_data())
     clf = dofit_ensemble()['clf']
     y_pred = clf.predict(X_train)
+    y_pred_test = clf.predict(X_test)
     y_prob = clf.predict_proba(X_train)[:,1]
     y_prob_test = clf.predict_proba(X_test)[:,1] # not sure which one
     auc_train = roc_auc_score(y_train, y_prob)
     out = {'clf': clf, 'y_train': y_train, 'y_pred': y_pred, 'y_prob': y_prob, 'y_prod_test': y_prob_test, 'auc_train': auc_train}
     out['conf'] = confusion_matrix(y_train, y_pred)
-    submission = pd.DataFrame({"ID":id_test, "TARGET":y_pred})
+    submission = pd.DataFrame({"ID":id_test, "TARGET":y_prob_test})
     submission.to_csv("submission_b.csv", index=False)
     return out
 
