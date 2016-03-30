@@ -13,7 +13,7 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, confusion_matrix
 from sklearn.pipeline import Pipeline
 from sklearn.svm import OneClassSVM
 
@@ -75,13 +75,16 @@ def get_subsample():
         d[k] = d[k][:10000]
     return d
 
+# get_the_data = get_subsample
+get_the_data = get_data
+
 # just do the predict at the same time ... 
 
 @bc.cachecalc()
 def dofit_xgb():
-    globals().update(get_subsample())
-    clf = xgb.XGBClassifier(missing=np.nan, max_depth=5, n_estimators=350, learning_rate=0.03, nthread=4, subsample=0.95, colsample_bytree=0.85, seed=4242)
-    clf.fit(X_train, y_train, early_stopping_rounds=20, eval_metric="auc", eval_set=[(X_eval, y_eval)])
+    globals().update(get_the_data())
+    clf = xgb.XGBClassifier(missing=np.nan, max_depth=5, n_estimators=350, learning_rate=0.03, nthread=4, subsample=0.95, colsample_bytree=0.85, seed=242)
+    clf.fit(X_train, y_train, early_stopping_rounds=40, eval_metric="auc", eval_set=[(X_eval, y_eval)])
     return {'clf': clf}
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -104,16 +107,16 @@ class FM(pylibfm.FM):
 
 @bc.cachecalc()
 def dofit_pyfm():
-    globals().update(get_subsample())
+    globals().update(get_the_data())
     ss = preproc.StandardScaler(with_mean=False) # hmm
-    fm = FM(num_factors=4, num_iter=10, verbose=True, task="classification", initial_learning_rate=0.00001, learning_rate_schedule="optimal")
+    fm = FM(num_factors=8, num_iter=100, verbose=True, task="classification", initial_learning_rate=0.00001, learning_rate_schedule="optimal")
     clf = Pipeline(steps=[('scale_and_sparse', ss), ('fm', fm)])
     clf.fit(X_train, y_train)
     return {'clf': clf}
 
 @bc.cachecalc()
 def predict():
-    globals().update(get_subsample())
+    globals().update(get_the_data())
     models = {'fm': dofit_pyfm(), 'xgb': dofit_xgb()}
     pred = defaultdict(dict)
     for k in models:
@@ -124,14 +127,38 @@ def predict():
 
 @bc.cachecalc()
 def get_augmented_data():
-    globals().update(get_subsample())
+    globals().update(get_the_data())
     pred = predict()
     X = X_train.toarray()
     Xt = X_test.toarray()
     for k in sorted(list(pred['train'].keys())): # same order
-        X = np.hstack([X, pred['train'][k]])
-        Xt = np.hstack([Xt, pred['test'][k]])
+        X = np.hstack([X, pred['train'][k][:,0:1]]) # don't need both
+        Xt = np.hstack([Xt, pred['test'][k][:,0:1]]) # don't need both
     return {'X_train': X, 'X_test': Xt, 'y_train': y_train}
+
+@bc.cachecalc()
+def dofit_ensemble():
+    # TODO: use eval split and use some simpler model that has predict_proba
+    globals().update(get_augmented_data())
+    clf = xgb.XGBClassifier(missing=np.nan, max_depth=5, n_estimators=350, learning_rate=0.03, nthread=4, subsample=0.95, colsample_bytree=0.85, seed=4242)
+    clf.fit(X_train, y_train, early_stopping_rounds=20, eval_metric="auc", eval_set=[(X_eval, y_eval)])
+    # rc = sklearn.linear_model.RidgeClassifier(alpha=1.0, class_weight=None, copy_X=True,
+    #         fit_intercept=True, max_iter=None, normalize=False, random_state=None, solver='auto', tol=0.001)
+    # rc.fit(X_train, y_train)
+    return {'clf': clf}
+
+def finalize():
+    globals().update(get_augmented_data())
+    clf = dofit_ensemble()['clf']
+    y_pred = clf.predict(X_train)
+    y_prob = clf.predict_proba(X_train)[:,1]
+    y_prob_test = clf.predict_proba(X_test)[:,1] # not sure which one
+    auc_train = roc_auc_score(y_train, y_prob)
+    out = {'clf': clf, 'y_train': y_train, 'y_pred': y_pred, 'y_prob': y_prob, 'y_prod_test': y_prob_test, 'auc_train': auc_train}
+    out['conf'] = confusion_matrix(y_train, y_pred)
+    submission = pd.DataFrame({"ID":id_test, "TARGET":y_pred})
+    submission.to_csv("submission_b.csv", index=False)
+    return out
 
 
 
