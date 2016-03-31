@@ -62,10 +62,10 @@ def get_data():
 
     id_test = df_test['ID'].values
     X_test = df_test.drop(['ID'], axis=1).values
-    X_fit, X_eval, y_fit, y_eval = train_test_split(X_train, y_train, test_size=0.3)
-
     X_train = scipy.sparse.csr_matrix(X_train)
     X_test = scipy.sparse.csr_matrix(X_test)
+    X_fit, X_eval, y_fit, y_eval = train_test_split(X_train, y_train, test_size=0.3)
+
     d = dict()
     for k in ['X_train', 'X_test', 'X_fit', 'X_eval', 'y_train', 'y_fit', 'y_eval', 'id_test']:
         d[k] = locals()[k]
@@ -121,27 +121,35 @@ class FM(pylibfm.FM):
 def dofit_pyfm():
     globals().update(get_the_data())
     ss = preproc.StandardScaler(with_mean=False) # hmm
-    fm = FM(num_factors=8, num_iter=3, verbose=True, task="classification", initial_learning_rate=0.000001, learning_rate_schedule="optimal")
+    fm = FM(num_factors=12, num_iter=100, verbose=True, task="classification", initial_learning_rate=0.000001, learning_rate_schedule="optimal")
     clf = Pipeline(steps=[('scaler', ss), ('fm', fm)])
     clf.fit(X_fit, y_fit)
-    return {'clf': clf}
+    p = clf.predict(X_fit)
+    pev = clf.predict(X_eval)
+    pte = clf.predict(X_test)
+    auc = sklearn.metrics.roc_auc_score(y_fit, p)
+    # clf is not pickling properly??? always get 0
+    return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
 
 @bc.cachecalc()
 def predict():
     globals().update(get_the_data())
     models = {'fm': dofit_pyfm(), 'xgb': dofit_xgb()}
     pred = defaultdict(dict)
+    auc = defaultdict(dict)
     for k in models:
         clf = models[k]['clf']
-        pred['test'][k] = clf.predict_proba(X_test)
-        pred['fit'][k] = clf.predict_proba(X_fit)
-        pred['eval'][k] = clf.predict_proba(X_eval)
+        pred['test'][k] = models[k].get('y_test_pred', clf.predict_proba(X_test)[:,1])
+        pred['fit'][k] = models[k].get('y_fit_pred', clf.predict_proba(X_fit)[:,1])
+        pred['eval'][k] = models[k].get('y_eval_pred', clf.predict_proba(X_eval)[:,1])
+        auc['fit'][k] = sklearn.metrics.roc_auc_score(y_fit, pred['fit'][k])
+        auc['eval'][k] = sklearn.metrics.roc_auc_score(y_eval, pred['eval'][k])
         filename = 'submission_b_{}.csv'.format(k)
-        y_prob_test = pred['test'][k][:,1]
+        y_prob_test = pred['test'][k]
         submission = pd.DataFrame({"ID": id_test, "TARGET": y_prob_test})
         print("writing {}".format(filename))
         submission.to_csv(filename, index=False)
-    return pred
+    return {'pred': pred, 'auc': auc}
 
 # # workflow beyond here is dumb
 # 
