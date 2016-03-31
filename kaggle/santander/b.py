@@ -1,4 +1,5 @@
 from __future__ import division
+import sklearn.neighbors
 import sklearn.linear_model
 from collections import defaultdict
 import sklearn.preprocessing as preproc
@@ -71,6 +72,15 @@ def get_data():
     return d
 
 @bc.cachecalc()
+def compute_cosine_distances():
+    globals().update(get_the_data())
+    lsh = sklearn.neighbors.LSHForest(n_estimators=20, n_candidates=100)
+    lsh.fit(X_train)
+    r = lsh.kneighbors(X_test, return_distance=True, n_neighbors=10)
+    return {'r': r}
+
+
+@bc.cachecalc()
 def get_subsample():
     d = get_data()
     for k in d:
@@ -133,47 +143,47 @@ def predict():
         submission.to_csv(filename, index=False)
     return pred
 
-# workflow beyond here is dumb
-
-@bc.cachecalc()
-def get_augmented_data():
-    globals().update(get_the_data())
-    pred = predict()
-    X = X_fit.toarray()
-    Xe = X_eval.toarray()
-    Xt = X_test.toarray()
-    for k in sorted(list(pred['fit'].keys())): # same order
-        X = np.hstack([X, pred['fit'][k][:,0:1]]) # don't need both
-        Xe = np.hstack([Xe, pred['eval'][k][:,0:1]]) # don't need both
-        Xt = np.hstack([Xt, pred['test'][k][:,0:1]]) # don't need both
-    return {'X_fit': X, 'X_eval': Xe, 'X_test': Xt}
-
-@bc.cachecalc()
-def dofit_ensemble():
-    # TODO: use eval split and use some simpler model that has predict_proba
-    globals().update(get_the_data())
-    globals().update(get_augmented_data())
-    clf = xgb.XGBClassifier(missing=np.nan, max_depth=5, n_estimators=350, learning_rate=0.03, nthread=4, subsample=0.95, colsample_bytree=0.85, seed=4242)
-    clf.fit(X_fit, y_fit, early_stopping_rounds=20, eval_metric="auc", eval_set=[(X_eval, y_eval)])
-    # rc = sklearn.linear_model.RidgeClassifier(alpha=1.0, class_weight=None, copy_X=True,
-    #         fit_intercept=True, max_iter=None, normalize=False, random_state=None, solver='auto', tol=0.001)
-    # rc.fit(X_train, y_train)
-    return {'clf': clf}
-
-def finalize():
-    id_test = get_the_data()['id_test']
-    globals().update(get_augmented_data())
-    clf = dofit_ensemble()['clf']
-    y_pred = clf.predict(X_train)
-    y_pred_test = clf.predict(X_test)
-    y_prob = clf.predict_proba(X_train)[:,1]
-    y_prob_test = clf.predict_proba(X_test)[:,1] # not sure which one
-    auc_train = roc_auc_score(y_train, y_prob)
-    out = {'clf': clf, 'y_train': y_train, 'y_pred': y_pred, 'y_prob': y_prob, 'y_prod_test': y_prob_test, 'auc_train': auc_train}
-    out['conf'] = confusion_matrix(y_train, y_pred)
-    submission = pd.DataFrame({"ID":id_test, "TARGET":y_prob_test})
-    submission.to_csv("submission_b.csv", index=False)
-    return out
+# # workflow beyond here is dumb
+# 
+# @bc.cachecalc()
+# def get_augmented_data():
+#     globals().update(get_the_data())
+#     pred = predict()
+#     X = X_fit.toarray()
+#     Xe = X_eval.toarray()
+#     Xt = X_test.toarray()
+#     for k in sorted(list(pred['fit'].keys())): # same order
+#         X = np.hstack([X, pred['fit'][k][:,0:1]]) # don't need both
+#         Xe = np.hstack([Xe, pred['eval'][k][:,0:1]]) # don't need both
+#         Xt = np.hstack([Xt, pred['test'][k][:,0:1]]) # don't need both
+#     return {'X_fit': X, 'X_eval': Xe, 'X_test': Xt}
+# 
+# @bc.cachecalc()
+# def dofit_ensemble():
+#     # TODO: use eval split and use some simpler model that has predict_proba
+#     globals().update(get_the_data())
+#     globals().update(get_augmented_data())
+#     clf = xgb.XGBClassifier(missing=np.nan, max_depth=5, n_estimators=350, learning_rate=0.03, nthread=4, subsample=0.95, colsample_bytree=0.85, seed=4242)
+#     clf.fit(X_fit, y_fit, early_stopping_rounds=20, eval_metric="auc", eval_set=[(X_eval, y_eval)])
+#     # rc = sklearn.linear_model.RidgeClassifier(alpha=1.0, class_weight=None, copy_X=True,
+#     #         fit_intercept=True, max_iter=None, normalize=False, random_state=None, solver='auto', tol=0.001)
+#     # rc.fit(X_train, y_train)
+#     return {'clf': clf}
+# 
+# def finalize():
+#     id_test = get_the_data()['id_test']
+#     globals().update(get_augmented_data())
+#     clf = dofit_ensemble()['clf']
+#     y_pred = clf.predict(X_train)
+#     y_pred_test = clf.predict(X_test)
+#     y_prob = clf.predict_proba(X_train)[:,1]
+#     y_prob_test = clf.predict_proba(X_test)[:,1] # not sure which one
+#     auc_train = roc_auc_score(y_train, y_prob)
+#     out = {'clf': clf, 'y_train': y_train, 'y_pred': y_pred, 'y_prob': y_prob, 'y_prod_test': y_prob_test, 'auc_train': auc_train}
+#     out['conf'] = confusion_matrix(y_train, y_pred)
+#     submission = pd.DataFrame({"ID":id_test, "TARGET":y_prob_test})
+#     submission.to_csv("submission_b.csv", index=False)
+#     return out
 
 
 

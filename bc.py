@@ -49,16 +49,17 @@ def cachecalc(path=None):
             path = fun.__name__ + '.things' # save locally, could get weird with this default
         @functools.wraps(fun)
         def _inner(*args, **kwargs):
-            if hasattr(path, '__call__'):
-                path = path(*args, **kwargs)
-            assert type(path) is str
-            if os.path.exists(path):
-                logging.warning("reading from cache {}".format(path))
-                d = from_dict_of_things(path)
+            _path = path
+            if hasattr(_path, '__call__'):
+                _path = _path(*args, **kwargs)
+            assert type(_path) is str
+            if os.path.exists(_path):
+                logging.warning("reading from cache {}".format(_path))
+                d = from_dict_of_things(_path)
             else:
-                logging.warning("Computing new {}".format(path))
+                logging.warning("Computing new {}".format(_path))
                 d = fun(*args, **kwargs)
-                to_dict_of_things(d, path)
+                to_dict_of_things(d, _path)
             return d
         return _inner
     return inner
