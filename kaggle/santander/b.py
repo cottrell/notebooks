@@ -118,10 +118,10 @@ class FM(pylibfm.FM):
         return out
 
 @bc.cachecalc()
-def dofit_pyfm():
+def dofit_pyfm(num_iter=1000, num_factors=20):
     globals().update(get_the_data())
     ss = preproc.StandardScaler(with_mean=False) # hmm
-    fm = FM(num_factors=12, num_iter=100, verbose=True, task="classification", initial_learning_rate=0.000001, learning_rate_schedule="optimal")
+    fm = FM(num_factors=num_factors, num_iter=num_iter, verbose=True, task="classification", initial_learning_rate=0.000001, learning_rate_schedule="optimal")
     clf = Pipeline(steps=[('scaler', ss), ('fm', fm)])
     clf.fit(X_fit, y_fit)
     p = clf.predict(X_fit)

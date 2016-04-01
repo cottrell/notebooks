@@ -14,8 +14,8 @@ import os
 import time
 import contextlib
 import multiprocessing.pool
-import functools
 from pandas.core.internals import SingleBlockManager
+import decorator
 
 class TimeLogger():
 
@@ -30,7 +30,7 @@ class TimeLogger():
         yield
         end = time.time()
         interval = end - start
-        self.log("%s took %f s" % ('-'.join(name), interval))
+        self.log("%f s : %s " % (interval, '-'.join(name)))
         self.d[name] = [start, end, interval]
 
     def get_frame(self):
@@ -43,26 +43,29 @@ class TimeLogger():
 log = TimeLogger()
 
 def cachecalc(path=None):
-    """ super basic bundler and serializer of flattish outputs. """
-    def inner(fun, path=path):
-        if path is None:
-            path = fun.__name__ + '.things' # save locally, could get weird with this default
-        @functools.wraps(fun)
-        def _inner(*args, **kwargs):
-            _path = path
-            if hasattr(_path, '__call__'):
-                _path = _path(*args, **kwargs)
-            assert type(_path) is str
-            if os.path.exists(_path):
-                logging.warning("reading from cache {}".format(_path))
-                d = from_dict_of_things(_path)
-            else:
-                logging.warning("Computing new {}".format(_path))
-                d = fun(*args, **kwargs)
-                to_dict_of_things(d, _path)
-            return d
-        return _inner
-    return inner
+    """ basic bundler and serializer of dict outputs. Tries to use *args and **kwargs using default_namer. """
+
+    def default_namer(*args, **kwargs):
+        """ try best attempt make a name """
+        return list(map(str, args)) + ['{}={}'.format(k, kwargs[k]) for k in sorted(kwargs.keys())]
+
+    def inner(fun, *args, **kwargs):
+        _path = path
+        d = fun(*args, **kwargs)
+        if _path is None:
+            _path = '_'.join([fun.__name__] + default_namer(*args, **kwargs)) + '.things' # save locally, could get weird with this default
+        if hasattr(_path, '__call__'):
+            _path = _path(*args, **kwargs)
+        assert type(_path) is str
+        if os.path.exists(_path):
+            logging.warning("reading from cache {}".format(_path))
+            d = from_dict_of_things(_path)
+        else:
+            logging.warning("Computing new {}".format(_path))
+            d = fun(*args, **kwargs)
+            to_dict_of_things(d, _path)
+        return d
+    return decorator.decorator(inner)
 
 def to_dict_of_things(d, path):
     if os.path.exists(path):
@@ -303,7 +306,7 @@ def timedlogger(name, log=logging.warning):
     yield
     end = time.time()
     interval = end - start
-    log("%s took %f s" % (name, interval))
+    log("%f s : %s " % (interval, name))
 
 
 class FastCat(pandas.Categorical):
