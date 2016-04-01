@@ -90,14 +90,14 @@ def get_subsample():
 # get_the_data = get_subsample
 get_the_data = get_data
 
-# just do the predict at the same time ... 
+# just do the predict at the same time ...
 
 @bc.cachecalc()
 def dofit_xgb(n_estimators=350, max_depth=5, learning_rate=0.03, subsample=0.95, colsample_bytree=0.85, seed=242, early_stopping_rounds=40):
     globals().update(get_the_data())
     clf = xgb.XGBClassifier(missing=np.nan, max_depth=max_depth, n_estimators=n_estimators, learning_rate=learning_rate, nthread=4,
             subsample=subsample, colsample_bytree=colsample_bytree, seed=seed)
-    clf.fit(X_fit, y_fit, early_stopping_rounds=early_stopping_rounds, eval_metric="auc", eval_set=[(X_eval, y_eval)])
+    clf.fit(X_fit, y_fit, early_stopping_rounds=early_stopping_rounds, eval_metric="auc", eval_set=[(X_fit, y_fit), (X_eval, y_eval)])
     return {'clf': clf}
 
 from sklearn.base import BaseEstimator, TransformerMixin

@@ -43,26 +43,26 @@ class TimeLogger():
 log = TimeLogger()
 
 def cachecalc(path=None):
-    """ basic bundler and serializer of dict outputs. Tries to use *args and **kwargs using default_namer. """
+    """ basic bundler and serializer of dict outputs. Tries to use **kwargs using default_namer (*args is banned). """
 
-    def default_namer(*args, **kwargs):
+    def default_namer(**kwargs):
         """ try best attempt make a name """
-        return list(map(str, args)) + ['{}={}'.format(k, kwargs[k]) for k in sorted(kwargs.keys())]
+        return ['{}={}'.format(k, kwargs[k]) for k in sorted(kwargs.keys())]
 
-    def inner(fun, *args, **kwargs):
+    def inner(fun, **kwargs):
         _path = path
-        d = fun(*args, **kwargs)
+        d = fun(**kwargs)
         if _path is None:
-            _path = '_'.join([fun.__name__] + default_namer(*args, **kwargs)) + '.things' # save locally, could get weird with this default
+            _path = '_'.join([fun.__name__] + default_namer(**kwargs)) + '.things' # save locally, could get weird with this default
         if hasattr(_path, '__call__'):
-            _path = _path(*args, **kwargs)
+            _path = _path(**kwargs)
         assert type(_path) is str
         if os.path.exists(_path):
             logging.warning("reading from cache {}".format(_path))
             d = from_dict_of_things(_path)
         else:
             logging.warning("Computing new {}".format(_path))
-            d = fun(*args, **kwargs)
+            d = fun(**kwargs)
             to_dict_of_things(d, _path)
         return d
     return decorator.decorator(inner)
