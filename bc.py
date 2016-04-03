@@ -45,7 +45,7 @@ class TimeLogger():
 log = TimeLogger()
 
 import functools
-def cachecalc(path=None):
+def cachecalc(basepath=None):
     """ basic bundler and serializer of dict outputs. Tries to use **kwargs using default_namer (*args is banned). """
 
     def default_namer(fun, args, kwargs):
@@ -57,11 +57,12 @@ def cachecalc(path=None):
 
     reg = re.compile('\.py$')
     def inner(fun):
-        # set the base path, really need to refactor to Class
-        _path = path
-        if _path is None:
-            _path = '{}:{}'.format(reg.sub('', os.path.basename(inspect.getmodule(fun).__file__)), fun.__name__) # basically use pwd
+        # set the base basepath, really need to refactor to Class
+        _basepath = basepath
+        if _basepath is None:
+            _basepath = '{}:{}'.format(reg.sub('', os.path.basename(inspect.getmodule(fun).__file__)), fun.__name__) # basically use pwd
         def _inner(fun, *args, **kwargs):
+            _path = _basepath
             if type(_path) is str:
                 _path = '{}:{}'.format(_path, '_'.join(default_namer(fun, args, kwargs)) + '.things') # save locally, could get weird with this default
             if hasattr(_path, '__call__'):
@@ -76,7 +77,7 @@ def cachecalc(path=None):
         _inner = decorator.decorate(fun, _inner)
         def list_caches():
             # if you need to parse the filenames, you need to rewrite this using a better args, kwargs storing mechanisi and a hash
-            files = glob.glob('{}*.things'.format(_path))
+            files = glob.glob('{}*.things'.format(_basepath))
             return files
         _inner.list_caches = list_caches
         return _inner
