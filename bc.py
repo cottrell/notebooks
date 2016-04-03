@@ -44,6 +44,7 @@ class TimeLogger():
 
 log = TimeLogger()
 
+import functools
 def cachecalc(path=None):
     """ basic bundler and serializer of dict outputs. Tries to use **kwargs using default_namer (*args is banned). """
 
@@ -55,23 +56,31 @@ def cachecalc(path=None):
         return ['{}={}'.format(k, all_args[k]) for k in sorted(all_args.keys())]
 
     reg = re.compile('\.py$')
-    def inner(fun, *args, **kwargs):
+    def inner(fun):
+        # set the base path, really need to refactor to Class
         _path = path
-        d = fun(*args, **kwargs)
         if _path is None:
             _path = '{}:{}'.format(reg.sub('', os.path.basename(inspect.getmodule(fun).__file__)), fun.__name__) # basically use pwd
-        if type(_path) is str:
-            _path = '{}:{}'.format(_path, '_'.join(default_namer(fun, args, kwargs)) + '.things') # save locally, could get weird with this default
-        if hasattr(_path, '__call__'):
-            _path = _path(**kwargs) # in case you want to do something else?
-        assert type(_path) is str
-        if os.path.exists(_path):
-            d = from_dict_of_things(_path)
-        else:
-            d = fun(*args, **kwargs)
-            to_dict_of_things(d, _path)
-        return d
-    return decorator.decorator(inner)
+        def _inner(fun, *args, **kwargs):
+            if type(_path) is str:
+                _path = '{}:{}'.format(_path, '_'.join(default_namer(fun, args, kwargs)) + '.things') # save locally, could get weird with this default
+            if hasattr(_path, '__call__'):
+                _path = _path(**kwargs) # in case you want to do something else?
+            assert type(_path) is str
+            if os.path.exists(_path):
+                d = from_dict_of_things(_path)
+            else:
+                d = fun(*args, **kwargs)
+                to_dict_of_things(d, _path)
+            return d
+        _inner = decorator.decorate(fun, _inner)
+        def list_caches():
+            # if you need to parse the filenames, you need to rewrite this using a better args, kwargs storing mechanisi and a hash
+            files = glob.glob('{}*.things'.format(_path))
+            return files
+        _inner.list_caches = list_caches
+        return _inner
+    return inner
 
 @decorator.decorator
 def www(fun, *args, **kwargs):
@@ -79,9 +88,10 @@ def www(fun, *args, **kwargs):
     print('look', args, kwargs)
     return fun(*args, **kwargs)
 
-# @cachecalc()
-# def test(x, y, a=1, b=2, **kwargs):
-#     return {'a': 1}
+@cachecalc()
+def test(x, y, a=1, b=2, **kwargs):
+    print('here')
+    return {'a': 1}
 
 def to_dict_of_things(d, path):
     if os.path.exists(path):
@@ -122,7 +132,7 @@ def from_dict_of_things(path):
     return d
 
 def to_pickle(d, filename):
-    with log.timedlogger('writing {} (type = {})'.format(filename, type(d))):
+    with log.timedlogger('writing {} (type={})'.format(filename, type(d))):
         pickle.dump(d, open(filename, 'wb'))
 
 def to_block(d, filename):
