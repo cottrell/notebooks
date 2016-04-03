@@ -149,7 +149,7 @@ def dofit_pyfm(num_iter=1000, num_factors=20):
     return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
 
 # @bc.cachecalc()
-def dofit_nn(dims='64,64,64', nb_epoch=100, batch_size=30):
+def dofit_nn(dims='64,64,64', nb_epoch=100, batch_size=30, dropout=0.5):
     dd = get_the_data()
     for k in dd:
         if type(dd[k]) is scipy.sparse.csr.csr_matrix:
@@ -165,7 +165,7 @@ def dofit_nn(dims='64,64,64', nb_epoch=100, batch_size=30):
 
     model = Sequential()
     dims = [X_fit.shape[1]] + list(map(int, dims.split(',')))
-    dropout = 0.2
+    dropout = dropout
     for i in range(len(dims) - 1):
         model.add(Dense(input_dim=dims[i], output_dim=dims[i+1], init='glorot_uniform'))
         model.add(Activation('tanh'))
