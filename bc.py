@@ -65,7 +65,7 @@ def cachecalc(basepath=None):
             _path = _basepath
             if type(_path) is str:
                 tmp = '_'.join(default_namer(fun, args, kwargs))
-                tmp = ':{}.things' if tmp else '.things'
+                tmp = ':{}.things'.format(tmp) if tmp else '.things'
                 _path = _path + tmp # save locally, could get weird with this default
             if hasattr(_path, '__call__'):
                 _path = _path(**kwargs) # in case you want to do something else?
