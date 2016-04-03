@@ -95,6 +95,12 @@ def compute_cosine_distances_2():
     r = lsh.kneighbors(X_train, return_distance=True, n_neighbors=10)
     return {'r': r}
 
+@bc.cachecalc()
+def get_test_weights():
+    dist, ind = compute_cosine_distances_2()['r']
+    w = (1 - np.abs(dist)).mean(axis=1)
+    return {'w': w}
+
 
 @bc.cachecalc()
 def get_subsample():
@@ -148,8 +154,8 @@ def dofit_pyfm(num_iter=1000, num_factors=20):
     # clf is not pickling properly??? always get 0
     return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
 
-# @bc.cachecalc()
-def dofit_nn(dims='64,64,64', nb_epoch=100, batch_size=30, dropout=0.5):
+@bc.cachecalc()
+def get_nn_data():
     dd = get_the_data()
     for k in dd:
         if type(dd[k]) is scipy.sparse.csr.csr_matrix:
@@ -157,10 +163,18 @@ def dofit_nn(dims='64,64,64', nb_epoch=100, batch_size=30, dropout=0.5):
             if len(dd[k].shape) == 1:
                 dd[k] = np.atleast_2d(dd[k]).T
     ss = preproc.StandardScaler(with_mean=False) # hmm
-    ss.fit(X_fit)
+    ss.fit(dd['X_fit'])
     for k in dd:
         if k.startswith('X_'):
             dd[k] = ss.transform(dd[k])
+    return dd
+
+base_dims = '64,64,64,64'
+
+@bc.cachecalc()
+def dofit_nn(dims=base_dims, nb_epoch=100, batch_size=32 * 1024, lr=0.0001, dropout=0.0):
+    # 50k fit samples 4k is about 8%
+    dd = get_nn_data()
     globals().update(dd)
 
     model = Sequential()
@@ -172,11 +186,34 @@ def dofit_nn(dims='64,64,64', nb_epoch=100, batch_size=30, dropout=0.5):
         model.add(Dropout(dropout))
     model.add(Dense(input_dim=dims[-1], output_dim=1, init='glorot_uniform'))
     model.add(Activation('sigmoid'))
-    sgd = SGD(lr=0.0001, decay=1e-6, momentum=0.5, nesterov=True)
+    sgd = SGD(lr=lr, decay=1e-6, momentum=0.5, nesterov=True)
     model.compile(loss='binary_crossentropy', optimizer=sgd)
     clf = model
     # clf = Pipeline(steps=[('scaling/embedding', ss), ('clf', model)])
-    clf.fit(X_fit, y_fit, nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True)
+    cw = y_fit.shape[0] / y_fit.sum()
+    print('training with class_weight={}'.format(cw))
+    clf.fit(X_fit, y_fit, nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
+    # clf.fit(X_fit, y_fit)
+    p = clf.predict(X_fit)
+    pev = clf.predict(X_eval)
+    pte = clf.predict(X_test)
+    auc = sklearn.metrics.roc_auc_score(y_fit, p)
+    return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
+
+@bc.cachecalc()
+def dofit_nn_01(dims=base_dims, nb_epoch=1000, batch_size=4 * 1024, lr=0.0001, dropout=0.1):
+    dd = get_nn_data()
+    globals().update(dd)
+
+    # DO NOT TOUCH PARAMS HERE ... make same as above
+    dd = dofit_nn(dims=dims, nb_epoch=100, batch_size=32 * 1024, lr=0.0001, dropout=0.0)
+
+    clf = dd['clf']
+    sgd = SGD(lr=lr, decay=1e-6, momentum=0.5, nesterov=True)
+    clf.compile(loss='binary_crossentropy', optimizer=sgd) # recompile hopefully not clear weights?
+    cw = y_fit.shape[0] / y_fit.sum()
+    print('training with class_weight={}'.format(cw))
+    clf.fit(X_fit, y_fit, nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
     # clf.fit(X_fit, y_fit)
     p = clf.predict(X_fit)
     pev = clf.predict(X_eval)
