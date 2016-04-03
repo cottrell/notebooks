@@ -78,9 +78,15 @@ def cachecalc(basepath=None):
             return d
         _inner = decorator.decorate(fun, _inner)
         def list_caches():
+            """ list .things that have been computed """
             # if you need to parse the filenames, you need to rewrite this using a better args, kwargs storing mechanisi and a hash
             files = glob.glob('{}*.things'.format(_basepath))
             return files
+        def load_all_caches():
+            """ load .things that have been computed """
+            files = glob.glob('{}*.things'.format(_basepath))
+            return {k: from_dict_of_things(k) for k in files}
+        _inner.load_all_caches = load_all_caches
         _inner.list_caches = list_caches
         _inner.basepath = _basepath
         return _inner

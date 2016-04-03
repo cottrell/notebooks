@@ -73,10 +73,22 @@ def get_data():
 
 @bc.cachecalc()
 def compute_cosine_distances():
+    """ not sure if did this sort of backwards. I think am getting 10 nearest
+    train for each test. This will mean some train will not be listed in the
+    weights """
     globals().update(get_the_data())
     lsh = sklearn.neighbors.LSHForest(n_estimators=20, n_candidates=100)
     lsh.fit(X_train)
     r = lsh.kneighbors(X_test, return_distance=True, n_neighbors=10)
+    return {'r': r}
+
+@bc.cachecalc()
+def compute_cosine_distances_2():
+    """ other way round """
+    globals().update(get_the_data())
+    lsh = sklearn.neighbors.LSHForest(n_estimators=20, n_candidates=100)
+    lsh.fit(X_test)
+    r = lsh.kneighbors(X_train, return_distance=True, n_neighbors=10)
     return {'r': r}
 
 
