@@ -82,19 +82,20 @@ def cachecalc(basepath=None):
             files = glob.glob('{}*.things'.format(_basepath))
             return files
         _inner.list_caches = list_caches
+        _inner.basepath = _basepath
         return _inner
     return inner
 
-@decorator.decorator
-def www(fun, *args, **kwargs):
-    print(inspect.getfullargspec(fun))
-    print('look', args, kwargs)
-    return fun(*args, **kwargs)
-
-@cachecalc()
-def test(x, y, a=1, b=2, **kwargs):
-    print('here')
-    return {'a': 1}
+# @decorator.decorator
+# def www(fun, *args, **kwargs):
+#     print(inspect.getfullargspec(fun))
+#     print('look', args, kwargs)
+#     return fun(*args, **kwargs)
+# 
+# @cachecalc()
+# def test(x, y, a=1, b=2, **kwargs):
+#     print('here')
+#     return {'a': 1}
 
 def to_dict_of_things(d, path):
     if os.path.exists(path):
