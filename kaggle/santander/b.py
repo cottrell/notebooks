@@ -62,16 +62,18 @@ def get_data():
     df_test.drop(remove, axis=1, inplace=True)
 
     y_train = df_train['TARGET'].values
+    id_train = df_train['ID'].values
     X_train = df_train.drop(['ID','TARGET'], axis=1).values
 
     id_test = df_test['ID'].values
     X_test = df_test.drop(['ID'], axis=1).values
     X_train = scipy.sparse.csr_matrix(X_train)
     X_test = scipy.sparse.csr_matrix(X_test)
-    X_fit, X_eval, y_fit, y_eval = train_test_split(X_train, y_train, test_size=0.3)
+    ind_train = np.arange(X_train.shape[0])
+    X_fit, X_eval, y_fit, y_eval, ind_fit, ind_eval = train_test_split(X_train, y_train, ind_train, test_size=0.3)
 
     d = dict()
-    for k in ['X_train', 'X_test', 'X_fit', 'X_eval', 'y_train', 'y_fit', 'y_eval', 'id_test']:
+    for k in ['X_train', 'X_test', 'X_fit', 'X_eval', 'y_train', 'y_fit', 'y_eval', 'id_test', 'ind_eval', 'ind_fit']:
         d[k] = locals()[k]
     return d
 
@@ -98,9 +100,8 @@ def compute_cosine_distances_2():
 @bc.cachecalc()
 def get_test_weights():
     dist, ind = compute_cosine_distances_2()['r']
-    w = (1 - np.abs(dist)).mean(axis=1)
+    w = np.exp(-(np.abs(dist) ** 0.25) * 10).mean(axis=1)
     return {'w': w}
-
 
 @bc.cachecalc()
 def get_subsample():
@@ -115,11 +116,15 @@ get_the_data = get_data
 # just do the predict at the same time ...
 
 @bc.cachecalc()
-def dofit_xgb(n_estimators=350, max_depth=5, learning_rate=0.03, subsample=0.95, colsample_bytree=0.85, seed=242, early_stopping_rounds=40):
+def dofit_xgb(n_estimators=350, max_depth=5, learning_rate=0.03, subsample=0.95, colsample_bytree=0.85, seed=242, early_stopping_rounds=40, use_weights=True):
     globals().update(get_the_data())
+    sample_weight_fit = None
+    if use_weights:
+        sample_weight = get_test_weights()['w']
+        sample_weight_fit = sample_weight[ind_fit]
     clf = xgb.XGBClassifier(missing=np.nan, max_depth=max_depth, n_estimators=n_estimators, learning_rate=learning_rate, nthread=4,
             subsample=subsample, colsample_bytree=colsample_bytree, seed=seed)
-    clf.fit(X_fit, y_fit, early_stopping_rounds=early_stopping_rounds, eval_metric="auc", eval_set=[(X_fit, y_fit), (X_eval, y_eval)])
+    clf.fit(X_fit, y_fit, sample_weight=sample_weight_fit, early_stopping_rounds=early_stopping_rounds, eval_metric="auc", eval_set=[(X_fit, y_fit), (X_eval, y_eval)])
     return {'clf': clf}
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -169,10 +174,10 @@ def get_nn_data():
             dd[k] = ss.transform(dd[k])
     return dd
 
-base_dims = '64,64,64,64'
+base_dims = '128,64,64,64,64,64'
 
 @bc.cachecalc()
-def dofit_nn(dims=base_dims, nb_epoch=100, batch_size=32 * 1024, lr=0.0001, dropout=0.0):
+def dofit_nn(dims=base_dims, nb_epoch=1000, batch_size=16 * 1024, lr=0.00001, dropout=0.2):
     # 50k fit samples 4k is about 8%
     dd = get_nn_data()
     globals().update(dd)
@@ -200,26 +205,26 @@ def dofit_nn(dims=base_dims, nb_epoch=100, batch_size=32 * 1024, lr=0.0001, drop
     auc = sklearn.metrics.roc_auc_score(y_fit, p)
     return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
 
-@bc.cachecalc()
-def dofit_nn_01(dims=base_dims, nb_epoch=1000, batch_size=4 * 1024, lr=0.0001, dropout=0.1):
-    dd = get_nn_data()
-    globals().update(dd)
-
-    # DO NOT TOUCH PARAMS HERE ... make same as above
-    dd = dofit_nn(dims=dims, nb_epoch=100, batch_size=32 * 1024, lr=0.0001, dropout=0.0)
-
-    clf = dd['clf']
-    sgd = SGD(lr=lr, decay=1e-6, momentum=0.5, nesterov=True)
-    clf.compile(loss='binary_crossentropy', optimizer=sgd) # recompile hopefully not clear weights?
-    cw = y_fit.shape[0] / y_fit.sum()
-    print('training with class_weight={}'.format(cw))
-    clf.fit(X_fit, y_fit, nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
-    # clf.fit(X_fit, y_fit)
-    p = clf.predict(X_fit)
-    pev = clf.predict(X_eval)
-    pte = clf.predict(X_test)
-    auc = sklearn.metrics.roc_auc_score(y_fit, p)
-    return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
+# @bc.cachecalc()
+# def dofit_nn_01(dims=base_dims, nb_epoch=1000, batch_size=32 * 1024, lr=0.0001, dropout=0.1):
+#     dd = get_nn_data()
+#     globals().update(dd)
+# 
+#     # DO NOT TOUCH PARAMS HERE ... make same as above
+#     dd = dofit_nn(dims=dims, nb_epoch=100, batch_size=32 * 1024, lr=0.0001, dropout=0.0)
+# 
+#     clf = dd['clf']
+#     sgd = SGD(lr=lr, decay=1e-6, momentum=0.5, nesterov=True)
+#     clf.compile(loss='binary_crossentropy', optimizer=sgd) # recompile hopefully not clear weights?
+#     cw = y_fit.shape[0] / y_fit.sum()
+#     print('training with class_weight={}'.format(cw))
+#     clf.fit(X_fit, y_fit, nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
+#     # clf.fit(X_fit, y_fit)
+#     p = clf.predict(X_fit)
+#     pev = clf.predict(X_eval)
+#     pte = clf.predict(X_test)
+#     auc = sklearn.metrics.roc_auc_score(y_fit, p)
+#     return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
 
 # don't bother with basic linear model, poor performance
 # @bc.cachecalc()
@@ -235,6 +240,14 @@ def dofit_logisticregression(penalty='l2', C=1e12, **kwargs):
     pte = clf.predict(X_test)
     auc = sklearn.metrics.roc_auc_score(y_fit, p)
     return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
+
+def create_submission(clf, filename):
+    globals().update(get_data())
+    y_prob_test = clf.predict_proba(X_test)[:,1]
+    submission = pd.DataFrame({"ID": id_test, "TARGET": y_prob_test})
+    print("writing {}".format(filename))
+    submission.to_csv(filename, index=False)
+
 
 @bc.cachecalc()
 def predict():
