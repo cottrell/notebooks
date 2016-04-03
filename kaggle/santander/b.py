@@ -13,10 +13,14 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 from sklearn.cross_validation import train_test_split
+import sklearn.ensemble
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score, confusion_matrix
 from sklearn.pipeline import Pipeline
 from sklearn.svm import OneClassSVM
+from keras.models import Sequential
+from keras.layers.core import Dense, Dropout, Activation
+from keras.optimizers import SGD
 
 @bc.cachecalc()
 def read_zip():
@@ -142,6 +146,57 @@ def dofit_pyfm(num_iter=1000, num_factors=20):
     pte = clf.predict(X_test)
     auc = sklearn.metrics.roc_auc_score(y_fit, p)
     # clf is not pickling properly??? always get 0
+    return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
+
+# @bc.cachecalc()
+def dofit_nn(dims='64,64,64', nb_epoch=100, batch_size=30):
+    dd = get_the_data()
+    for k in dd:
+        if type(dd[k]) is scipy.sparse.csr.csr_matrix:
+            dd[k] = dd[k].toarray()
+            if len(dd[k].shape) == 1:
+                dd[k] = np.atleast_2d(dd[k]).T
+    ss = preproc.StandardScaler(with_mean=False) # hmm
+    ss.fit(X_fit)
+    for k in dd:
+        if k.startswith('X_'):
+            dd[k] = ss.transform(dd[k])
+    globals().update(dd)
+
+    model = Sequential()
+    dims = [X_fit.shape[1]] + list(map(int, dims.split(',')))
+    dropout = 0.2
+    for i in range(len(dims) - 1):
+        model.add(Dense(input_dim=dims[i], output_dim=dims[i+1], init='glorot_uniform'))
+        model.add(Activation('tanh'))
+        model.add(Dropout(dropout))
+    model.add(Dense(input_dim=dims[-1], output_dim=1, init='glorot_uniform'))
+    model.add(Activation('sigmoid'))
+    sgd = SGD(lr=0.0001, decay=1e-6, momentum=0.5, nesterov=True)
+    model.compile(loss='binary_crossentropy', optimizer=sgd)
+    clf = model
+    # clf = Pipeline(steps=[('scaling/embedding', ss), ('clf', model)])
+    clf.fit(X_fit, y_fit, nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True)
+    # clf.fit(X_fit, y_fit)
+    p = clf.predict(X_fit)
+    pev = clf.predict(X_eval)
+    pte = clf.predict(X_test)
+    auc = sklearn.metrics.roc_auc_score(y_fit, p)
+    return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
+
+# don't bother with basic linear model, poor performance
+# @bc.cachecalc()
+def dofit_logisticregression(penalty='l2', C=1e12, **kwargs):
+    globals().update(get_the_data())
+    # ss = preproc.StandardScaler(with_mean=False) # hmm
+    ss = sklearn.ensemble.RandomTreesEmbedding(n_estimators=1000, min_samples_leaf=20)
+    lm = sklearn.linear_model.LogisticRegression(penalty=penalty, C=C, verbose=1)
+    clf = Pipeline(steps=[('scaling/embedding', ss), ('clf', lm)])
+    clf.fit(X_fit, y_fit)
+    p = clf.predict(X_fit)
+    pev = clf.predict(X_eval)
+    pte = clf.predict(X_test)
+    auc = sklearn.metrics.roc_auc_score(y_fit, p)
     return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
 
 @bc.cachecalc()
