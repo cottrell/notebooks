@@ -1,4 +1,6 @@
 import pandas
+import re
+import inspect
 import pandas as pd
 import numpy
 import numpy as np
@@ -45,27 +47,41 @@ log = TimeLogger()
 def cachecalc(path=None):
     """ basic bundler and serializer of dict outputs. Tries to use **kwargs using default_namer (*args is banned). """
 
-    def default_namer(**kwargs):
+    def default_namer(fun, args, kwargs):
         """ try best attempt make a name """
-        return ['{}={}'.format(k, kwargs[k]) for k in sorted(kwargs.keys())]
+        argspec = inspect.getfullargspec(fun)
+        all_args = dict(zip(argspec.args, args))
+        all_args.update(kwargs)
+        return ['{}={}'.format(k, all_args[k]) for k in sorted(all_args.keys())]
 
-    def inner(fun, **kwargs):
+    reg = re.compile('\.py$')
+    def inner(fun, *args, **kwargs):
         _path = path
-        d = fun(**kwargs)
+        d = fun(*args, **kwargs)
         if _path is None:
-            _path = '_'.join([fun.__name__] + default_namer(**kwargs)) + '.things' # save locally, could get weird with this default
+            _path = '{}:{}'.format(reg.sub('', os.path.basename(inspect.getmodule(fun).__file__)), fun.__name__) # basically use pwd
+        if type(_path) is str:
+            _path = '{}:{}'.format(_path, '_'.join(default_namer(fun, args, kwargs)) + '.things') # save locally, could get weird with this default
         if hasattr(_path, '__call__'):
-            _path = _path(**kwargs)
+            _path = _path(**kwargs) # in case you want to do something else?
         assert type(_path) is str
         if os.path.exists(_path):
-            logging.warning("reading from cache {}".format(_path))
             d = from_dict_of_things(_path)
         else:
-            logging.warning("Computing new {}".format(_path))
-            d = fun(**kwargs)
+            d = fun(*args, **kwargs)
             to_dict_of_things(d, _path)
         return d
     return decorator.decorator(inner)
+
+@decorator.decorator
+def www(fun, *args, **kwargs):
+    print(inspect.getfullargspec(fun))
+    print('look', args, kwargs)
+    return fun(*args, **kwargs)
+
+# @cachecalc()
+# def test(x, y, a=1, b=2, **kwargs):
+#     return {'a': 1}
 
 def to_dict_of_things(d, path):
     if os.path.exists(path):
@@ -327,7 +343,7 @@ class FastCat(pandas.Categorical):
 
 
 def _mkdir(path):
-    logging.warning("mkdir %s" % path)
+    # logging.warning("mkdir %s" % path)
     os.mkdir(path)
 
 
