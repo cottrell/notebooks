@@ -1,4 +1,6 @@
 from __future__ import division
+import datetime
+import pywFM
 import sklearn.neighbors
 import sklearn.linear_model
 from collections import defaultdict
@@ -18,6 +20,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score, confusion_matrix
 from sklearn.pipeline import Pipeline
 from sklearn.svm import OneClassSVM
+import keras.callbacks
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
 from keras.optimizers import SGD
@@ -127,6 +130,21 @@ def dofit_xgb(n_estimators=350, max_depth=5, learning_rate=0.03, subsample=0.95,
     clf.fit(X_fit, y_fit, sample_weight=sample_weight_fit, early_stopping_rounds=early_stopping_rounds, eval_metric="auc", eval_set=[(X_fit, y_fit), (X_eval, y_eval)])
     return {'clf': clf}
 
+# @bc.cachecalc()
+def dofit_pywFM(num_iter=100, lr=0.1, k2=8, learning_method='sgda'):
+    globals().update(get_nn_data())
+    fm = pywFM.FM('classification', num_iter=num_iter, init_stdev=0.1, k0=True,
+            k1=True, k2=k2, learning_method=learning_method, learn_rate=lr,
+            r0_regularization=0, r1_regularization=0, r2_regularization=0,
+            rlog=False, verbose=True, silent=False, temp_path=None)
+    y_fake_test = np.empty((X_test.shape[0]))
+    assert(X_test.shape[0] == y_fake_test.shape[0])
+    predictions, global_bias, weights, pairwise_interactions, rlog = \
+    fm.run(X_fit[:1000], y_fit[:1000], X_test[:1000], y_fake_test[:1000],
+            X_eval[:1000], y_eval[:1000])
+    # auc = sklearn.metrics.roc_auc_score(y_fit, predictions)
+    return {'predictions': predictions, 'global_bias': global_bias, 'weights': weights, 'pairwise_interactions': pairwise_interactions, 'rlog': rlog}
+
 from sklearn.base import BaseEstimator, TransformerMixin
 
 class ScaleAndSparse(BaseEstimator, TransformerMixin):
@@ -174,36 +192,79 @@ def get_nn_data():
             dd[k] = ss.transform(dd[k])
     return dd
 
-base_dims = '128,64,64,64,64,64'
+base_dims = ','.join(['8'] * 8)
 
 @bc.cachecalc()
-def dofit_nn(dims=base_dims, nb_epoch=1000, batch_size=16 * 1024, lr=0.00001, dropout=0.2):
+def dofit_nn(dims=base_dims, dropout=0.0, poison=datetime.datetime.now().isoformat()):
     # 50k fit samples 4k is about 8%
     dd = get_nn_data()
     globals().update(dd)
+    cw = y_fit.shape[0] / y_fit.sum()
+    # cw *= 2
+    print('training with class_weight={}'.format(cw))
+    print('base dims {}'.format(dims))
 
     model = Sequential()
     dims = [X_fit.shape[1]] + list(map(int, dims.split(',')))
     dropout = dropout
     for i in range(len(dims) - 1):
         model.add(Dense(input_dim=dims[i], output_dim=dims[i+1], init='glorot_uniform'))
-        model.add(Activation('tanh'))
+        model.add(Activation('relu'))
         model.add(Dropout(dropout))
     model.add(Dense(input_dim=dims[-1], output_dim=1, init='glorot_uniform'))
     model.add(Activation('sigmoid'))
-    sgd = SGD(lr=lr, decay=1e-6, momentum=0.5, nesterov=True)
-    model.compile(loss='binary_crossentropy', optimizer=sgd)
     clf = model
-    # clf = Pipeline(steps=[('scaling/embedding', ss), ('clf', model)])
-    cw = y_fit.shape[0] / y_fit.sum()
-    print('training with class_weight={}'.format(cw))
-    clf.fit(X_fit, y_fit, nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
-    # clf.fit(X_fit, y_fit)
+
+    # callback = keras.callbacks.Callback()
+    checkpointer = keras.callbacks.ModelCheckpoint(filepath="weights.hdf5", verbose=1, save_best_only=True, monitor='val_acc')
+
+    try:
+        # HERE HERE HERE LOADING PREEXISTING WEIGHTS!!!
+        weights = clf.load_weights('weights.hdf5')
+    except Exception as e:
+        print('could not load weights (probably you changed dims) due to {}'.format(e))
+
+    nb_epoch=10; batch_size=32 * 1024; lr=0.05; decay=0.0001; momentum=0.9
+    sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
+    clf.compile(loss='binary_crossentropy', optimizer=sgd)
+    clf.fit(X_fit, y_fit, callbacks=[checkpointer], nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
+    print('auc fit: {}, auc eval: {}'.format(get_auc(clf, X_fit, y_fit), get_auc(clf, X_eval, y_eval)))
+
+    weights = clf.load_weights('weights.hdf5')
+    nb_epoch=10; batch_size=32 * 1024; lr=0.01; decay=0.0001; momentum=0.9
+    sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
+    clf.compile(loss='binary_crossentropy', optimizer=sgd)
+    clf.fit(X_fit, y_fit, callbacks=[checkpointer], nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
+    print('auc fit: {}, auc eval: {}'.format(get_auc(clf, X_fit, y_fit), get_auc(clf, X_eval, y_eval)))
+
+    weights = clf.load_weights('weights.hdf5')
+    nb_epoch=10; batch_size=32 * 1024; lr=0.001; decay=0.0001; momentum=0.9
+    sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
+    clf.compile(loss='binary_crossentropy', optimizer=sgd)
+    clf.fit(X_fit, y_fit, callbacks=[checkpointer], nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
+    print('auc fit: {}, auc eval: {}'.format(get_auc(clf, X_fit, y_fit), get_auc(clf, X_eval, y_eval)))
+
+    weights = clf.load_weights('weights.hdf5')
+    nb_epoch=10; batch_size=32 * 1024; lr=0.0001; decay=0.0001; momentum=0.9
+    sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
+    clf.compile(loss='binary_crossentropy', optimizer=sgd)
+    clf.fit(X_fit, y_fit, callbacks=[checkpointer], nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
+    print('auc fit: {}, auc eval: {}'.format(get_auc(clf, X_fit, y_fit), get_auc(clf, X_eval, y_eval)))
+
+    weights = clf.load_weights('weights.hdf5')
+    hist = clf.load_weights('weights.hdf5') # is it taking the best if we do not do this?
+
     p = clf.predict(X_fit)
     pev = clf.predict(X_eval)
     pte = clf.predict(X_test)
     auc = sklearn.metrics.roc_auc_score(y_fit, p)
-    return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte, 'y_eval_pred': pev}
+    auc_eval = sklearn.metrics.roc_auc_score(y_eval, pev)
+    return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte,
+            'y_eval_pred': pev, 'weights': weights, 'hist': hist}
+
+def get_auc(clf, X, y):
+    p = clf.predict(X)
+    return sklearn.metrics.roc_auc_score(y, p)
 
 # @bc.cachecalc()
 # def dofit_nn_01(dims=base_dims, nb_epoch=1000, batch_size=32 * 1024, lr=0.0001, dropout=0.1):
