@@ -1,4 +1,5 @@
 from __future__ import division
+import os
 import datetime
 import pywFM
 import sklearn.neighbors
@@ -192,7 +193,7 @@ def get_nn_data():
             dd[k] = ss.transform(dd[k])
     return dd
 
-base_dims = ','.join(['8'] * 8)
+base_dims = '128,64,32,64,128' # ','.join(['8'] * 8)
 
 @bc.cachecalc()
 def dofit_nn(dims=base_dims, dropout=0.0, poison=datetime.datetime.now().isoformat()):
@@ -218,41 +219,35 @@ def dofit_nn(dims=base_dims, dropout=0.0, poison=datetime.datetime.now().isoform
     # callback = keras.callbacks.Callback()
     checkpointer = keras.callbacks.ModelCheckpoint(filepath="weights.hdf5", verbose=1, save_best_only=True, monitor='val_acc')
 
+    best_auc = 0
+    best_weights = None
+    nb_epoch=3; batch_size=32 * 1024; lr=0.005; decay=0.0001; momentum=0.9
+    sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
+    clf.compile(loss='binary_crossentropy', optimizer=sgd)
+
     try:
         # HERE HERE HERE LOADING PREEXISTING WEIGHTS!!!
         weights = clf.load_weights('weights.hdf5')
     except Exception as e:
         print('could not load weights (probably you changed dims) due to {}'.format(e))
 
-    nb_epoch=10; batch_size=32 * 1024; lr=0.05; decay=0.0001; momentum=0.9
-    sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
-    clf.compile(loss='binary_crossentropy', optimizer=sgd)
-    clf.fit(X_fit, y_fit, callbacks=[checkpointer], nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
-    print('auc fit: {}, auc eval: {}'.format(get_auc(clf, X_fit, y_fit), get_auc(clf, X_eval, y_eval)))
+    for i in range(2):
+        print('round {}'.format(i))
+        clf.fit(X_fit, y_fit, callbacks=[checkpointer], nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
+        auc = get_auc(clf, X_eval, y_eval)
+        print('auc fit: {}, auc eval: {}'.format(get_auc(clf, X_fit, y_fit), auc))
+        if auc > best_auc:
+            print('updating best. improve by {}. {} > {}\n'.format(auc - best_auc, auc, best_auc))
+            best_auc = auc
+            best_weights = clf.get_weights()
 
-    weights = clf.load_weights('weights.hdf5')
-    nb_epoch=10; batch_size=32 * 1024; lr=0.01; decay=0.0001; momentum=0.9
-    sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
-    clf.compile(loss='binary_crossentropy', optimizer=sgd)
-    clf.fit(X_fit, y_fit, callbacks=[checkpointer], nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
-    print('auc fit: {}, auc eval: {}'.format(get_auc(clf, X_fit, y_fit), get_auc(clf, X_eval, y_eval)))
-
-    weights = clf.load_weights('weights.hdf5')
-    nb_epoch=10; batch_size=32 * 1024; lr=0.001; decay=0.0001; momentum=0.9
-    sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
-    clf.compile(loss='binary_crossentropy', optimizer=sgd)
-    clf.fit(X_fit, y_fit, callbacks=[checkpointer], nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
-    print('auc fit: {}, auc eval: {}'.format(get_auc(clf, X_fit, y_fit), get_auc(clf, X_eval, y_eval)))
-
-    weights = clf.load_weights('weights.hdf5')
-    nb_epoch=10; batch_size=32 * 1024; lr=0.0001; decay=0.0001; momentum=0.9
-    sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
-    clf.compile(loss='binary_crossentropy', optimizer=sgd)
-    clf.fit(X_fit, y_fit, callbacks=[checkpointer], nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
-    print('auc fit: {}, auc eval: {}'.format(get_auc(clf, X_fit, y_fit), get_auc(clf, X_eval, y_eval)))
-
-    weights = clf.load_weights('weights.hdf5')
-    hist = clf.load_weights('weights.hdf5') # is it taking the best if we do not do this?
+    clf.set_weights(best_weights)
+    if os.path.exists('weights.hdf5'):
+        os.remove('weights.hdf5')
+    clf.save_weights('weights.hdf5')
+    hist = None
+    # weights = clf.load_weights('weights.hdf5')
+    # hist = clf.load_weights('weights.hdf5') # is it taking the best if we do not do this?
 
     p = clf.predict(X_fit)
     pev = clf.predict(X_eval)
