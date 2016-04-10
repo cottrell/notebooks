@@ -193,7 +193,7 @@ def get_nn_data():
             dd[k] = ss.transform(dd[k])
     return dd
 
-base_dims = '128,64,32,64,128' # ','.join(['8'] * 8)
+base_dims = '128,64,64,64,64,128' # ','.join(['8'] * 8)
 
 @bc.cachecalc()
 def dofit_nn(dims=base_dims, dropout=0.0, poison=datetime.datetime.now().isoformat()):
@@ -221,7 +221,7 @@ def dofit_nn(dims=base_dims, dropout=0.0, poison=datetime.datetime.now().isoform
 
     best_auc = 0
     best_weights = None
-    nb_epoch=3; batch_size=32 * 1024; lr=0.005; decay=0.0001; momentum=0.9
+    nb_epoch=3; batch_size=32 * 1024; lr=0.001; decay=0.0001; momentum=0.9
     sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
     clf.compile(loss='binary_crossentropy', optimizer=sgd)
 
@@ -231,7 +231,7 @@ def dofit_nn(dims=base_dims, dropout=0.0, poison=datetime.datetime.now().isoform
     except Exception as e:
         print('could not load weights (probably you changed dims) due to {}'.format(e))
 
-    for i in range(2):
+    for i in range(100):
         print('round {}'.format(i))
         clf.fit(X_fit, y_fit, callbacks=[checkpointer], nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, y_eval), show_accuracy=True, class_weight={0: 1.0, 1: cw})
         auc = get_auc(clf, X_eval, y_eval)
