@@ -257,6 +257,28 @@ def dofit_nn(dims=base_dims, dropout=0.0, poison=datetime.datetime.now().isoform
     return {'clf': clf, 'y_fit_pred': p, 'auc': auc, 'y_test_pred': pte,
             'y_eval_pred': pev, 'weights': weights, 'hist': hist}
 
+@bc.cachecalc()
+def dofit_nn_autoencoder(dims='32,16,8,2,8,16,32', dropout=0.1, poison=datetime.datetime.now().isoformat()):
+    # 50k fit samples 4k is about 8%
+    dd = get_nn_data()
+    globals().update(dd)
+
+    model = Sequential()
+    dims = [X_fit.shape[1]] + list(map(int, dims.split(',')))
+    dropout = dropout
+    for i in range(len(dims) - 1):
+        model.add(Dense(input_dim=dims[i], output_dim=dims[i+1], init='glorot_uniform'))
+        model.add(Activation('relu'))
+        model.add(Dropout(dropout))
+    model.add(Dense(input_dim=dims[-1], output_dim=X_fit.shape[1], init='glorot_uniform'))
+    model.add(Activation('sigmoid'))
+    clf = model
+    nb_epoch=10; batch_size=8 * 1024; lr=0.1; decay=0.0001; momentum=0.9
+    sgd = SGD(lr=lr, decay=decay, momentum=momentum, nesterov=True)
+    clf.compile(loss='mse', optimizer=sgd)
+    hist = clf.fit(X_fit, X_fit, nb_epoch=nb_epoch, batch_size=batch_size, validation_data=(X_eval, X_eval))
+    return {'clf': clf} # , 'hist': hist}
+
 def get_auc(clf, X, y):
     p = clf.predict(X)
     return sklearn.metrics.roc_auc_score(y, p)
