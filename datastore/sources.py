@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 import Quandl
 token = os.environ['QUANDL_AUTH']
@@ -45,6 +46,15 @@ class QuandlReader():
             dfs = pd.concat(dfs, axis=1)
             return {'data': dfs}
         obj.get_all = lambda : get_all()['data']
+        def get_all_cleaned():
+            df = obj.get_all()
+            df = df[[x for x in df.columns if x.endswith('Rate')]]
+            m = df.mean()
+            s = df.std()
+            z = (df - m).abs() / s
+            df[z > 10] = np.nan
+            return df
+        obj.get_all_cleaned = get_all_cleaned
         setattr(self, database, obj)
 
 quandl = QuandlReader()
