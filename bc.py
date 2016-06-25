@@ -366,7 +366,7 @@ class FastCat(pandas.Categorical):
 
 
 def _mkdir(path):
-    # logging.warning("mkdir %s" % path)
+    logging.warning("mkdir %s" % path)
     os.makedirs(path)
 
 
