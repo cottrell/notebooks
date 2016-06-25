@@ -60,10 +60,10 @@ def cachecalc(basepath=None):
         # set the base basepath, really need to refactor to Class
         _basepath = basepath
         if _basepath is None:
-            _basepath = 'things/{}:{}'.format(reg.sub('', os.path.basename(inspect.getmodule(fun).__file__)), fun.__name__) # basically use pwd
-        if type(basepath) is str:
-            if not os.path.exists(os.path.dirname(basepath)):
-                _mkdir(os.path.dirname(basepath))
+            _basepath = 'things'
+        _basepath = os.path.join(_basepath, '{}:{}'.format(reg.sub('', os.path.basename(inspect.getmodule(fun).__file__)), fun.__name__)) # basically use pwd
+        if not os.path.exists(os.path.dirname(_basepath)):
+            _mkdir(os.path.dirname(_basepath))
         def _inner(fun, *args, **kwargs):
             _path = _basepath
             if type(_path) is str:
