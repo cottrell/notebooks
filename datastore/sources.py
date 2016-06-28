@@ -5,7 +5,7 @@ import Quandl
 token = os.environ['QUANDL_AUTH']
 mydir = os.path.dirname(os.path.realpath(__file__))
 basepath = os.path.join(mydir, 'data_cache')
-import bc
+from . import bc
 
 @bc.cachecalc(basepath=basepath)
 def _get_from_quandl(code=None, **kwargs):
