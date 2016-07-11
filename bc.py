@@ -406,6 +406,9 @@ def to_dict_of_blocks(d, rootdir):
             bcolz.carray(d[k], rootdir=filename)
 
 
+def test_bc():
+    df = pd.DataFrame(randn(4, 3))
+    df.columns = zip(['asdf', 'df', 'asdfasdf'], [1, 2, 3])
 
 # ######################
 # def get_carray_monkeypatched(rootdir=None, categories=None):
