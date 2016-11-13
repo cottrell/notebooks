@@ -7,12 +7,14 @@ mydir = os.path.dirname(os.path.realpath(__file__))
 basepath = os.path.join(mydir, 'data_cache')
 from . import bc
 
+_trim_start = '2014-01-01'
+
 @bc.cachecalc(basepath=basepath)
-def _get_from_quandl(code=None, **kwargs):
-    return {'data': Quandl.get(code, authtoken=token).reset_index()}
+def _get_from_quandl(code=None, trim_start=_trim_start, **kwargs):
+    return {'data': Quandl.get(code, trim_start=trim_start, authtoken=token, **kwargs).reset_index()}
 
 def _get_currencies():
-    filename = os.path.join(mydir, 'major_currencies.tab')
+    filename = os.path.join(mydir, 'meta/major_currencies.tab')
     df_currfx = pd.read_csv(filename, sep='\t')
     currencies = df_currfx['Currency Code'].tolist()
     return currencies

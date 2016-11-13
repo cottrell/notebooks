@@ -73,11 +73,12 @@ def cachecalc(basepath=None):
             if hasattr(_path, '__call__'):
                 _path = _path(**kwargs) # in case you want to do something else?
             assert type(_path) is str
-            if os.path.exists(_path):
+            if os.path.exists(_path) and not inner._dirty:
                 d = from_dict_of_things(_path)
             else:
                 d = fun(*args, **kwargs)
                 to_dict_of_things(d, _path)
+                inner._dirty = False
             return d
         _inner = decorator.decorate(fun, _inner)
         def list_caches():
@@ -93,6 +94,11 @@ def cachecalc(basepath=None):
         _inner.list_caches = list_caches
         _inner.basepath = _basepath
         return _inner
+    inner._dirty = False
+    def recalc():
+        inner._dirty = True
+        return inner()
+    inner.recalc = recalc
     return inner
 
 # @decorator.decorator
