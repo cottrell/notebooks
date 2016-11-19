@@ -30,7 +30,7 @@ def Ymem(F, cache=None):
     def inner(arg):
         if arg in cache:
             return cache[arg]
-        answer = F(lambda n: Ymem(F, cache)(n))(arg)
+        answer = F(Ymem(F, cache))(arg)
         cache[arg] = answer
         return answer
     return inner
