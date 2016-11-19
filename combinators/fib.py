@@ -39,9 +39,40 @@ fib3 = Ymem(fib_functional)
 
 n = 30
 
-with Timer():
-    print(fib(n))
-with Timer():
-    print(fib2(n))
-with Timer():
-    print(fib3(n))
+# with Timer():
+#     print(fib(n))
+# with Timer():
+#     print(fib2(n))
+# with Timer():
+#     print(fib3(n))
+
+def gettimings(n=n):
+    import pandas as pd
+    d = list()
+    timer = Timer()
+    for i in range(0, n, 2):
+        temp = [i]
+        with timer:
+            fib(i)
+        temp.append(timer.interval)
+        with timer:
+            fib2(i)
+        temp.append(timer.interval)
+        with timer:
+            fib3(i)
+        temp.append(timer.interval)
+        d.append(temp)
+    d = pd.DataFrame(d)
+    d.columns = ['n', 'fib', 'fib2', 'fib3']
+    d = d.set_index('n')
+    return d
+
+def doplot():
+    from pylab import clf, show, figure, gca
+    figure(1)
+    clf()
+    df = gettimings()
+    df.plot(ax=gca(), logy=True, logx=True, style='o')
+    show()
+
+
