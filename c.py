@@ -38,6 +38,9 @@ class VersionedCachedComputation():
             key += tuple([x._get_key() for x in self._versioned_args])
         return key
 
+    def _get_graph(self):
+        pass
+
     def compute(self, force=False):
         global _cache
         key = self._get_key()
@@ -64,12 +67,10 @@ def B(x, y='more', v_args=[A(41.3, 23)]):
     time.sleep(1)
     return str(x) + ":" + str(y) + ':' + str(v_args[0])
 
-
-
-
-
-
-
+@decorator.decorator(VersionedCachedComputation)
+def C(x, y='more', v_args=[B(1111), A(41.3, 23)]):
+    time.sleep(1)
+    return str(x) + ":" + str(y) + ':' + str(v_args[0])
 
 # NOPE
 
