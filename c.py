@@ -1,4 +1,5 @@
 from functools import wraps
+import time
 import inspect
 import decorator
 import logging
@@ -6,6 +7,11 @@ from pdb import set_trace
 logging.getLogger().setLevel(logging.INFO)
 
 _version = 0
+
+try:
+    _cache
+except NameError as e:
+    _cache = dict()
 
 class VersionedCachedComputation():
     def __init__(self, fun, *args, **kwargs):
@@ -22,32 +28,40 @@ class VersionedCachedComputation():
         if 'v_args' in kwargs:
             self._kwargs.pop('v_args')
         self._fun = fun
+        self._name = '{}:{}'.format(inspect.getabsfile(fun), fun.__name__)
         # set_trace()
 
     def _get_key(self):
-        # TODO v_args
-        key = self._fun.__name__, self._args, frozenset(self._kwargs.items())
+        key = self._name, self._args, frozenset(self._kwargs.items())
         if self._versioned_args is not None:
             key += tuple([x._get_key() for x in self._versioned_args])
         return key
 
-    def compute(self):
-        if self._versioned_args is not None:
-            v_args = [x.compute() for x in self._versioned_args]
-            logging.info("VCC.compute name={} args={}, kwargs={}, v_args={}".format(self._fun.__name__, self._args, self._kwargs, self._versioned_args))
-            return self._fun(*self._args, v_args=v_args, **self._kwargs)
+    def compute(self, force=False):
+        global _cache
+        key = self._get_key()
+        if key in _cache:
+            logging.info("retrieve from cache for {}".format(key))
+            res = _cache[key]
         else:
-            logging.info("VCC.compute name={} args={}, kwargs={}".format(self._fun.__name__, self._args, self._kwargs))
-            return self._fun(*self._args, **self._kwargs)
+            logging.info("compute for {}".format(key))
+            if self._versioned_args is not None:
+                v_args = [x.compute() for x in self._versioned_args]
+                res = self._fun(*self._args, v_args=v_args, **self._kwargs)
+            else:
+                res = self._fun(*self._args, **self._kwargs)
+            _cache[key] = res
+        return res
 
 @decorator.decorator(VersionedCachedComputation)
 def A(x, y='here', z='more'):
+    time.sleep(1)
     return str(x) + ":" + str(y)
 
 @decorator.decorator(VersionedCachedComputation)
-def B(x, y='more', v_args=[A(43.3, 23)]):
+def B(x, y='more', v_args=[A(41.3, 23)]):
+    time.sleep(1)
     return str(x) + ":" + str(y) + ':' + str(v_args[0])
-
 
 
 
