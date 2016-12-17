@@ -32,6 +32,7 @@ class VersionedCachedComputation():
         # set_trace()
 
     def _get_key(self):
+        """ function signature key """
         key = self._name, self._args, frozenset(self._kwargs.items())
         if self._versioned_args is not None:
             key += tuple([x._get_key() for x in self._versioned_args])
