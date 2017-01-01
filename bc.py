@@ -70,11 +70,13 @@ def cachecalc(basepath=None):
             _path = _basepath
             if type(_path) is str:
                 tmp = '_'.join(default_namer(fun, args, kwargs))
-                tmp = ':{}.things'.format(tmp) if tmp else '.things'
-                _path = _path + tmp # save locally, could get weird with this default
+                tmp = '{}.things'.format(tmp) if tmp else '.things'
+                # what about '/' in tmp ?
+                _path = os.path.join(_path, tmp) # save locally, could get weird with this default
             if hasattr(_path, '__call__'):
                 _path = _path(**kwargs) # in case you want to do something else?
             assert type(_path) is str
+            print("checking cache {}".format(_path))
             if os.path.exists(_path) and not inner._dirty:
                 d = from_dict_of_things(_path)
             else:
@@ -94,7 +96,10 @@ def cachecalc(basepath=None):
             return {k: from_dict_of_things(k) for k in files}
         def poison_cache():
             inner._dirty = True
+        def force_clean():
+            inner._dirty = False
         _inner.poison_cache = poison_cache
+        _inner.force_clean = force_clean
         _inner.load_all_caches = load_all_caches
         _inner.list_caches = list_caches
         _inner.basepath = _basepath

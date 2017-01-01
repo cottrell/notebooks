@@ -32,6 +32,7 @@ class QuandlReader():
         codes = [os.path.join(database, '{}{}'.format(k, base_currency)) for k in currencies]
         obj = BlankObject()
         for code in codes:
+            print('setting up {}'.format(code))
             name = code.split('/')[1] # first part is database
             cache_key = os.path.join(basepath, code)
             def fun(code=code):
