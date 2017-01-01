@@ -70,6 +70,8 @@ def cachecalc(basepath=None):
             _path = _basepath
             if type(_path) is str:
                 tmp = '_'.join(default_namer(fun, args, kwargs))
+                if tmp == '':
+                    tmp = '__noargs__' # TODO is this the only place ... yikes
                 tmp = '{}.things'.format(tmp) if tmp else '.things'
                 # what about '/' in tmp ?
                 _path = os.path.join(_path, tmp) # save locally, could get weird with this default
@@ -347,6 +349,8 @@ def _from_carray(path, format_categories=None, format_codes=None, format_values=
         # s = values # [:]
     # logging.warning('Constructing categorical for %s' % meta['name'])
     # s = pandas.Categorical.from_codes(codes_values, categories_values, name=meta['name'])
+    if isinstance(meta['name'], list):
+        meta['name'] = tuple(meta['name'])
     return meta, s  # codes_values, categories_values
 
 

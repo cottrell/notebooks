@@ -44,7 +44,9 @@ class QuandlReader():
             for code in codes:
                 name = code.split('/')[1] # first part is database
                 temp = getattr(obj, name)()
-                temp.columns = ["{}_{}".format(name, x) for x in temp.columns]
+                # temp.columns = ["{}_{}".format(name, x) for x in temp.columns]
+                temp.columns = pd.MultiIndex.from_tuples([(x, name) for x in temp.columns])
+                temp.columns.names = ['type', 'ccyccy']
                 dfs.append(temp)
             dfs = pd.concat(dfs, axis=1)
             return {'data': dfs}
