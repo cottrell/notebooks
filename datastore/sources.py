@@ -48,10 +48,10 @@ class QuandlReader():
                 dfs.append(temp)
             dfs = pd.concat(dfs, axis=1)
             return {'data': dfs}
-        obj._get_all = get_all
-        obj.get_all = lambda : obj._get_all()['data']
+        obj.get_all = get_all
+        # obj.get_all = lambda : obj._get_all()['data']
         def get_all_cleaned():
-            df = obj.get_all()
+            df = obj.get_all()['data']
             df = df[[x for x in df.columns if x.endswith('Rate')]]
             m = df.mean()
             s = df.std()
