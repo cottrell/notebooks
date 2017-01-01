@@ -57,6 +57,7 @@ def cachecalc(basepath=None):
 
     reg = re.compile('\.py$')
     def inner(fun):
+        """ This one is not returned """
         # set the base basepath, really need to refactor to Class
         _basepath = basepath
         if _basepath is None:
@@ -65,6 +66,7 @@ def cachecalc(basepath=None):
         if not os.path.exists(os.path.dirname(_basepath)):
             _mkdir(os.path.dirname(_basepath))
         def _inner(fun, *args, **kwargs):
+            """ this one is returned """
             _path = _basepath
             if type(_path) is str:
                 tmp = '_'.join(default_namer(fun, args, kwargs))
@@ -90,15 +92,14 @@ def cachecalc(basepath=None):
             """ load .things that have been computed """
             files = glob.glob('{}*.things'.format(_basepath))
             return {k: from_dict_of_things(k) for k in files}
+        def poison_cache():
+            inner._dirty = True
+        _inner.poison_cache = poison_cache
         _inner.load_all_caches = load_all_caches
         _inner.list_caches = list_caches
         _inner.basepath = _basepath
         return _inner
     inner._dirty = False
-    def recalc():
-        inner._dirty = True
-        return inner()
-    inner.recalc = recalc
     return inner
 
 # @decorator.decorator
@@ -106,11 +107,11 @@ def cachecalc(basepath=None):
 #     print(inspect.getfullargspec(fun))
 #     print('look', args, kwargs)
 #     return fun(*args, **kwargs)
-# 
-# @cachecalc()
-# def test(x, y, a=1, b=2, **kwargs):
-#     print('here')
-#     return {'a': 1}
+
+@cachecalc()
+def test(x, y, a=1, b=2, **kwargs):
+    print('here')
+    return {'a': 1}
 
 def to_dict_of_things(d, path):
     if os.path.exists(path):

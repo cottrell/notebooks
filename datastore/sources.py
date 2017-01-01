@@ -5,7 +5,7 @@ import Quandl
 token = os.environ['QUANDL_AUTH']
 mydir = os.path.dirname(os.path.realpath(__file__))
 basepath = os.path.join(mydir, 'data_cache')
-from . import bc
+import bc
 
 _trim_start = '2014-01-01'
 
@@ -47,7 +47,8 @@ class QuandlReader():
                 dfs.append(temp)
             dfs = pd.concat(dfs, axis=1)
             return {'data': dfs}
-        obj.get_all = lambda : get_all()['data']
+        obj._get_all = get_all
+        obj.get_all = lambda : obj._get_all()['data']
         def get_all_cleaned():
             df = obj.get_all()
             df = df[[x for x in df.columns if x.endswith('Rate')]]
