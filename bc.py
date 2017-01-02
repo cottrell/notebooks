@@ -79,14 +79,15 @@ def cachecalc(basepath=None):
                 _path = _path(**kwargs) # in case you want to do something else?
             assert type(_path) is str
             print("checking cache {}".format(_path))
-            if os.path.exists(_path) and not inner._dirty:
+            if os.path.exists(_path) and not _inner._dirty:
                 d = from_dict_of_things(_path)
             else:
                 d = fun(*args, **kwargs)
                 to_dict_of_things(d, _path)
-                inner._dirty = False
+                _inner._dirty = False
             return d
         _inner = decorator.decorate(fun, _inner)
+        _inner._dirty = False
         def list_caches():
             """ list .things that have been computed """
             # if you need to parse the filenames, you need to rewrite this using a better args, kwargs storing mechanisi and a hash
@@ -97,16 +98,18 @@ def cachecalc(basepath=None):
             files = glob.glob('{}*.things'.format(_basepath))
             return {k: from_dict_of_things(k) for k in files}
         def poison_cache():
-            inner._dirty = True
+            _inner._dirty = True
         def force_clean():
-            inner._dirty = False
+            _inner._dirty = False
+        def is_dirty():
+            return _inner._dirty
         _inner.poison_cache = poison_cache
+        _inner.is_dirty = is_dirty
         _inner.force_clean = force_clean
         _inner.load_all_caches = load_all_caches
         _inner.list_caches = list_caches
         _inner.basepath = _basepath
         return _inner
-    inner._dirty = False
     return inner
 
 # @decorator.decorator
@@ -172,6 +175,8 @@ def to_carrays(df, path, format_categories=['bcolz'], format_codes=['bcolz'], fo
     if os.path.exists(path):
         _move_and_remove_nonblocking(path)  # TODO move/raise only
     _mkdir(path)
+    assert len(df.index.names) == 1
+    assert df.index.names[0] is None
     for i, k in enumerate(df):
         _to_carray(df[k], k, os.path.join(path, str(i)),
                    format_categories=format_categories, format_codes=format_codes,

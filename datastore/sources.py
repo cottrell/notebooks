@@ -8,10 +8,11 @@ basepath = os.path.join(mydir, 'data_cache')
 import bc
 
 _trim_start = '2014-01-01'
+_trim_end = '2017-01-02' # way of bumping the cache
 
 @bc.cachecalc(basepath=basepath)
-def _get_from_quandl(code=None, trim_start=_trim_start, **kwargs):
-    return {'data': Quandl.get(code, trim_start=trim_start, authtoken=token, **kwargs).reset_index()}
+def _get_from_quandl(code=None, trim_start=_trim_start, trim_end=_trim_end, **kwargs):
+    return {'data': Quandl.get(code, trim_start=trim_start, authtoken=token, trim_end=trim_end, **kwargs).reset_index()}
 
 def _get_currencies():
     filename = os.path.join(mydir, 'meta/major_currencies.tab')
@@ -49,11 +50,12 @@ class QuandlReader():
                 temp.columns.names = ['type', 'ccyccy']
                 dfs.append(temp)
             dfs = pd.concat(dfs, axis=1)
+            dfs = dfs.reset_index()
             return {'data': dfs}
         obj.get_all = get_all
         # obj.get_all = lambda : obj._get_all()['data']
         def get_all_cleaned():
-            df = obj.get_all()['data']
+            df = obj.get_all()['data'].set_index('Date')
             df = df[[x for x in df.columns if x.endswith('Rate')]]
             m = df.mean()
             s = df.std()
