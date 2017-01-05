@@ -57,7 +57,7 @@ class QuandlReader():
         def get_all_cleaned():
             df = obj.get_all()['data'].set_index('Date')
             # df = df[[x for x in df.columns if x.endswith('Rate')]]
-            df = df[[x for x in df.columns if x[0] == 'Rate']]
+            # df = df[[x for x in df.columns if x[0] == 'Rate']]
             m = df.mean()
             s = df.std()
             z = (df - m).abs() / s
