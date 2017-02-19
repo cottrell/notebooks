@@ -2,6 +2,8 @@ import logging
 import time
 import pandas as pd
 import threading
+import contextlib
+
 
 class TimeLogger():
 
