@@ -1,3 +1,7 @@
+metastore_db/
+derby.log
+*.csv.gz
+*.dat
 .ipynb_checkpoints/
 __pycache__/
 *.pyc
