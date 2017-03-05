@@ -2,6 +2,7 @@ import asyncio
 import os
 import pandas as pd
 import mylib.data # setup.py in notebooks
+import mylib.tools as tools
 from numpy.random import randn
 import string
 
@@ -12,7 +13,10 @@ def gen_data(m=10, n=4):
     df = df.set_index('a')
     return df
 
-async def periodically_generate_new_data(period=5, nmax=100, basedir='./data'):
+def periodically_generate_new_data():
+    return tools.schedule_coroutine(_periodically_generate_new_data())
+
+async def _periodically_generate_new_data(period=5, nmax=100, basedir='./data'):
     if not os.path.exists(basedir):
         os.makedirs(basedir)
     dt = 1

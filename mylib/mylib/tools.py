@@ -25,7 +25,7 @@ def schedule_coroutine(target, *, loop=None):
         return asyncio.ensure_future(target, loop=loop)
     raise TypeError("target must be a coroutine, not {!r}".format(type(target)))
 
-def run_in_foreground(tasks, loop=None):
+def run_in_foreground(*tasks, loop=None):
     """Runs event loop in current thread until the given task completes
 
     Returns the result of the task.
@@ -35,7 +35,7 @@ def run_in_foreground(tasks, loop=None):
     if loop is None:
         loop = asyncio.get_event_loop()
     tasks = [asyncio.ensure_future(task, loop=loop) for task in tasks]
-    tasks = asyncio.gather(tasks)
+    tasks = asyncio.gather(*tasks)
     try:
         res = loop.run_until_complete(tasks)
     except KeyboardInterrupt as e:
@@ -43,8 +43,8 @@ def run_in_foreground(tasks, loop=None):
         tasks.cancel()
         loop.run_forever()
         tasks.exception()
-    finally:
-        loop.close()
+    # finally:
+    #     loop.close()
 
 @contextlib.contextmanager
 def spark_manager(spark_master=None, name='default name'):
