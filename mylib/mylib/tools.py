@@ -5,7 +5,24 @@ import threading
 import contextlib
 import asyncio
 
-def dict_of_lists(d):
+def dict_of_lists_to_dict(d):
+    r = dict()
+    for k, v in d.items():
+        for x in v:
+            assert x not in r, 'clash {}'.format(x)
+            r[x] = k
+    return r
+
+def dict_to_spark_schema(d):
+    import pyspark.sql.types as t
+    s = list()
+    r = dict(str=t.StringType(),
+            float=t.DoubleType()) # etc
+    for k, v in d.items():
+        s.append(t.StructField(k, r[v]))
+    return t.StructType(s)
+
+def invert_dict(d):
     r = dict()
     for k, v in d.items():
         if v not in r:
@@ -24,6 +41,14 @@ def schedule_coroutine(target, *, loop=None):
     if asyncio.iscoroutine(target):
         return asyncio.ensure_future(target, loop=loop)
     raise TypeError("target must be a coroutine, not {!r}".format(type(target)))
+
+def run_in_background(non_co_callable, loop=None, executor=None):
+    # not concellable
+    if loop is None:
+        loop = asyncio.get_event_loop()
+    if callable(non_co_callable):
+        return loop.run_in_executor(executor, non_co_callable)
+    raise TypeError("target must be a callable, not {!r}".format(type(target)))
 
 def run_in_foreground(*tasks, loop=None):
     """Runs event loop in current thread until the given task completes
@@ -45,6 +70,7 @@ def run_in_foreground(*tasks, loop=None):
         tasks.exception()
     # finally:
     #     loop.close()
+
 
 @contextlib.contextmanager
 def spark_manager(spark_master=None, name='default name'):
