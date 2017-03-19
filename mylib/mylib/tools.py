@@ -4,6 +4,7 @@ import pandas as pd
 import threading
 import contextlib
 import asyncio
+import collections
 
 def dict_of_lists_to_dict(d):
     r = dict()
@@ -13,14 +14,11 @@ def dict_of_lists_to_dict(d):
             r[x] = k
     return r
 
-def dict_to_spark_schema(d):
-    import pyspark.sql.types as t
-    s = list()
-    r = dict(str=t.StringType(),
-            float=t.DoubleType()) # etc
-    for k, v in d.items():
-        s.append(t.StructField(k, r[v]))
-    return t.StructType(s)
+def list_of_tuples_to_dict_of_lists(d):
+    out = collections.defaultdict(list)
+    for k, v in d:
+        out[k].append(v)
+    return dict(out)
 
 def invert_dict(d):
     r = dict()
@@ -30,6 +28,34 @@ def invert_dict(d):
         r[v].append(k)
     r = {k: sorted(v) for k, v in r.items()}
     return v
+
+def reorder_schema(schema, names):
+    schema_names = [x.name for x in schema]
+    index = dict(zip(schema_names, range(len(schema_names))))
+    new_schema = [schema[index[x]] for x in names]
+    from pyspark.sql.types import StructType
+    return StructType(new_schema)
+
+def dict_to_spark_schema(d):
+    """ spark schema are ordered so be careful """
+    import pyspark.sql.types as t
+    s = list()
+    for k, v in d.items():
+        if v.startswith('int'):
+            temp = k, t.IntegerType()
+        elif v.startswith('object') or v.startswith('str'):
+            temp = k, t.StringType()
+        elif v.startswith('float'):
+            temp = k, t.DoubleType()
+        elif v.startswith('date'):
+            temp = k, t.DateType()
+        else:
+            raise Exception('uh oh {} {}'.format(k, v))
+        s.append(t.StructField(*temp))
+    return t.StructType(s)
+
+def df_to_spark_schema(df):
+    return dict_to_spark_schema(df.dtypes.map(lambda x: x.name))
 
 def schedule_coroutine(target, *, loop=None):
     """Schedules target coroutine in the given event loop
