@@ -46,29 +46,30 @@ def prep():
     import json
     dk = json.load(open('key.json'))
     dk = {k: {int(kk): vv for kk, vv in v.items()} for k, v in dk.items()}
-    
+
     c = list(dk.keys())
     for k, v in dk.items():
         if len(v) > 0:
             print('mapping {}'.format(k))
             df[k] = df[k].map(lambda x: v[x] if not np.isnan(x) else x)
+    df['race_o'] = df['race_o'].map(dk['race'])
     df = df[c]
-    
+
     df = df.dropna(subset=['iid', 'pid'], how='any').copy()
     for k in ['iid', 'pid']:
         df[k] = df[k].astype(int)
-    
+
     for k in ['idg', 'iid', 'round', 'partner', 'position']:
         df[k] = df[k].astype('category')
     for k in ['order']:
         df[k] = df[k].astype('float')
-    
+
     for k in df:
         if df[k].dtype.name == 'object':
             df[k] = df[k].astype('category')
         if df[k].dtype.name.startswith('int'):
             print(k, df[k].min(), df[k].max())
-    
+
     # better be one
     assert df.groupby(['iid', 'pid']).size().max() == 1
 
@@ -83,9 +84,10 @@ def prep():
     b['iid'] = x
     b = b.set_index(c)
     b.columns = ['{}_male'.format(x) for x in b.columns]
+    a.columns = ['{}_female'.format(x) for x in a.columns]
     d = pd.concat([a, b], axis=1)
-    assert all(d.match == d.match_male)
-    d = d.rename(columns={'dec_o': 'dec_male', 'dec_o_male': 'dec_female'})
+    assert all(d.match_female == d.match_male)
+    d = d.rename(columns={'dec_o_female': 'dec_male', 'dec_o_male': 'dec_female'})
     d = d.drop(['match_male'], axis=1)
     import mylib.tools as tools
     tools.convert_to_categorical_inplace(d)
