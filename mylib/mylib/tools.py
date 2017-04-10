@@ -6,6 +6,11 @@ import contextlib
 import asyncio
 import collections
 
+def convert_to_categorical_inplace(df):
+    for k in df:
+        if df[k].dtype.name in ('object', 'str'):
+            df[k] = df[k].astype('category')
+
 def dict_of_lists_to_dict(d):
     r = dict()
     for k, v in d.items():
