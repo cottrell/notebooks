@@ -91,6 +91,6 @@ def prep():
     d = d.drop(['match_male'], axis=1)
     import mylib.tools as tools
     tools.convert_to_categorical_inplace(d)
-    return d
+    return d, df
 
 
