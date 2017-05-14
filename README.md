@@ -3,8 +3,10 @@ notebooks
 
 IPython notebooks
 
-conda install anaconda-client scikit-learn pandas matplotlib jupyter
+## env setup
 
-conda install keras jupyterhub -c conda-forge
+	conda create -n35 python=3.5
+	./env_setup.sh 35
 
-pip install https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.1.0-py3-none-any.whl
+	conda create -n36 python=3.6
+	./env_setup.sh 36
