@@ -14,7 +14,7 @@ if [[ ! $(conda info --envs | grep $ENV) ]]; then
 fi
 
 source activate $ENV || exit 1
-pip install ipython # see issue https://github.com/ipython/ipython/issues/10560
-conda install -y pandas anaconda-client scikit-learn matplotlib jupyter dask
+# pip install ipython # see issue https://github.com/ipython/ipython/issues/10560
+conda install -y ipython pandas anaconda-client scikit-learn matplotlib jupyter dask
 conda install -y keras jupyterhub -c conda-forge
 pip install https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.1.0-py3-none-any.whl
