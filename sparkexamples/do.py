@@ -62,10 +62,12 @@ _s = tools.dict_of_lists_to_dict(_s_orig)
 _n = len(_s)
 _s = tools.dict_to_spark_schema(_s)
 
-sp = SparkParser(
-        lambda : glob.glob('data/*.csv.gz'),
-        schema=_s)
-
+try:
+    sp = SparkParser(
+            lambda : glob.glob('data/*.csv.gz'),
+            schema=_s)
+except Exception as e:
+    print('no spark maybe')
 def gen_data(m=10, n=_n):
     df = pd.DataFrame(randn(m, n))
     df.columns = list(string.ascii_lowercase[:n])
