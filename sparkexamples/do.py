@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 import asyncio
+import argh
 import time
 import os
 import pandas as pd
@@ -95,4 +97,4 @@ def _periodically_generate_new_data(period=5, nmax=100, basedir='./data', scramb
         time.sleep(period)
 
 if __name__ == '__main__':
-    pass
+    argh.dispatch_command(_periodically_generate_new_data)
