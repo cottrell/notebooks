@@ -1,10 +1,22 @@
 import logging
+import subprocess
 import time
 import pandas as pd
 import threading
 import contextlib
 import asyncio
 import collections
+
+def run_command_get_output(cmd, shell=True, splitlines=True):
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell)
+    out, err = p.communicate()
+    status = p.returncode
+    out = out.decode()
+    err = err.decode()
+    if splitlines:
+        out = out.split()
+        err = err.split()
+    return out, err, status
 
 def convert_to_categorical_inplace(df):
     for k in df:
@@ -143,3 +155,4 @@ class AttrDict(dict):
     def __init__(self, *args, **kwargs):
         super(AttrDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
+
