@@ -23,3 +23,6 @@ fi
 
 gpg --import KEYS
 gpg --verify spark-"$version"-bin-hadoop2.7.tgz.asc spark-"$version"-bin-hadoop2.7.tgz && echo '.asc pass' || echo '.asc fail'
+
+echo untar and add spark-"$version"-bin-hadoop2.7/bin to PATH
+echo alias pyspark_ipython='PYSPARK_DRIVER_PYTHON=ipython pyspark'
