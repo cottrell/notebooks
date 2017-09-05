@@ -38,9 +38,6 @@ class VersionedCachedComputation():
             key += tuple([x._get_key() for x in self._versioned_args])
         return key
 
-    def _get_graph(self):
-        pass
-
     def compute(self, force=False):
         global _cache
         key = self._get_key()
@@ -71,25 +68,3 @@ def B(x, y='more', v_args=[A(41.3, 23)]):
 def C(x, y='more', v_args=[B(1111), A(41.3, 23)]):
     time.sleep(1)
     return str(x) + ":" + str(y) + ':' + str(v_args[0])
-
-# NOPE
-
-# # using decorator.decorate allows you to avoid closures
-# def _versioned_cached_computation_factory(fun, *args, **kwargs):
-#     return VersionedCachedComputation(fun, *args, *kwargs)
-#
-# def versioned_cached_computation_factory(fun):
-#     return decorator.decorate(fun, _return_vcc)
-# class VersionedCachedComputationFactory(object):
-#     def __init__(self, fun, *args, **kwargs):
-#         self._fun = fun
-#         self._name = 'needname'
-#         argspec = inspect.getfullargspec(fun)
-#         self._kwarg_defaults = dict(zip(argspec.args[::-1], argspec.defaults[::-1]))
-#         logging.info("VCCF.__init__:{} _kwarg_defaults={}".format(self._name, self._kwarg_defaults))
-#     def __call__(self, *args, **kwargs):
-#         kwargs_out = dict(self._kwarg_defaults)
-#         kwargs_out.update(kwargs)
-#         logging.info("VCCF.__call__:{} args={}, kwargs={}".format(self._name, args, kwargs_out))
-#         return VersionedCachedComputation(self._fun, *args, **kwargs_out)
-
