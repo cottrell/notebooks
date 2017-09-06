@@ -14,8 +14,8 @@ def run_command_get_output(cmd, shell=True, splitlines=True):
     out = out.decode()
     err = err.decode()
     if splitlines:
-        out = out.split()
-        err = err.split()
+        out = out.split('\n')
+        err = err.split('\n')
     return out, err, status
 
 def convert_to_categorical_inplace(df):
