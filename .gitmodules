@@ -1,0 +1,3 @@
+[submodule "commoncrawlscraper"]
+	path = commoncrawlscraper
+	url = https://github.com/cottrell/commoncrawlscraper.git
