@@ -4,3 +4,6 @@
 [submodule "dbit"]
 	path = dbit
 	url = https://github.com/cottrell/dbit.git
+[submodule "consul_examples"]
+	path = consul_examples
+	url = https://github.com/cottrell/consul_examples.git
