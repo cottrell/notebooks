@@ -1,3 +1,6 @@
 [submodule "commoncrawlscraper"]
 	path = commoncrawlscraper
 	url = https://github.com/cottrell/commoncrawlscraper.git
+[submodule "dbit"]
+	path = dbit
+	url = https://github.com/cottrell/dbit.git
