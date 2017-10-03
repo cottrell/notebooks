@@ -1,4 +1,13 @@
 """
+pip install broken for swagger-ui: https://github.com/jmcarp/flask-apispec/issues/28
+
+# pip install flask-apispec
+git clone https://github.com/jmcarp/flask-apispec.git
+cd flask_apispec
+pip install invoke
+invoke install
+python setup.py install
+
 test with
 
 http://localhost:5000/pets?category=adsf&size=12
@@ -19,6 +28,14 @@ api = Api(app)
 def get_pets(**kwargs):
     return {'something': 'here', 'size': kwargs['size'], 'category': kwargs['category']}
 
+class UserResource(MethodResource):
+    def get(self, id):
+        return 'asdf'
+    def put(self, id):
+        return 'asdf'
+    def delete(self, id):
+        return 'asdf'
+
 app.config.update({
     'APISPEC_SPEC': APISpec(
         title='pets',
@@ -30,6 +47,7 @@ app.config.update({
 
 docs = FlaskApiSpec(app)
 docs.register(get_pets)
+# docs.register(UserResource)
 
 if __name__ == '__main__':
     app.run(debug=True)
