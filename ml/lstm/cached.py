@@ -7,13 +7,13 @@ mangled_data = os.path.join(mydir, 'mangled_data.txt.gz')
 filename = os.path.join(mydir, '../../data/bis/all.text')
 
 @lru_cache()
-def get_data(filename=filename):
+def get_data(filename=filename, maxlen=10000):
     if os.path.exists(mangled_data):
         print('reading {}'.format(mangled_data))
         data = gzip.open(mangled_data).read().decode()
     else:
         print('reading {}'.format(filename))
-        data = open(filename).read()
+        data = open(filename).read()[:maxlen]
         # 12 s
         s = pd.Series(list(data)).value_counts()
         # 6 s

@@ -73,7 +73,7 @@ def build_model(m_input=128, n_input=32):
     print("> Compilation Time : ", time.time() - start)
     return model
 
-def load_data(seq_length, filename=filename):
+def load_data(seq_length, filename=filename, max_len=10000):
     data, chars, vocab_size = get_data(filename=filename)
     # chars is ints: ord('a') is chr(97)
     print('Data length: {} characters'.format(len(data)))
@@ -81,8 +81,8 @@ def load_data(seq_length, filename=filename):
 
     ix_to_char = {ix: char for ix, char in enumerate(chars)}
     char_to_ix = {char: ix for ix, char in enumerate(chars)}
-    xfile = os.path.join(mydir, 'X_{}.bcolz'.format(seq_length))
-    yfile = os.path.join(mydir, 'y_{}.bcolz'.format(seq_length))
+    xfile = os.path.join(mydir, 'X_{}_{}.bcolz'.format(seq_length, max_len))
+    yfile = os.path.join(mydir, 'y_{}_{}.bcolz'.format(seq_length, max_len))
     if os.path.exists(xfile):
         print('using cached values from {}'.format(xfile))
         X = bcolz.carray(rootdir=xfile, mode='r')[:]
@@ -104,11 +104,14 @@ def load_data(seq_length, filename=filename):
     for i in range(0, nnn):
         if i % 100 == 1:
             percent_done = i / float(nnn)
-            eta = (time.time() - t0) / percent_done / 60
+            eta = (1 - percent_done) * (time.time() - t0) / percent_done / 60
             print('iteration {}: {} done. ETA {} minutes'.format(i, percent_done, eta))
         X[i] = I[data_mapped[i * seq_length:(i+1) * seq_length]]
         y[i] = I[data_mapped[i * seq_length + 1:(i+1) * seq_length + 1]]
 
+    print('saving bcolz')
+    bcolz.carray(X, rootdir=xfile)
+    bcolz.carray(y, rootdir=yfile)
     return X, y, vocab_size, ix_to_char
 
 def generate_text(model, length, vocab_size, ix_to_char):
