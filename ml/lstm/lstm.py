@@ -7,6 +7,10 @@ import numpy.random as nr
 import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.keras as K
+from keras.models import Sequential
+from keras.layers.core import Dense, Activation, Dropout
+from keras.layers.recurrent import LSTM, SimpleRNN
+from keras.layers.wrappers import TimeDistributed
 from cached import get_data
 mydir = os.path.dirname(os.path.realpath(__file__))
 filename = os.path.join(mydir, '../../data/bis/all.text')
@@ -14,7 +18,7 @@ filename = os.path.join(mydir, '../../data/bis/all.text')
 def run(filename=filename,
         batch_size=50,
         layer_num=2,
-        seq_length=50,
+        seq_length=200,
         hidden_dim=500,
         generate_length=500,
         nb_epoch=20,
@@ -32,7 +36,7 @@ def run(filename=filename,
     model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
 
     # Generate some sample before training to know how bad it is!
-    generate_text(model, args['generate_length'], vocab_size, ix_to_char)
+    generate_text(model, generate_length, vocab_size, ix_to_char)
 
     if not weights == '':
         model.load_weights(weights)
@@ -41,7 +45,7 @@ def run(filename=filename,
         nb_epoch = 0
 
     # Training if there is no trained weights specified
-    if args['mode'] == 'train' or weights == '':
+    if mode == 'train' or weights == '':
         while True:
             print('\n\nEpoch: {}\n'.format(nb_epoch))
             model.fit(X, y, batch_size=batch_size, verbose=1, nb_epoch=1)
