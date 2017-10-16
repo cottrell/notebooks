@@ -85,8 +85,8 @@ def load_data(seq_length, filename=filename, maxlen=10000):
 
     ix_to_char = {ix: char for ix, char in enumerate(chars)}
     char_to_ix = {char: ix for ix, char in enumerate(chars)}
-    xfile = os.path.join(mydir, 'X_{}_{}.bcolz'.format(seq_length, max_len))
-    yfile = os.path.join(mydir, 'y_{}_{}.bcolz'.format(seq_length, max_len))
+    xfile = os.path.join(mydir, 'X_{}_{}.bcolz'.format(seq_length, maxlen))
+    yfile = os.path.join(mydir, 'y_{}_{}.bcolz'.format(seq_length, maxlen))
     if os.path.exists(xfile):
         print('using cached values from {}'.format(xfile))
         X = bcolz.carray(rootdir=xfile, mode='r')[:]
