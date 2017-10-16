@@ -18,7 +18,7 @@ filename = os.path.join(mydir, '../../data/bis/all.text')
 def run(filename=filename,
         batch_size=50,
         layer_num=2,
-        seq_length=200,
+        seq_length=50,
         hidden_dim=500,
         generate_length=500,
         nb_epoch=20,
@@ -77,8 +77,8 @@ def build_model(m_input=128, n_input=32):
     print("> Compilation Time : ", time.time() - start)
     return model
 
-def load_data(seq_length, filename=filename, max_len=10000):
-    data, chars, vocab_size = get_data(filename=filename)
+def load_data(seq_length, filename=filename, maxlen=10000):
+    data, chars, vocab_size = get_data(filename=filename, maxlen=10000)
     # chars is ints: ord('a') is chr(97)
     print('Data length: {} characters'.format(len(data)))
     print('Vocabulary size: {} characters'.format(vocab_size))
