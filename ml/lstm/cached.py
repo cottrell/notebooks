@@ -10,10 +10,10 @@ filename = os.path.join(mydir, '../../data/bis/all.text')
 def get_data(filename=filename, maxlen=10000):
     if os.path.exists(mangled_data):
         print('reading {}'.format(mangled_data))
-        data = gzip.open(mangled_data).read().decode()
+        data = gzip.open(mangled_data).read().decode()[:(maxlen+1)]
     else:
         print('reading {}'.format(filename))
-        data = open(filename).read()[:maxlen]
+        data = open(filename).read()
         # 12 s
         s = pd.Series(list(data)).value_counts()
         # 6 s
@@ -21,6 +21,7 @@ def get_data(filename=filename, maxlen=10000):
         a = str.maketrans({k: None for k in s[s<1000].index.tolist()})
         data = data.translate(a)
         gzip.open(mangled_data, 'w').write(data.encode())
+        data = data[:(maxlen+1)]
     chars = sorted(list(set(data))) # is int if data is bytes, is str if data is str
     VOCAB_SIZE = len(chars)
     return data, chars, VOCAB_SIZE

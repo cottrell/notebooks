@@ -77,8 +77,8 @@ def build_model(m_input=128, n_input=32):
     print("> Compilation Time : ", time.time() - start)
     return model
 
-def load_data(seq_length, filename=filename, maxlen=10000):
-    data, chars, vocab_size = get_data(filename=filename, maxlen=10000)
+def load_data(seq_length, filename=filename, maxlen=100000):
+    data, chars, vocab_size = get_data(filename=filename, maxlen=maxlen)
     # chars is ints: ord('a') is chr(97)
     print('Data length: {} characters'.format(len(data)))
     print('Vocabulary size: {} characters'.format(vocab_size))
@@ -95,7 +95,7 @@ def load_data(seq_length, filename=filename, maxlen=10000):
     else:
         print('no file {}'.format(xfile))
     # 6 s
-    print('mapping data')
+    print('mapping data of len {}'.format(len(data)))
     data_mapped = np.array(list(map(char_to_ix.get, data)))
 
     nnn = int(len(data_mapped) / seq_length)
@@ -106,7 +106,7 @@ def load_data(seq_length, filename=filename, maxlen=10000):
     I = np.eye(vocab_size, dtype=np.int16)
     t0 = time.time()
     for i in range(0, nnn):
-        if i % 100 == 1:
+        if i % 1000 == 1:
             percent_done = i / float(nnn)
             eta = (1 - percent_done) * (time.time() - t0) / percent_done / 60
             print('iteration {}: {} done. ETA {} minutes'.format(i, percent_done, eta))
