@@ -3,6 +3,8 @@ from setuptools import setup
 
 REQUIRED_PACKAGES = [
         'keras',
+        'argh',
+        'bcolz',
         'pandas',
         'tensorflow'
 ]
