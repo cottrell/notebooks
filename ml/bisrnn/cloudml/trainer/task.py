@@ -2,6 +2,7 @@
 import gzip
 import argh
 import bcolz
+import sys
 import pandas as pd
 import os
 import time
@@ -136,7 +137,7 @@ def generate_text(model, length, vocab_size, ix_to_char):
         # appending the last predicted character to sequence
         X[0, i, :][ix[-1]] = 1
         # print(ix_to_char[ix[-1]], end="")
-        stdout.write(ix_to_char[ix[-1]])
+        sys.stdout.write(ix_to_char[ix[-1]])
         ix = np.argmax(model.predict(X[:, :i + 1, :])[0], 1)
         y_char.append(ix_to_char[ix[-1]])
     return ('').join(y_char)
