@@ -59,4 +59,4 @@ api.add_resource(Todo, '/todos/<todo_id>')
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(listen='0.0.0.0', debug=True)
