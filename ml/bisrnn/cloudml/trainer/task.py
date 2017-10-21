@@ -28,7 +28,7 @@ def mangle_data(filename=orig_data, outfile=filename):
     s = pd.Series(list(data)).value_counts()
     # 6 s
     # keep chars with more than 1000 occurences
-    a = str.maketrans({k: None for k in s[s<1000].index.tolist()})
+    a = str.maketrans({k: ' ' for k in s[s<1000].index.tolist()})
     data = data.translate(a)
     print('writing {}'.format(mangle_data))
     gzip.open(outfile, 'w').write(data.encode())
