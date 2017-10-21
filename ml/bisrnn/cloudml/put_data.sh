@@ -1,2 +1,4 @@
 #!/bin/sh
-gsutil cp ../mangled_data.txt.gz gs://${BUCKET}/
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. ${DIR}/env.sh
+gsutil cp ${FILENAME} ${BUCKET}
