@@ -24,7 +24,15 @@ case $method in
                                      --hidden-dim=10
         ;;
     gcloud_mlengine)
-        echo gcloud mlengine
+        # see readme for setup etc
+        gcloud ml-engine jobs submit training ${JOB_NAME} \
+                                     --package-path trainer \
+                                     --module-name trainer.task -- \
+                                     --filename=${GCS_FILENAME} \
+                                     --maxlen=100 \
+                                     --epochs=2 \
+                                     --seq-length=10 \
+                                     --hidden-dim=10
         ;;
     *)
         echo unknown method ${method}
