@@ -15,7 +15,7 @@ orig_data = os.path.join(mydir, '../../../../data/bis/all.text.gz')
 def get_data(filename=filename, maxlen=None):
     """ read the mangled data """
     print('reading {}'.format(filename))
-    data = gzip.open(filename).read().decode()[:(maxlen+1)]
+    data = gzip.open(filename).read().decode('utf-8')[:(maxlen+1)]
     chars = sorted(list(set(data))) # is int if data is bytes, is str if data is str
     VOCAB_SIZE = len(chars)
     return data, chars, VOCAB_SIZE
@@ -23,7 +23,7 @@ def get_data(filename=filename, maxlen=None):
 def mangle_data(filename=orig_data, outfile=filename):
     """ preprocessing only, do this once basically """
     print('reading {}'.format(filename))
-    data = gzip.open(filename).read().decode()
+    data = gzip.open(filename).read().decode('utf-8')
     # 12 s
     s = pd.Series(list(data)).value_counts()
     # 6 s
