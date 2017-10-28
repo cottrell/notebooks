@@ -17,7 +17,6 @@ case $method in
     gcloud_local)
         gcloud ml-engine local train --package-path trainer \
                                      --module-name trainer.task -- \
-                                     -- \
                                      --filename=${FILENAME} \
                                      --maxlen=100 \
                                      --epochs=2 \
