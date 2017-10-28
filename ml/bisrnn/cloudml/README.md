@@ -35,16 +35,36 @@ See what models you have: `gcloud ml-engine models list`
 
 6. Submit job
 
-export JOB_NAME="job_$(date +%Y%m%d_%H%M%S)"
-gcloud ml-engine jobs submit training ${JOB_NAME} \
-    --package-path trainer \
-    --module-name trainer.task \
-    --staging-bucket gs://${BUCKET} \
-    --job-dir gs://${BUCKET}/${JOB_NAME} \
-    --runtime-version 1.2 \
-    --region us-central1 \
-    --config config/config.yaml \
-    -- \
-    --data_dir gs://${BUCKET}/data \
-    --output_dir gs://${BUCKET}/${JOB_NAME} \
-    --train_steps 10000
+    $ ./run.sh gcloud_mlengine
+    method=gcloud_mlengine
+    Job [job_20171028_143140] submitted successfully.
+    Your job is still active. You may view the status of your job with the command
+    
+      $ gcloud ml-engine jobs describe job_20171028_143140
+    
+      or continue streaming the logs with the command
+    
+        $ gcloud ml-engine jobs stream-logs job_20171028_143140
+        jobId: job_20171028_143140
+        state: QUEUED
+    
+    
+        Updates are available for some Cloud SDK components.  To install them,
+        please run:
+          $ gcloud components update
+
+    other example:
+
+    export JOB_NAME="job_$(date +%Y%m%d_%H%M%S)"
+    gcloud ml-engine jobs submit training ${JOB_NAME} \
+        --package-path trainer \
+        --module-name trainer.task \
+        --staging-bucket gs://${BUCKET} \
+        --job-dir gs://${BUCKET}/${JOB_NAME} \
+        --runtime-version 1.2 \
+        --region us-central1 \
+        --config config/config.yaml \
+        -- \
+        --data_dir gs://${BUCKET}/data \
+        --output_dir gs://${BUCKET}/${JOB_NAME} \
+        --train_steps 10000

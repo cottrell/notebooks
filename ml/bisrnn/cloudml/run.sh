@@ -16,7 +16,8 @@ case $method in
         ;;
     gcloud_local)
         gcloud ml-engine local train --package-path trainer \
-                                     --module-name trainer.task -- \
+                                     --module-name trainer.task \
+                                     -- \
                                      --filename=${FILENAME} \
                                      --maxlen=100 \
                                      --epochs=2 \
@@ -27,7 +28,10 @@ case $method in
         # see readme for setup etc
         gcloud ml-engine jobs submit training ${JOB_NAME} \
                                      --package-path trainer \
-                                     --module-name trainer.task -- \
+                                     --module-name trainer.task \
+                                     --staging-bucket gs://${BUCKET} \
+                                     --job-dir gs://${BUCKET}/${JOB_NAME} \
+                                     -- \
                                      --filename=${GCS_FILENAME} \
                                      --maxlen=100 \
                                      --epochs=2 \
