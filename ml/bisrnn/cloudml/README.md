@@ -9,6 +9,17 @@ See here: cloudml-samples/census/keras
 	gcloud projects list
 	gcloud projects create <some name>
 
+How to switch projects? 
+
+How to specify buckets? How to read config or display it? 
+
+    gcloud config set/get
+    gcloud config set compute/region europe-west1
+    gcloud config set compute/zone europe-west1-b
+    gcloud config set compute/region us-east1
+    gcloud config list
+    gcloud compute zones list
+
 2. Set up billing for project: https://console.cloud.google.com/billing/projects
 
 3. Enable the Google Compute Engine and the Cloud Machine Learning APIs. (not working currently ... maybe not needed? gcloud just prompts you but is slow)
