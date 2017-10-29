@@ -46,6 +46,8 @@ See what models you have: `gcloud ml-engine models list`
 
 6. Submit job
 
+    Where to view jobs on UI?
+
     $ ./run.sh gcloud_mlengine
     method=gcloud_mlengine
     Job [job_20171028_143140] submitted successfully.
