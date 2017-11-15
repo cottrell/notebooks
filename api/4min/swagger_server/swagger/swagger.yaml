@@ -1,0 +1,36 @@
+---
+swagger: "2.0"
+info:
+  description: "A sample API that says hello"
+  version: "1.0.0"
+  title: "Hello World"
+  contact:
+    name: "You name here"
+  license:
+    name: "MIT"
+host: "localhost:8080"
+basePath: "/api/v1"
+schemes:
+- "http"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /message:
+    get:
+      description: "Returns a greeting."
+      operationId: "message_get"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Message"
+      x-swagger-router-controller: "swagger_server.controllers.default_controller"
+definitions:
+  Message:
+    type: "object"
+    properties:
+      message:
+        type: "string"

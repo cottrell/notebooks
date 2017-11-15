@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags always come first -->
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Zero to API in 4 minutes | network | automation
+</title>
+  <link rel="canonical" href="https://cidrblock.github.io/zero-to-api-in-4-minutes.html">
+
+  <link rel="alternate" type="application/atom+xml" href="https://cidrblock.github.io/feeds/all.atom.xml" title="Full Atom Feed">
+  <link rel="alternate" type="application/atom+xml" href="https://cidrblock.github.io/feeds/apis-python.atom.xml" title="Categories Atom Feed">
+
+
+  <link rel="stylesheet" href="https://cidrblock.github.io/theme/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cidrblock.github.io/theme/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cidrblock.github.io/theme/css/pygments/default.min.css">
+  <link rel="stylesheet" href="https://cidrblock.github.io/theme/css/style.css">
+  <link href="https://fonts.googleapis.com/css?family=Anonymous+Pro" rel="stylesheet">
+
+
+<meta name="description" content="Build an design-first API in python with swagger in four minutes.">
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <h1 class="title"><a href="https://cidrblock.github.io">network | automation</a></h1>
+          <ul class="list-inline">
+            <li class="list-inline-item"><a href="http://drawthe.net/" target="_blank">[drawthe.net]</a></li>
+            <li class="list-inline-item"><a href="https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&cad=rja&uact=8&ved=0ahUKEwiKscj5lYPRAhUT4GMKHdAsBM4QFgghMAE&url=https%3A%2F%2Ftwitter.com%2Fjedelman8%2Fstatus%2F663808419783045120&usg=AFQjCNGWhcMLiY_-O6QZwG82IxyIMHqXoA" target="_blank">[#networktocode]</a></li>
+            <li class="list-inline-item"><a href="https://github.com/cidrblock/cidrblock.github.io-src/issues" target="_blank">[comments/issues]</a></li>
+            <li class="list-inline-item"><a href="network-automation-and-devops-resources.html" target="_blank">[netdevops resources]</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="container">
+      <h1>Zero to API in 4 minutes
+</h1>
+      <hr>
+<article class="article">
+  <header>
+    <ul class="list-inline">
+      <li class="list-inline-item text-muted" title="2017-01-16T13:18:37.525920-08:00">
+        <i class="fa fa-clock-o"></i>
+        Mon 16 January 2017
+      </li>
+      <li class="list-inline-item">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="https://cidrblock.github.io/category/apis-python.html">APIs, python</a>
+      </li>
+      <li class="list-inline-item">
+        <i class="fa fa-user-o"></i>
+        <a href="https://cidrblock.github.io/author/bradley-a-thornton.html">Bradley A. Thornton</a>      </li>
+      <li class="list-inline-item">
+        <i class="fa fa-files-o"></i>
+        <a href="https://cidrblock.github.io/tag/python.html">#python</a>,         <a href="https://cidrblock.github.io/tag/netdevops.html">#netdevops</a>      </li>
+    </ul>
+  </header>
+  <div class="content">
+    <p>Are you are a network engineer and spend most of your time doing service delivery, instead of network engineering, architecture, and automation?  One way to eliminate the <a href="https://www.safaribooksonline.com/library/view/site-reliability-engineering/9781491929117/ch05.html">toil</a> might be to expose your services as APIs so your customers can consume them, self-service and programatically. Ansible and python are popular tools for network automation.  Using familiar tools, YAML and python, a simple design-first API can be written will little to no code.</p>
+<p>This tutorial should take no more than a few minutes to work through and results in a documented, usable API in a format your application devops team should be ready to consume.</p>
+<h2>Getting started</h2>
+<p>Build a new folder for the project, add a <a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/">virtual environment</a> and install <a href="http://flask.pocoo.org/">Flask</a>.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Make a new project folder</span>
+mkdir my_api
+<span class="nb">cd</span> my_api
+<span class="c1"># Set up a virtual environement</span>
+virtualenv venv
+<span class="nb">source</span> venv/bin/activate
+<span class="c1"># Install flask</span>
+pip install flask
+<span class="c1"># Save the dependancies</span>
+pip freeze &gt; requirements.txt
+</pre></div>
+
+
+<h2>Install Swagger editor</h2>
+<p>The API will be define using the <a href="https://github.com/OAI/OpenAPI-Specification">The OpenAPI Specification (fka The Swagger Specification)</a></p>
+<p>Install the <a href="https://github.com/swagger-api/swagger-editor">swagger editor</a> and unzip</p>
+<div class="highlight"><pre><span></span>wget https://github.com/swagger-api/swagger-editor/releases/download/v2.10.4/swagger-editor.zip
+unzip swagger-editor.zip
+</pre></div>
+
+
+<h2>Build a backend for swagger.</h2>
+<p>Two small changes need to be made to swagger-editor.</p>
+<p>1) Enable backend saving, so files can be saved the local file system.</p>
+<p>2) Set the default format to yaml.</p>
+<p>Make the following changes to the <code>swagger-editor/config/defaults.json</code> file:</p>
+<p>Swagger editor doesn't ship with a backend for saving files.  To enable backend saving modify the <code>swagger-editor/config</code></p>
+<div class="highlight"><pre><span></span><span class="s">&quot;useBackendForStorage&quot;</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true,</span>
+<span class="s">&quot;useYamlBackend&quot;</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true,</span>
+</pre></div>
+
+
+<p>The following python script is all that is needed for a backend.  Swagger editor only does a GET when it starts, and a PUT every time the spec file is modified.</p>
+<p>Create <code>backend.py</code>:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot; Simple swagger backend (backend.py)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">webbrowser</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span>
+
+<span class="c1"># pylint: disable=invalid-name</span>
+<span class="n">specfile</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">port</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="n">static_url_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">static_folder</span><span class="o">=</span><span class="s2">&quot;swagger-editor&quot;</span><span class="p">)</span>
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">root</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; The swagger editor entry point</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">send_static_file</span><span class="p">(</span><span class="s1">&#39;index.html&#39;</span><span class="p">)</span>
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/editor/spec&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;PUT&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">spec</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; The route for swagger</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">specfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_contents</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">file_contents</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">data</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">400</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;PUT&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">specfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">200</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">400</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; The main entry point</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=global-statement</span>
+    <span class="k">global</span> <span class="n">port</span>
+    <span class="k">global</span> <span class="n">specfile</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Simple swagger backend&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--specfile&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;specfile&quot;</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">specfile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">specfile</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">port</span>
+    <span class="n">webbrowser</span><span class="o">.</span><span class="n">open_new</span><span class="p">(</span><span class="s1">&#39;http://127.0.0.1:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">port</span><span class="p">))</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+
+<h2>Create our API specification</h2>
+<p>This is a <a href="https://apigee.com/about/blog/developer/design-first-approach-building-apis-swagger">design first</a> approach to API development.  The schema for the API is written in yaml.</p>
+<p>Start the swagger backend:</p>
+<div class="highlight"><pre><span></span>python backend.py -p 5000 -s swagger.yml
+</pre></div>
+
+
+<p>The system default browser should open to http://127.0.0.1:5000/.</p>
+<p>Here is the specification for the API. Paste it in the editor, the backend should save the file automatically for you.</p>
+<div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">swagger</span><span class="p p-Indicator">:</span> <span class="s">&quot;2.0&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">info</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">version</span><span class="p p-Indicator">:</span> <span class="s">&quot;1.0.0&quot;</span>
+  <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="s">&quot;Hello</span><span class="nv"> </span><span class="s">World&quot;</span>
+  <span class="l l-Scalar l-Scalar-Plain">description</span><span class="p p-Indicator">:</span> <span class="s">&quot;A</span><span class="nv"> </span><span class="s">sample</span><span class="nv"> </span><span class="s">API</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">says</span><span class="nv"> </span><span class="s">hello&quot;</span>
+  <span class="l l-Scalar l-Scalar-Plain">contact</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&quot;You</span><span class="nv"> </span><span class="s">name</span><span class="nv"> </span><span class="s">here&quot;</span>
+  <span class="l l-Scalar l-Scalar-Plain">license</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&quot;MIT&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">host</span><span class="p p-Indicator">:</span> <span class="s">&quot;localhost:8080&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">basePath</span><span class="p p-Indicator">:</span> <span class="s">&quot;/api/v1&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">schemes</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="s">&quot;http&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">consumes</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="s">&quot;application/json&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">produces</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="s">&quot;application/json&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">paths</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">/message</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">get</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">description</span><span class="p p-Indicator">:</span> <span class="s">&quot;Returns</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">greeting.&quot;</span>
+      <span class="l l-Scalar l-Scalar-Plain">responses</span><span class="p p-Indicator">:</span>
+        <span class="s">&quot;200&quot;</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">description</span><span class="p p-Indicator">:</span> <span class="s">&quot;Success&quot;</span>
+          <span class="l l-Scalar l-Scalar-Plain">schema</span><span class="p p-Indicator">:</span>
+            <span class="l l-Scalar l-Scalar-Plain">$ref</span><span class="p p-Indicator">:</span> <span class="s">&quot;#/definitions/Message&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">definitions</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">Message</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="s">&quot;object&quot;</span>
+    <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">message</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="s">&quot;string&quot;</span>
+</pre></div>
+
+
+<h3>Convert the specification to code</h3>
+<p>using <a href="https://github.com/swagger-api/swagger-codegen">swagger codegen</a></p>
+<p>The conversion can be done easily using either the online <a href="http://generator.swagger.io/">swagger codegen api</a> or a local <a href="https://hub.docker.com/r/jimschubert/swagger-codegen-cli/">docker container</a></p>
+<h4>Generate using the online API</h4>
+<p>In order to us the online API, a few dependancies need to be installed.</p>
+<div class="highlight"><pre><span></span>pip install pyyaml
+pip install requests
+<span class="c1"># update the requirements.txt file</span>
+pip freeze &gt; requirements.txt
+</pre></div>
+
+
+<p>A simply python script can submit the <code>swagger.yml</code> file and unzip it.</p>
+<p>Create <code>submit.py</code>:</p>
+<div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot; Submit for codegen</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+
+<span class="n">FILENAME</span> <span class="o">=</span> <span class="s2">&quot;codegen.zip&quot;</span>
+
+<span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">specfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; convert to json</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">specfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_contents</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_contents</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+<span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Send the swagger spec file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;supportPython2&#39;</span><span class="p">:</span> <span class="bp">True</span> <span class="p">}})</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Content-type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span> <span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://generator.swagger.io/api/gen/servers/python-flask&#39;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;link&#39;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">retrieve</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Retreive the codegen file and save</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">FILENAME</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">unzip</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Unzip the codegen file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">zip_ref</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">FILENAME</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">zip_ref</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s2">&quot;Extracted in Current Directory&quot;</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; The main entry point</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Submit for codegen&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--specfile&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;specfile&quot;</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">specfile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">specfile</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">convert</span><span class="p">(</span><span class="n">specfile</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">retrieve</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">unzip</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+
+<p>and run it</p>
+<div class="highlight"><pre><span></span>python submit.py -s swagger.yml
+</pre></div>
+
+
+<h4>Generate using a local docker container</h4>
+<div class="highlight"><pre><span></span>docker run -it -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:/swagger-api/out <span class="se">\</span>
+    -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:/swagger-api/yaml <span class="se">\</span>
+    jimschubert/swagger-codegen-cli generate <span class="se">\</span>
+    -i /swagger-api/yaml/swagger.yml <span class="se">\</span>
+    -l python-flask <span class="se">\</span>
+    -D <span class="nv">supportPython2</span><span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+    -o /swagger-api/out/python-flask-server
+</pre></div>
+
+
+<h3>API server prep</h3>
+<p>Install the requirements for the backend API server.</p>
+<div class="highlight"><pre><span></span>pip install -r python-flask-server/requirements.txt
+pip install flask-cors
+# Save the dependancies
+pip freeze &gt; requirements.txt
+</pre></div>
+
+
+<p>Move the <code>swagger_server</code> directory up to the project parent folder and delete the previous parent.</p>
+<div class="highlight"><pre><span></span>mv python-flask-server/swagger_server swagger_server
+rm -rf python-flask-server
+</pre></div>
+
+
+<h4>Modify the swagger_server/<strong>main</strong>.py.</h4>
+<p>Since the API server will be run on a different port than the swagger editor, we need to enable CORS.</p>
+<p>Modify the swagger_server/<strong>main</strong>.py file as follows:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">connexion</span>
+<span class="kn">from</span> <span class="nn">.encoder</span> <span class="kn">import</span> <span class="n">JSONEncoder</span>
+<span class="kn">from</span> <span class="nn">flask_cors</span> <span class="kn">import</span> <span class="n">CORS</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">connexion</span><span class="o">.</span><span class="n">App</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="n">specification_dir</span><span class="o">=</span><span class="s1">&#39;./swagger/&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">json_encoder</span> <span class="o">=</span> <span class="n">JSONEncoder</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_api</span><span class="p">(</span><span class="s1">&#39;swagger.yaml&#39;</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;A sample API that syas hello&#39;</span><span class="p">})</span>
+    <span class="n">CORS</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">app</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Several models were generated during the codegen process, use the Message class:</p>
+<p>Modify the swagger_server/controllers/default_controler.py:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">message_get</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    message_get</span>
+<span class="sd">    Returns a greeting.</span>
+
+<span class="sd">    :rtype: Message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">Message</span><span class="p">()</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Hello World&#39;</span>
+    <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+
+
+<h3>Start the backend</h3>
+<div class="highlight"><pre><span></span>python -m swagger_server
+</pre></div>
+
+
+<h3>Test the API</h3>
+<p>The new API can be tested from the command line:</p>
+<div class="highlight"><pre><span></span>curl localhost:8080/api/v1/message
+&quot;Hello world&quot;
+</pre></div>
+
+
+<p>or using the swagger editor or UI built into your project:</p>
+<p>http://localhost:8080/api/v1/ui/</p>
+<h3>Congratulations</h3>
+<p>You just wrote your first REST API. Take a few minutes to look through the directories and models. One word of caution, if you rerun the <code>submit.py</code> script it will overwrite your changes in the swagger_server directory.</p>
+  </div>
+</article>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+       <ul class="col-sm-6 list-inline">
+          <li class="list-inline-item"><a href="https://cidrblock.github.io/authors.html">Authors</a></li>
+          <li class="list-inline-item"><a href="https://cidrblock.github.io/archives.html">Archives</a></li>
+          <li class="list-inline-item"><a href="https://cidrblock.github.io/categories.html">Categories</a></li>
+          <li class="list-inline-item"><a href="https://cidrblock.github.io/tags.html">Tags</a></li>
+        </ul>
+        <p class="col-sm-6 text-sm-right text-muted">
+          Generated by <a href="https://github.com/getpelican/pelican" target="_blank">Pelican</a> / <a href="https://github.com/nairobilug/pelican-alchemy" target="_blank">&#x2728;</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>

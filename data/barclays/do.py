@@ -28,4 +28,4 @@ d.plot(ax=ax, drawstyle="steps-post", linewidth=2)
 a = d.copy()
 a[:] = 0
 a.plot()
-
+savefig('fig.png')
