@@ -22,6 +22,8 @@ def get_data(filename=filename, maxlen=None):
 
 def mangle_data(filename=orig_data, outfile=filename):
     """ preprocessing only, do this once basically """
+    if sys.version_info[0] < 3:
+        raise Exception('python 2 not work')
     print('reading {}'.format(filename))
     data = gzip.open(filename).read().decode('utf-8')
     # 12 s
@@ -32,60 +34,6 @@ def mangle_data(filename=orig_data, outfile=filename):
     data = data.translate(a)
     print('writing {}'.format(mangle_data))
     gzip.open(outfile, 'w').write(data.encode())
-
-def run(filename=filename,
-        batch_size=50,
-        layer_num=2,
-        seq_length=50,
-        hidden_dim=500,
-        generate_length=500,
-        epochs=20,
-        mode='train',
-        weights='',
-        maxlen=100000):
-    from keras.models import Sequential
-    from keras.layers.core import Dense, Activation, Dropout
-    from keras.layers.recurrent import LSTM, SimpleRNN
-    from keras.layers.wrappers import TimeDistributed
-    print('run filename={}'.format(filename))
-    X, y, vocab_size, ix_to_char = load_data(seq_length, filename, maxlen)
-
-    # Creating and compiling the Network
-    model = Sequential()
-    model.add(LSTM(hidden_dim, input_shape=(None, vocab_size), return_sequences=True))
-    for i in range(layer_num - 1):
-        model.add(LSTM(hidden_dim, return_sequences=True))
-    model.add(TimeDistributed(Dense(vocab_size)))
-    model.add(Activation('softmax'))
-    model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
-
-    # Generate some sample before training to know how bad it is!
-    generate_text(model, generate_length, vocab_size, ix_to_char)
-
-    if not weights == '':
-        model.load_weights(weights)
-        epochs = int(weights[weights.rfind('_') + 1:weights.find('.')])
-    else:
-        epochs = 0
-
-    # Training if there is no trained weights specified
-    if mode == 'train' or weights == '':
-        while True:
-            print('\n\nEpoch: {}\n'.format(epochs))
-            model.fit(X, y, batch_size=batch_size, verbose=1, epochs=1)
-            epochs += 1
-            generate_text(model, generate_length, vocab_size, ix_to_char)
-            if epochs % 10 == 0:
-                model.save_weights('checkpoint_layer_{}_hidden_{}_epoch_{}.hdf5'.format(layer_num, hidden_dim, epochs))
-
-    # Else, loading the trained weights and performing generation only
-    elif weights == '':
-        # Loading the trained weights
-        model.load_weights(weights)
-        generate_text(model, generate_length, vocab_size, ix_to_char)
-        print('\n\n')
-    else:
-        print('\n\nNothing to do!')
 
 def load_data(seq_length, filename, maxlen):
     data, chars, vocab_size = get_data(filename=filename, maxlen=maxlen)
@@ -142,5 +90,60 @@ def generate_text(model, length, vocab_size, ix_to_char):
         y_char.append(ix_to_char[ix[-1]])
     return ('').join(y_char)
 
+def run(filename=filename,
+        batch_size=50,
+        layer_num=2,
+        seq_length=50,
+        hidden_dim=500,
+        generate_length=500,
+        epochs=20,
+        mode='train',
+        weights='',
+        maxlen=100000):
+    from keras.models import Sequential
+    from keras.layers.core import Dense, Activation, Dropout
+    from keras.layers.recurrent import LSTM, SimpleRNN
+    from keras.layers.wrappers import TimeDistributed
+    print('run filename={}'.format(filename))
+    X, y, vocab_size, ix_to_char = load_data(seq_length, filename, maxlen)
+
+    # Creating and compiling the Network
+    model = Sequential()
+    model.add(LSTM(hidden_dim, input_shape=(None, vocab_size), return_sequences=True))
+    for i in range(layer_num - 1):
+        model.add(LSTM(hidden_dim, return_sequences=True))
+    model.add(TimeDistributed(Dense(vocab_size)))
+    model.add(Activation('softmax'))
+    model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
+
+    # Generate some sample before training to know how bad it is!
+    generate_text(model, generate_length, vocab_size, ix_to_char)
+
+    if not weights == '':
+        model.load_weights(weights)
+        epochs = int(weights[weights.rfind('_') + 1:weights.find('.')])
+    else:
+        epochs = 0
+
+    # Training if there is no trained weights specified
+    if mode == 'train' or weights == '':
+        while True:
+            print('\n\nEpoch: {}\n'.format(epochs))
+            model.fit(X, y, batch_size=batch_size, verbose=1, epochs=1)
+            epochs += 1
+            generate_text(model, generate_length, vocab_size, ix_to_char)
+            if epochs % 10 == 0:
+                model.save_weights('checkpoint_layer_{}_hidden_{}_epoch_{}.hdf5'.format(layer_num, hidden_dim, epochs))
+
+    # Else, loading the trained weights and performing generation only
+    elif weights == '':
+        # Loading the trained weights
+        model.load_weights(weights)
+        generate_text(model, generate_length, vocab_size, ix_to_char)
+        print('\n\n')
+    else:
+        print('\n\nNothing to do!')
+
+
 if __name__ == '__main__':
-    argh.dispatch_command(run)
+    argh.dispatch_commands([run, mangle_data])
