@@ -14,14 +14,14 @@ orig_data = os.path.join(mydir, '../../../../data/bis/all.text.gz')
 
 def get_data(filename=filename, maxlen=None):
     """ read the mangled data """
-    print('reading {}'.format(filename))
+    print('reading {} with maxlen={}'.format(filename, maxlen))
     data = gzip.open(filename).read().decode('utf-8')[:(maxlen+1)]
     chars = sorted(list(set(data))) # is int if data is bytes, is str if data is str
     VOCAB_SIZE = len(chars)
     return data, chars, VOCAB_SIZE
 
 def mangle_data(filename=orig_data, outfile=filename):
-    """ preprocessing only, do this once basically """
+    """ preprocessing only, do this once (manually) basically """
     if sys.version_info[0] < 3:
         raise Exception('python 2 not work')
     print('reading {}'.format(filename))
@@ -46,9 +46,9 @@ def load_data(seq_length, filename, maxlen):
     xfile = os.path.join(mydir, 'X_{}_{}.bcolz'.format(seq_length, maxlen))
     yfile = os.path.join(mydir, 'y_{}_{}.bcolz'.format(seq_length, maxlen))
     if os.path.exists(xfile):
-        print('using cached values from {}'.format(xfile))
         X = bcolz.carray(rootdir=xfile, mode='r')[:]
         y = bcolz.carray(rootdir=yfile, mode='r')[:]
+        print('using cached values from {}. X.shape={}, y.shape={}'.format(xfile, X.shape, y.shape))
         return X, y, vocab_size, ix_to_char
     else:
         print('no file {}'.format(xfile))
@@ -136,7 +136,7 @@ def run(filename=filename,
                 model.save_weights('checkpoint_layer_{}_hidden_{}_epoch_{}.hdf5'.format(layer_num, hidden_dim, epochs))
 
     # Else, loading the trained weights and performing generation only
-    elif weights == '':
+    elif weights != '':
         # Loading the trained weights
         model.load_weights(weights)
         generate_text(model, generate_length, vocab_size, ix_to_char)
