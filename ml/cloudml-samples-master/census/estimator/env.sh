@@ -1,4 +1,6 @@
 #!/bin/sh -e
+# a script as notes from: https://cloud.google.com/ml-engine/docs/getting-started-training-prediction
+
 # --scale-tier Enums
 # BASIC	A single worker instance. This tier is suitable for learning how to use Cloud ML, and for experimenting with new models using small datasets.
 # STANDARD_1	Many workers and a few parameter servers.
@@ -28,8 +30,6 @@ if [[ ! -e $touchfile ]]; then
     touch $touchfile
 fi
 
-MODEL_DIR=$DIR/output
-
 PROJECT_ID=$(gcloud config list project --format "value(core.project)")
 BUCKET_NAME=${PROJECT_ID}-mlengine
 REGION=$(gcloud config list --format "value(compute.region)")
@@ -40,6 +40,9 @@ if [[ "$1" ]]; then
 fi
 case $method in
     local)
+        OUTPUT_PATH=$DIR/output
+        echo OUTPUT_PATH=$OUTPUT_PATH
+        echo python -m tensorflow.tensorboard --logdir=$OUTPUT_PATH
         gcloud ml-engine local train \
             --module-name trainer.task \
             --package-path trainer/ \
@@ -47,7 +50,7 @@ case $method in
             --train-files $TRAIN_DATA \
             --eval-files $EVAL_DATA \
             --train-steps 1000 \
-            --job-dir $MODEL_DIR \
+            --job-dir $OUTPUT_PATH \
             --eval-steps 100 \
             --verbosity DEBUG
         ;;
@@ -57,7 +60,9 @@ case $method in
         #          --distributed
         #     Runs the provided code in distributed mode by providing cluster
         #     configurations as environment variables to subprocesses
-        MODEL_DIR=output-dist
+        OUTPUT_PATH=output-dist
+        echo OUTPUT_PATH=$OUTPUT_PATH
+        echo python -m tensorflow.tensorboard --logdir=$OUTPUT_PATH
         gcloud ml-engine local train \
             --module-name trainer.task \
             --package-path trainer/ \
@@ -66,13 +71,7 @@ case $method in
             --train-files $TRAIN_DATA \
             --eval-files $EVAL_DATA \
             --train-steps 1000 \
-            --job-dir $MODEL_DIR
-        ;;
-    tensorboard)
-        python -m tensorflow.tensorboard --logdir=$MODEL_DIR
-        ;;
-    create_bucket)
-        gsutil mb -l $REGION gs://$BUCKET_NAME
+            --job-dir $OUTPUT_PATH # confusing but this is actually part of the task.py in local mode
         ;;
     upload_data)
         gsutil cp -r data gs://$BUCKET_NAME/data
@@ -84,6 +83,10 @@ case $method in
         TEST_JSON=gs://$BUCKET_NAME/data/test.json
         JOB_NAME=census_single_1
         OUTPUT_PATH=gs://$BUCKET_NAME/$JOB_NAME
+        echo OUTPUT_PATH=$OUTPUT_PATH
+        echo you might need to run this first: gcloud auth application-default login
+        echo will save creds to /Users/davidcottrell/.config/gcloud/application_default_credentials.json
+        echo python -m tensorflow.tensorboard --logdir=$OUTPUT_PATH
         gcloud ml-engine jobs submit training $JOB_NAME \
             --job-dir $OUTPUT_PATH \
             --runtime-version 1.2 \
@@ -107,6 +110,92 @@ case $method in
         #   $ gcloud ml-engine jobs stream-logs census_single_1
         # jobId: census_single_1
         # state: QUEUED
+        ;;
+    cloud_distributed)
+        TRAIN_DATA=gs://$BUCKET_NAME/data/adult.data.csv
+        EVAL_DATA=gs://$BUCKET_NAME/data/adult.test.csv
+        TEST_JSON=gs://$BUCKET_NAME/data/test.json
+        JOB_NAME=census_dist_1
+        OUTPUT_PATH=gs://$BUCKET_NAME/$JOB_NAME
+        echo OUTPUT_PATH=$OUTPUT_PATH
+        echo you might need to run this first: gcloud auth application-default login
+        echo will save creds to /Users/davidcottrell/.config/gcloud/application_default_credentials.json
+        echo python -m tensorflow.tensorboard --logdir=$OUTPUT_PATH
+        gcloud ml-engine jobs submit training $JOB_NAME \
+            --job-dir $OUTPUT_PATH \
+            --runtime-version 1.2 \
+            --module-name trainer.task \
+            --package-path trainer/ \
+            --region $REGION \
+            --scale-tier STANDARD_1 \
+            -- \
+            --train-files $TRAIN_DATA \
+            --eval-files $EVAL_DATA \
+            --train-steps 1000 \
+            --verbosity DEBUG \
+            --eval-steps 100
+        ;;
+    cloud_tuning)
+        HPTUNING_CONFIG=../hptuning_config.yaml
+        JOB_NAME=census_core_hptune_1
+        OUTPUT_PATH=gs://$BUCKET_NAME/$JOB_NAME
+        echo OUTPUT_PATH=$OUTPUT_PATH
+        echo you might need to run this first: gcloud auth application-default login
+        echo will save creds to /Users/davidcottrell/.config/gcloud/application_default_credentials.json
+        echo python -m tensorflow.tensorboard --logdir=$OUTPUT_PATH
+        gcloud ml-engine jobs submit training $JOB_NAME \
+            --stream-logs \
+            --job-dir $OUTPUT_PATH \
+            --runtime-version 1.2 \
+            --config $HPTUNING_CONFIG \
+            --module-name trainer.task \
+            --package-path trainer/ \
+            --region $REGION \
+            --scale-tier STANDARD_1 \
+            -- \
+            --train-files $TRAIN_DATA \
+            --eval-files $EVAL_DATA \
+            --train-steps 1000 \
+            --verbosity DEBUG  \
+            --eval-steps 100
+        ;;
+    deploy_model)
+        # deploy a trained model for prediction
+        MODEL_NAME=census
+        # gcloud ml-engine models list
+        gcloud ml-engine models create $MODEL_NAME --regions=$REGION
+        OUTPUT_PATH=gs://$BUCKET_NAME/census_dist_1
+        # gsutil ls -r $OUTPUT_PATH/export # run this to find timestamp in next line
+        MODEL_BINARIES=gs://$BUCKET_NAME/census_dist_1/export/Servo/1511705712/
+        gcloud ml-engine versions create v1 \
+            --model $MODEL_NAME \
+            --origin $MODEL_BINARIES \
+            --runtime-version 1.2
+        ;;
+    predict)
+        echo predict
+        # get a prediction from the deployed model
+        MODEL_NAME=census
+        gcloud ml-engine predict \
+            --model $MODEL_NAME \
+            --version v1 \
+            --json-instances \
+            ../test.json
+        ;;
+    predict_batch)
+        # batch prediction (slow etc)
+        MODEL_NAME=census
+        JOB_NAME=census_prediction_1
+        OUTPUT_PATH=gs://$BUCKET_NAME/$JOB_NAME
+        gsutil ls gs://$BUCKET_NAME/data/test.json >/dev/null 2>&1 || gsutil cp ../test.json gs://$BUCKET_NAME/data/
+        TEST_JSON=gs://$BUCKET_NAME/data/test.json
+        gcloud ml-engine jobs submit prediction $JOB_NAME \
+            --model $MODEL_NAME \
+            --version v1 \
+            --data-format TEXT \
+            --region $REGION \
+            --input-paths $TEST_JSON \
+            --output-path $OUTPUT_PATH/predictions
         ;;
     *)
         echo unknown method ${method}
