@@ -196,6 +196,17 @@ case $method in
             --region $REGION \
             --input-paths $TEST_JSON \
             --output-path $OUTPUT_PATH/predictions
+        echo check with: gcloud ml-engine jobs describe $JOB_NAME
+        echo check with: gsutil cat $OUTPUT_PATH/predictions/prediction.results-00000-of-00001
+        ;;
+    clean_bucket)
+        for x in $(gsutil ls gs://$BUCKET_NAME/); do
+            read -r -p "delete $x? [y/N] " response
+            if [[ "$response" = "y" ]]; then
+                echo deleting $x
+                echo gsutil rm -r $x
+            fi
+        done
         ;;
     *)
         echo unknown method ${method}
