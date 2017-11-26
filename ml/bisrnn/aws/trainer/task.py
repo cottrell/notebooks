@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import boto3
 import gzip
 import argh
 import bcolz
@@ -21,7 +22,13 @@ orig_data = os.path.join(mydir, '../../../../data/bis/all.text.gz')
 def get_data(filename=filename, maxlen=None):
     """ read the mangled data """
     print('reading {} with maxlen={}'.format(filename, maxlen))
-    data = gzip.open(filename).read().decode('utf-8')[:(maxlen+1)]
+    if filename.startswith('s3'):
+        client = boto3.client('s3')
+        obj = client.get_object(Bucket='misc-data-ml-cottrell', Key='mangled_data.txt.gz')
+        fin = gzip.open(obj['Body'])
+    else:
+        fin = gzip.open(filename)
+    data = fin.read().decode('utf-8')[:(maxlen+1)]
     chars = sorted(list(set(data))) # is int if data is bytes, is str if data is str
     VOCAB_SIZE = len(chars)
     return data, chars, VOCAB_SIZE
