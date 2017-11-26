@@ -12,7 +12,7 @@ import platform
 mydir = os.path.dirname(os.path.realpath(__file__))
 
 if platform.uname().system == 'Darwin':
-    filename = os.path.join(mydir, '..', 'mangled_data.txt.gz')
+    filename = os.path.join(mydir, '../..', 'mangled_data.txt.gz')
 else:
     print("assuming on aws")
     filename = "s3://misc-data-ml-cottrell/mangled_data.txt.gz"
