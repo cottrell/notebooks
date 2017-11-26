@@ -136,6 +136,7 @@ case $method in
             --eval-steps 100
         ;;
     cloud_tuning)
+        # might have failed with errors
         HPTUNING_CONFIG=../hptuning_config.yaml
         JOB_NAME=census_core_hptune_1
         OUTPUT_PATH=gs://$BUCKET_NAME/$JOB_NAME
