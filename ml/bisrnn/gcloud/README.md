@@ -1,14 +1,20 @@
-# aws workflow
-
-create s3 bucket: misc-data-ml-cottrell
-
-	./put_data_s3.sh
-
 # google cloud workflow
 
 Start here: https://cloud.google.com/ml-engine/docs/distributed-tensorflow-mnist-cloud-datalab
 
 See here: cloudml-samples/census/keras
+
+1. datalab
+
+	gcloud components install datalab
+	datalab beta create-gpu bisrnn
+	# Due to GPU Driver installation, please note that Datalab GPU instances take significantly longer to startup compared to non-GPU instances.
+	# ERROR: (gcloud.beta.compute.instances.create) Could not fetch resource:
+ 	- Quota 'NVIDIA_K80_GPUS' exceeded. Limit: 0.0 in region europe-west1.
+	# datalab create bisrnn
+	http://localhost:8081
+	datalab connect bisrnn
+	datalab delete bisrnn
 
 1. Select or create a Cloud Platform project. Either go here: https://console.cloud.google.com/cloud-resource-manager or:
 
