@@ -28,7 +28,10 @@ def get_data(filename=filename, maxlen=None):
         fin = gzip.open(obj['Body'])
     else:
         fin = gzip.open(filename)
-    data = fin.read().decode('utf-8')[:(maxlen+1)]
+    data = fin.read().decode('utf-8')
+    print('data len is {}'.format(len(data)))
+    data = data[:(maxlen+1)]
+    print('using data len {}'.format(len(data)))
     chars = sorted(list(set(data))) # is int if data is bytes, is str if data is str
     VOCAB_SIZE = len(chars)
     return data, chars, VOCAB_SIZE
@@ -143,7 +146,7 @@ def run(filename=filename,
     if mode == 'train' or weights == '':
         while True:
             print('\n\nEpoch: {}\n'.format(epochs))
-            model.fit(X, y, batch_size=batch_size, verbose=1, epochs=1)
+            model.fit(X, y, batch_size=batch_size, verbose=1, epochs=1) # verbose is 0 or 1
             epochs += 1
             generate_text(model, generate_length, vocab_size, ix_to_char)
             if epochs % 10 == 0:

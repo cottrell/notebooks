@@ -2,8 +2,11 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . ${DIR}/env.sh
 python ${DIR}/trainer/task.py run --filename=${FILENAME} \
-    --maxlen=100 \
-    --epochs=2 \
-    --seq-length=10 \
-    --hidden-dim=2 \
-    --layer-num=2
+    --maxlen=57000000 \
+    --epochs=1000 \
+    --seq-length=1000 \
+    --hidden-dim=5 \
+    --layer-num=5 \
+    --batch-size=500 \
+    --generate-length=1000
+
