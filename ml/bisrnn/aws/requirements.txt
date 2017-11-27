@@ -1,5 +1,6 @@
 tensorflow
-Keras
+boto3
+keras
 pandas
 bcolz
 argh
