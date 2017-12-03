@@ -34,8 +34,8 @@ paths:
           schema:
             $ref: '#/definitions/FeedBackForm'
       responses:
-        default:
-          description: sucess
+        "200":
+          description: success
   /search/items_to_items:
     get:
       tags:
@@ -55,8 +55,10 @@ paths:
           schema:
             $ref: '#/definitions/SearchRequest'
       responses:
-        default:
+        "200":
           description: success
+          schema:
+            $ref: '#/definitions/SearchResponse'
   /search/items_to_client:
     get:
       tags:
@@ -74,12 +76,16 @@ paths:
           description: todo
           required: true
           schema:
-            $ref: '#/definitions/SearchRequest'
+            $ref: '#/definitions/SearchResponse'
       responses:
-        default:
+        "200":
           description: success
+          schema:
+            $ref: '#/definitions/SearchRequest'
 definitions:
   SearchRequest:
+    type: object
+  SearchResponse:
     type: object
   FeedBackForm:
     type: object
