@@ -1,12 +1,10 @@
 swagger: "2.0"
 info:
   version: "1.0.0"
-  title: "Hello World"
-  description: "A sample API that says hello"
+  title: "Search API"
+  description: "Miscellaneous search services"
   contact:
     name: "You name here"
-  license:
-    name: "MIT"
 host: "localhost:8080"
 basePath: "/api/v1"
 schemes:
@@ -16,14 +14,15 @@ consumes:
 produces:
 - "application/json"
 paths:
-  /message:
+  /search/item_to_items:
     get:
-      description: "Returns a greeting."
+      description: "returns a list of similar items"
       responses:
         "200":
           description: "Success"
           schema:
             $ref: "#/definitions/Message"
+
   /query:
     get:
       tags:

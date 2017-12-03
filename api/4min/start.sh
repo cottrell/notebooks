@@ -1,4 +1,6 @@
 #!/bin/sh
 
-python backend.py -p 5000 -s swagger.yml
+file=$1
+[[ "$file" ]] || file=swagger.yml
+python backend.py -p 5000 -s $file
 
