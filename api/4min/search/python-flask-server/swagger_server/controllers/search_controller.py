@@ -32,4 +32,30 @@ def search_items_to_items(body):
     """
     if connexion.request.is_json:
         body = SearchRequest.from_dict(connexion.request.get_json())
-    return 'do some magic!'
+    return {'result': 'do some magic!'}
+
+def search_client_to_client(body):
+    """
+    todo
+    todo
+    :param body: todo
+    :type body: dict | bytes
+
+    :rtype: SearchResponse
+    """
+    if connexion.request.is_json:
+        body = SearchRequest.from_dict(connexion.request.get_json())
+    return {'result': 'do some magic!'}
+
+def search_client_to_items(body):
+    """
+    todo
+    todo
+    :param body: todo
+    :type body: dict | bytes
+
+    :rtype: SearchResponse
+    """
+    if connexion.request.is_json:
+        body = SearchRequest.from_dict(connexion.request.get_json())
+    return {'result': 'do some magic!'}
