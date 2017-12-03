@@ -1,0 +1,89 @@
+---
+swagger: "2.0"
+info:
+  description: "todo"
+  version: "0"
+  title: "Search"
+  contact:
+    email: "apiteam@swagger.io"
+host: "localhost:8080"
+basePath: "/v0"
+tags:
+- name: "feedback"
+  description: "post feedback"
+- name: "search"
+  description: "search query"
+schemes:
+- "http"
+paths:
+  /feedback:
+    post:
+      tags:
+      - "feedback"
+      summary: "todo"
+      description: "todo"
+      operationId: "post_feedback"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "todo"
+        required: true
+        schema:
+          $ref: "#/definitions/FeedBackForm"
+      responses:
+        default:
+          description: "sucess"
+      x-swagger-router-controller: "swagger_server.controllers.feedback_controller"
+  /search/items_to_items:
+    get:
+      tags:
+      - "search"
+      summary: "todo"
+      description: "todo"
+      operationId: "search_items_to_items"
+      consumes:
+      - "application/json"
+      produces:
+      - "appplication/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "todo"
+        required: true
+        schema:
+          $ref: "#/definitions/SearchRequest"
+      responses:
+        default:
+          description: "success"
+      x-swagger-router-controller: "swagger_server.controllers.search_controller"
+  /search/items_to_client:
+    get:
+      tags:
+      - "search"
+      summary: "todo"
+      description: "todo"
+      operationId: "search_items_to_client"
+      consumes:
+      - "application/json"
+      produces:
+      - "appplication/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "todo"
+        required: true
+        schema:
+          $ref: "#/definitions/SearchRequest"
+      responses:
+        default:
+          description: "success"
+      x-swagger-router-controller: "swagger_server.controllers.search_controller"
+definitions:
+  SearchRequest:
+    type: "object"
+  FeedBackForm:
+    type: "object"
