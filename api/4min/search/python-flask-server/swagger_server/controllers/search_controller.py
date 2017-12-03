@@ -1,5 +1,6 @@
 import connexion
 from swagger_server.models.search_request import SearchRequest
+from swagger_server.models.search_response import SearchResponse
 from datetime import date, datetime
 from typing import List, Dict
 from six import iteritems
@@ -13,10 +14,10 @@ def search_items_to_client(body):
     :param body: todo
     :type body: dict | bytes
 
-    :rtype: None
+    :rtype: SearchRequest
     """
     if connexion.request.is_json:
-        body = SearchRequest.from_dict(connexion.request.get_json())
+        body = SearchResponse.from_dict(connexion.request.get_json())
     return 'do some magic!'
 
 
@@ -27,7 +28,7 @@ def search_items_to_items(body):
     :param body: todo
     :type body: dict | bytes
 
-    :rtype: None
+    :rtype: SearchResponse
     """
     if connexion.request.is_json:
         body = SearchRequest.from_dict(connexion.request.get_json())

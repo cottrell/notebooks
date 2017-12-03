@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 from swagger_server.models.search_request import SearchRequest
+from swagger_server.models.search_response import SearchResponse
 from . import BaseTestCase
 from six import BytesIO
 from flask import json
@@ -17,7 +18,7 @@ class TestSearchController(BaseTestCase):
 
         todo
         """
-        body = SearchRequest()
+        body = SearchResponse()
         response = self.client.open('/v0/search/items_to_client',
                                     method='GET',
                                     data=json.dumps(body),
