@@ -35,3 +35,14 @@ Make sure to log in as ubuntu
 	/job:localhost/replica:0/task:0/device:GPU:0 -> device: 0, name: Tesla K80, pci bus id: 0000:00:1e.0, compute capability: 3.7
 	2017-11-27 20:35:46.902337: I tensorflow/core/common_runtime/direct_session.cc:299] Device mapping:
 	/job:localhost/replica:0/task:0/device:GPU:0 -> device: 0, name: Tesla K80, pci bus id: 0000:00:1e.0, compute capability: 3.7
+
+# more from feedback/help from aws
+
+	http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
+	
+	http://docs.aws.amazon.com/cli/latest/userguide/cli-ec2-launch.html#listing-instances
+	
+	https://console.aws.amazon.com/billing/home#/bill
+	
+	https://console.aws.amazon.com/console/home?region=us-east-1
+
