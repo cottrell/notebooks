@@ -77,7 +77,7 @@ def schema_tuples_to_pasteable_spark_schema(d, print_string=True):
         temp = 't.StructField("{}", t.{}())'.format(temp[0], temp[1])
         s.append(temp)
     s = '\n    ' + ',\n    '.join(s)
-    s = "import pyspark.sql.types as t\nt.StructType([{}\n    ])".format(s)
+    s = "import pyspark.sql.types as t\nschema = t.StructType([{}\n    ])".format(s)
     if print_string:
         print(s)
     else:
