@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/bin/sh -e
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR
 
 function maybe_get {
     base=$(basename $1)
@@ -30,5 +33,6 @@ else
     echo untarring to ~/dev
     tar -xzf ./spark-$version-bin-hadoop2.7.tgz -C ~/dev
 fi
+echo clean up: rm -rf KEYS spark-2.2.0-bin-hadoop2.7.tgz spark-2.2.0-bin-hadoop2.7.tgz.asc spark-2.2.0-bin-hadoop2.7.tgz.md5 spark-2.2.0-bin-hadoop2.7.tgz.sha
 echo PATH='$PATH':$HOME/dev/spark-"$version"-bin-hadoop2.7/bin
 echo alias "pyspark_ipython='PYSPARK_DRIVER_PYTHON=ipython pyspark'"
