@@ -14,6 +14,5 @@ __pycache__/
 *.txt
 *.things
 *.blp
-spark/
 old/
 nogit/

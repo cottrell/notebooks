@@ -24,5 +24,11 @@ fi
 gpg --import KEYS
 gpg --verify spark-"$version"-bin-hadoop2.7.tgz.asc spark-"$version"-bin-hadoop2.7.tgz && echo '.asc pass' || echo '.asc fail'
 
-echo untar and add spark-"$version"-bin-hadoop2.7/bin to PATH
-echo alias pyspark_ipython='PYSPARK_DRIVER_PYTHON=ipython pyspark'
+if [[ -d "$HOME/dev/spark-$version-bin-hadoop2.7" ]]; then
+    echo ~/dev/spark-$version-bin-hadoop2.7 exists
+else
+    echo untarring to ~/dev
+    tar -xzf ./spark-$version-bin-hadoop2.7.tgz -C ~/dev
+fi
+echo PATH='$PATH':$HOME/dev/spark-"$version"-bin-hadoop2.7/bin
+echo alias "pyspark_ipython='PYSPARK_DRIVER_PYTHON=ipython pyspark'"
