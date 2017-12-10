@@ -9,6 +9,7 @@ import mylib
 import mylib.tools
 import mylib.data
 from numpy.random import randn, permutation
+import pyarrow
 
 _s_orig = dict(str=['a', 'f', 'g'], float=['b', 'c', 'd', 'e'])
 _s = mylib.tools.dict_of_lists_to_dict(_s_orig)

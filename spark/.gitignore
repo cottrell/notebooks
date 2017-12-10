@@ -1,3 +1,4 @@
 data/
+spark-warehouse
 checkpoints/
 data.parquet/
