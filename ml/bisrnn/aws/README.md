@@ -39,10 +39,10 @@ Make sure to log in as ubuntu
 # more from feedback/help from aws
 
 	http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
-	
+
 	http://docs.aws.amazon.com/cli/latest/userguide/cli-ec2-launch.html#listing-instances
-	
+
 	https://console.aws.amazon.com/billing/home#/bill
-	
+
 	https://console.aws.amazon.com/console/home?region=us-east-1
 
