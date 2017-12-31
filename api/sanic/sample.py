@@ -5,6 +5,7 @@ from sanic_openapi import swagger_blueprint, openapi_blueprint
 app = Sanic()
 app.blueprint(openapi_blueprint)
 app.blueprint(swagger_blueprint)
+# see /swagger
 
 @app.route("/")
 async def test(request):
