@@ -9,6 +9,7 @@ app.blueprint(openapi_blueprint)
 app.blueprint(swagger_blueprint)
 # see /swagger
 CORS(app)
+app.debug = True
 
 @app.route("/")
 async def test(request):
@@ -23,6 +24,21 @@ async def more(request, args, this=None):
 @doc.produces({ "user": { "name": str, "id": int } })
 async def get_user(request, user_id):
     return json({"bleep": "blop", "user_id": user_id})
+
+@app.route("/new_moment/<uid:int>",methods=["PUT"])
+@doc.consumes({
+    "type":int,
+    "res_json":str,
+    "words":str,
+    "location":str
+})
+async def testb(request, uid):
+    print(request)
+    return json({"uid": uid, "request.json": request.json})
+
+def rtest():
+    import requests
+    return requests.put('http://127.0.0.1:8000/new_moment/123')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
