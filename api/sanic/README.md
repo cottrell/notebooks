@@ -1,4 +1,4 @@
-#setup
+# setup
 
   pip install sanic
   pip install -U sanic-cors
