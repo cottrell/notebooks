@@ -16,16 +16,50 @@ def load_files():
         # print(df[-1].shape)
     return pd.concat(df)
 
-df = load_files()
-df['month'] = df.Date.apply(lambda x: datetime.datetime(x.year, x.month, 1))
-d = df.groupby('month').Amount.sum().sort_index()
+def remove_back_to_back(df):
+    d = df.Account.value_counts().index.tolist()
+    d = [x.replace('-', '') for x in d]
+    def f(x):
+        return not any([x.startswith(xx) for xx in d])
+    return df[df.Memo.apply(f)]
+
+try:
+    df
+except NameError as e:
+    df = load_files()
+    df = remove_back_to_back(df)
+    df = df[df.Amount < 0]
+    df['Amount'] *= -1
+    df['month'] = df.Date.apply(lambda x: datetime.datetime(x.year, x.month, 1))
+    df['week'] = df.Date.apply(lambda x: '{}-W{}'.format(x.year, x.week))
+    df['dayofweek'] = df.Date.apply(lambda x: x.strftime('%w-%a'))
+    d = df.groupby('Date').Amount.sum().sort_index()
+    d = d.resample('D').sum().fillna(0)
+
 from pylab import *
 ion()
 figure(1)
 clf()
-ax = subplot(111)
-d.plot(ax=ax, drawstyle="steps-post", linewidth=2)
-a = d.copy()
-a[:] = 0
-a.plot()
-savefig('fig.png')
+import matplotlib.gridspec as gridspec
+gs = gridspec.GridSpec(2, 2)
+ax = subplot(gs[0,:])
+d.plot(ax=ax, drawstyle="steps-post", linewidth=2, label='daily', alpha=0.5)
+nn = 30
+dd = d.rolling(window=nn).sum()
+# dd = d.ewm(halflife=nn).mean() * 30
+# dd = d.cumsum() / range(1, d.shape[0]+1) * 30
+dd.plot(ax=ax, linewidth=1, label='last {} days'.format(nn))
+# a = d.copy()
+# a[:] = 0
+# a.plot()
+title('spend')
+grid()
+# savefig('fig.png')
+legend()
+show()
+ax = subplot(gs[1,0])
+d.groupby(d.index.dayofweek).mean().plot(ax=ax, kind='bar')
+title('mean weekdays')
+ax = subplot(gs[1,1])
+d.groupby(d.index.month).mean().plot(ax=ax, kind='bar')
+title('mean weekdays')
