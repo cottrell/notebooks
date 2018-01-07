@@ -95,7 +95,7 @@ def doplot():
     title('mean weekdays')
     ax = subplot(gs[1,1])
     d.groupby(d.index.month).mean().plot(ax=ax, kind='bar')
-    title('mean weekdays')
+    title('mean month')
     show()
 
 def top_things(df):
