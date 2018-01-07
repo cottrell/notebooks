@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import glob
 import subprocess
 import pandas as pd
@@ -55,19 +56,39 @@ def remove_back_to_back(df):
         return not any([x.startswith(xx) for xx in d])
     return df[df.Memo.apply(f)]
 
+def get_noninteresting_mask(a):
+    return (a.Memo.str.match('^PEACH.*|^VIEW.*|^A A B.*')).values
+
+def is_transfer(df):
+    return df.Memo.str.startswith('QI').values
+
+
 try:
     df
 except NameError as e:
     df = load_files()
     df = remove_back_to_back(df)
     # spend is only interesting thing really
-    df = df[df.Amount < 0]
+    df['Amount_in'] = np.where(df.Amount > 0, df.Amount, 0)
+    df['Amount'] = np.where(df.Amount < 0, df.Amount, 0)
     df['Amount'] *= -1
     df['month'] = df.Date.apply(lambda x: datetime.datetime(x.year, x.month, 1))
     df['week'] = df.Date.apply(lambda x: '{}-W{}'.format(x.year, x.week))
     df['dayofweek'] = df.Date.apply(lambda x: x.strftime('%w-%a'))
-    d = df.groupby('Date').Amount.sum().sort_index()
-    d = d.resample('D').sum().fillna(0)
+    noninteresting = get_noninteresting_mask(df)
+    is_transfer_ = is_transfer(df)
+    df['rental'] = np.where(noninteresting, df.Amount.values, 0)
+    df['transfer'] = np.where(is_transfer_, df.Amount.values, 0)
+    df['Amount_orig'] = df.Amount.copy()
+    df['Amount'] = df.Amount - df.rental - df.transfer
+    df['Amount_out'] = df.Amount + df.rental + df.transfer
+    df['check'] = df.Amount_out == df.Amount_orig
+    assert df.check.all()
+
+    print('exclude initial by hard code')
+    df = df[(df.Memo != '14CANARY WHARF BRA REM') & (df.Date != '2014-06-10')]
+
+
 
 from pylab import *
 import matplotlib.gridspec as gridspec
@@ -75,33 +96,68 @@ def doplot():
     ion()
     figure(1)
     clf()
-    gs = gridspec.GridSpec(2, 2)
+    gs = gridspec.GridSpec(3, 2, hspace=0.5, wspace=0.5)
     ax = subplot(gs[0,:])
-    d.plot(ax=ax, drawstyle="steps-post", linewidth=2, label='daily', alpha=0.5)
+    cols = ['Amount', 'rental', 'transfer']
+    colors = dict(zip(cols, ['r', 'g', 'b']))
+    colors['Amount_in'] = 'c'
+    colors['Amount_out'] = 'k'
+    colors['net'] = 'm'
+    d = df.groupby('Date')[cols + ['Amount_in', 'Amount_out']].sum().sort_index()
+    d = d.resample('D').sum().fillna(0)
+    d['net'] = d['Amount_in'] - d[cols].sum(axis=1)
+    for k in cols:
+        d[k].plot(ax=ax, drawstyle="steps-post", linewidth=2, label='daily {}'.format(k), alpha=0.5, color=colors[k])
     nn = 30
     dd = d.rolling(window=nn).sum()
     # dd = d.ewm(halflife=nn).mean() * 30
     # dd = d.cumsum() / range(1, d.shape[0]+1) * 30
-    dd.plot(ax=ax, linewidth=1, label='last {} days'.format(nn))
+    for k in ['Amount']:
+        dd[k].plot(ax=ax, linewidth=1, label='last {} days {}'.format(nn, k), color=colors[k])
     # a = d.copy()
     # a[:] = 0
     # a.plot()
-    title('spend')
+    title('flows')
     grid()
     # savefig('fig.png')
     legend()
-    ax = subplot(gs[1,0])
-    d.groupby(d.index.dayofweek).mean().plot(ax=ax, kind='bar')
-    title('mean weekdays')
-    ax = subplot(gs[1,1])
-    d.groupby(d.index.month).mean().plot(ax=ax, kind='bar')
-    title('mean month')
+    # axis('tight')
+    ax.set_xlabel('')
+
+    ax = subplot(gs[1,:])
+    for k in cols + ['net', 'Amount_in', 'Amount_out']:
+        d[k].cumsum().plot(ax=ax, drawstyle="steps-post", linewidth=1, label='cumulative {}'.format(k), alpha=1.0, color=colors[k])
+    title('cumulative flows')
+    legend()
+    grid()
+    # axis('tight')
+    ax.set_xlabel('')
+
+    ax = subplot(gs[2,:])
+    # denom = d['Amount_in'].cumsum()
+    denom = (d.index - d.index[0]).days.values
+    for k in cols + ['net', 'Amount_in', 'Amount_out']:
+        temp = d[k].cumsum() / denom
+        temp.plot(ax=ax, drawstyle="steps-post", linewidth=1, label='cumulative {}'.format(k), alpha=1.0, color=colors[k])
+    title('cumulative flows (daily)')
+    ylim(0, 300)
+    legend()
+    grid()
+    # axis('tight')
+    ax.set_xlabel('')
+
+    # d['Amount'].groupby(d.index.dayofweek).mean().plot(ax=ax, kind='bar')
+    # title('mean weekdays')
+    # ax = subplot(gs[2,1])
+    # d['Amount'].groupby(d.index.month).mean().plot(ax=ax, kind='bar')
+    # title('mean month')
+    # axis('tight')
     show()
 
 def top_things(df):
     a = df.sort_values('Amount', ascending=False)
     a.index = range(a.shape[0])
-    noninteresting = (a.Memo.str.match('^PEACH.*|^VIEW.*|^A A B.*')).values
+    noninteresting = get_noninteresting_mask(a)
     return a[~noninteresting]
 
 def top_recent_things(df):
@@ -113,9 +169,9 @@ def top_recent_things(df):
     return a[i].head(n=30).sort_values('Date', ascending=False)
 
 doplot()
-print("\ntop recent things")
-print(top_recent_things(df))
-print("\ntop things all time")
-print(top_things(df).head(n=30))
+# print("\ntop recent things")
+# print(top_recent_things(df))
+# print("\ntop things all time")
+# print(top_things(df).head(n=30))
 
 
