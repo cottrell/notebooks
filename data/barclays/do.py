@@ -1,4 +1,5 @@
 import os
+import glob
 import subprocess
 import pandas as pd
 import shutil
@@ -21,8 +22,10 @@ def confirm_do_this(msg='are you sure?'):
 
 def load_files():
     df = list()
-    for f in ['chequing_20140401_20171112.csv', 'saver_20140401_20171113.csv', 'isa_20140401_20171113.csv'] + \
-             ['chequing_20171112_20170107.csv', 'isa_20171113_20170107.csv', 'saver_20171113_20170107.csv']:
+    # just update whole set each time
+    files = [glob.glob(x)[-1] for x in ['chequing_20140401_20??????.csv', 'saver_20140401_20??????.csv', 'isa_20140401_20??????.csv']]
+    print('found files {}'.format(files))
+    for f in files:
         try:
             temp = pd.read_csv(f, parse_dates=['Date'], dayfirst=True)
         except Exception as e:
@@ -36,7 +39,14 @@ def load_files():
                 raise e
         df.append(temp)
         # print(df[-1].shape)
-    return pd.concat(df)
+    df = pd.concat(df)
+    # there is no good way to do this, just repull the full datasets
+    # dupes = df[df.duplicated()]
+    # if dupes.shape[0] > 0:
+    #     print('dropping {} dupes:'.format(len(dupes)))
+    #     print(dupes)
+    #     df = df.drop_duplicates()
+    return df
 
 def remove_back_to_back(df):
     d = df.Account.value_counts().index.tolist()
@@ -50,6 +60,7 @@ try:
 except NameError as e:
     df = load_files()
     df = remove_back_to_back(df)
+    # spend is only interesting thing really
     df = df[df.Amount < 0]
     df['Amount'] *= -1
     df['month'] = df.Date.apply(lambda x: datetime.datetime(x.year, x.month, 1))
@@ -59,29 +70,52 @@ except NameError as e:
     d = d.resample('D').sum().fillna(0)
 
 from pylab import *
-ion()
-figure(1)
-clf()
 import matplotlib.gridspec as gridspec
-gs = gridspec.GridSpec(2, 2)
-ax = subplot(gs[0,:])
-d.plot(ax=ax, drawstyle="steps-post", linewidth=2, label='daily', alpha=0.5)
-nn = 30
-dd = d.rolling(window=nn).sum()
-# dd = d.ewm(halflife=nn).mean() * 30
-# dd = d.cumsum() / range(1, d.shape[0]+1) * 30
-dd.plot(ax=ax, linewidth=1, label='last {} days'.format(nn))
-# a = d.copy()
-# a[:] = 0
-# a.plot()
-title('spend')
-grid()
-# savefig('fig.png')
-legend()
-show()
-ax = subplot(gs[1,0])
-d.groupby(d.index.dayofweek).mean().plot(ax=ax, kind='bar')
-title('mean weekdays')
-ax = subplot(gs[1,1])
-d.groupby(d.index.month).mean().plot(ax=ax, kind='bar')
-title('mean weekdays')
+def doplot():
+    ion()
+    figure(1)
+    clf()
+    gs = gridspec.GridSpec(2, 2)
+    ax = subplot(gs[0,:])
+    d.plot(ax=ax, drawstyle="steps-post", linewidth=2, label='daily', alpha=0.5)
+    nn = 30
+    dd = d.rolling(window=nn).sum()
+    # dd = d.ewm(halflife=nn).mean() * 30
+    # dd = d.cumsum() / range(1, d.shape[0]+1) * 30
+    dd.plot(ax=ax, linewidth=1, label='last {} days'.format(nn))
+    # a = d.copy()
+    # a[:] = 0
+    # a.plot()
+    title('spend')
+    grid()
+    # savefig('fig.png')
+    legend()
+    ax = subplot(gs[1,0])
+    d.groupby(d.index.dayofweek).mean().plot(ax=ax, kind='bar')
+    title('mean weekdays')
+    ax = subplot(gs[1,1])
+    d.groupby(d.index.month).mean().plot(ax=ax, kind='bar')
+    title('mean weekdays')
+    show()
+
+def top_things(df):
+    a = df.sort_values('Amount', ascending=False)
+    a.index = range(a.shape[0])
+    noninteresting = (a.Memo.str.match('^PEACH.*|^VIEW.*|^A A B.*')).values
+    return a[~noninteresting]
+
+def top_recent_things(df):
+    a = top_things(df)
+    # big things last n days
+    n = 6 * 30
+    start_date = df.Date.max() - datetime.timedelta(days=n)
+    i = (a.Date > start_date).values
+    return a[i].head(n=30).sort_values('Date', ascending=False)
+
+doplot()
+print("\ntop recent things")
+print(top_recent_things(df))
+print("\ntop things all time")
+print(top_things(df).head(n=30))
+
+
