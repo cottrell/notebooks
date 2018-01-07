@@ -1,6 +1,9 @@
+import os
+import subprocess
 import pandas as pd
 import shutil
 import datetime
+_mydir = os.path.dirname(os.path.realpath(__file__))
 def fix_file(filename):
     rows = [x.strip().split(',', 5) for x in open(filename, encoding='latin-1')]
     bak = '{}.{}'.format(filename, datetime.datetime.today().isoformat())
@@ -9,10 +12,29 @@ def fix_file(filename):
     df = pd.DataFrame(rows[1:], columns=rows[0])
     df.to_csv(filename, index=False)
 
+def confirm_do_this(msg='are you sure?'):
+    res = input(msg + ' y[n] : ')
+    if res == 'y':
+        return True
+    else:
+        return False
+
 def load_files():
     df = list()
-    for f in ['chequing_20140401_20171112.csv', 'saver_20140401_20171113.csv', 'isa_20140401_20171113.csv']:
-        df.append(pd.read_csv(f, parse_dates=['Date'], dayfirst=True))
+    for f in ['chequing_20140401_20171112.csv', 'saver_20140401_20171113.csv', 'isa_20140401_20171113.csv'] + \
+             ['chequing_20171112_20170107.csv', 'isa_20171113_20170107.csv', 'saver_20171113_20170107.csv']:
+        try:
+            temp = pd.read_csv(f, parse_dates=['Date'], dayfirst=True)
+        except Exception as e:
+            print('got exception reading {} {}'.format(f, e))
+            print('usually this is because you need to strip the first column or something like that. The file looks like this:')
+            subprocess.call('cat {} | head'.format(os.path.join(_mydir, f)), shell=True)
+            if confirm_do_this(msg='Do you want to run the fixer and then try to read the file again? File will be backed up with a timestamped version?'):
+                fix_file(f)
+                temp = pd.read_csv(f, parse_dates=['Date'], dayfirst=True)
+            else:
+                raise e
+        df.append(temp)
         # print(df[-1].shape)
     return pd.concat(df)
 
