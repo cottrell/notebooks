@@ -1,0 +1,51 @@
+[
+  {
+    "country": "uk",
+    "notes": "www.gov.uk says: 'Your Personal Allowance goes down by £1 for every £2 that your adjusted net income is above £100,000. This means your allowance is zero if your income is £122,000 or above.'. This means there is an additional band of 0.60 between 100-122k. Additionally, NI employer contributions are absolutely ridiculous.",
+    "year": 2016,
+    "columns": ["income bucket (left)", "marginal rate"],
+    "data": [
+      [0.00, 0.00],
+      [11000.00, 0.20],
+      [43000.00, 0.40],
+      [100000.00, 0.60],
+      [122000.00, 0.40],
+      [150000.00, 0.45]
+    ],
+    "data_employee_ni": [
+      [0, 0],
+      [8112, 0.138]
+    ],
+    "data_employer_ni": [
+      [0, 0],
+      [8064, 0.12],
+      [42996, 0.02]
+    ]
+  },
+  {
+    "country": "canada",
+    "year": 2016,
+    "columns": ["income bucket (left)", "marginal rate"],
+    "data": [
+      [0.00, 0.00],
+      [11327.00, 0.15],
+      [56609.00, 0.21],
+      [101890.00, 0.26],
+      [151715.00, 0.29],
+      [211327.00, 0.33]
+    ],
+    "province/state": {
+      "ontario": {
+        "columns": ["income bucket (left)", "marginal rate"],
+        "data": [
+          [0.00, 0.0000],
+          [11327.00, 0.0505],
+          [52863.00, 0.0915],
+          [94402.00, 0.1116],
+          [161327.00, 0.1216],
+          [231327.00, 0.1316]
+        ]
+      }
+    }
+  }
+]

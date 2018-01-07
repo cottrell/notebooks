@@ -157,8 +157,9 @@ def doplot():
 def top_things(df):
     a = df.sort_values('Amount', ascending=False)
     a.index = range(a.shape[0])
-    noninteresting = get_noninteresting_mask(a)
-    return a[~noninteresting]
+    return a
+    # noninteresting = get_noninteresting_mask(a)
+    # return a[~noninteresting]
 
 def top_recent_things(df):
     a = top_things(df)
@@ -169,9 +170,10 @@ def top_recent_things(df):
     return a[i].head(n=30).sort_values('Date', ascending=False)
 
 doplot()
-# print("\ntop recent things")
-# print(top_recent_things(df))
-# print("\ntop things all time")
-# print(top_things(df).head(n=30))
+df = df.iloc[:,:-2]
+print("\ntop recent things")
+print(top_recent_things(df))
+print("\ntop things all time")
+print(top_things(df).head(n=30))
 
 
