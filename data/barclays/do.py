@@ -82,6 +82,8 @@ except NameError as e:
     df['Amount_orig'] = df.Amount.copy()
     df['Amount'] = df.Amount - df.rental - df.transfer
     df['Amount_out'] = df.Amount + df.rental + df.transfer
+    df['taxyear'] = np.where(df.Date.apply(lambda x: x < datetime.datetime(x.year, 4, 6)).values, df.Date.dt.year - 1, df.Date.dt.year)
+    df['taxyear'] = df.taxyear.apply(lambda x: str(x) + '-' + str(x+1)[-2:])
     df['check'] = df.Amount_out == df.Amount_orig
     assert df.check.all()
 
@@ -153,6 +155,7 @@ def doplot():
     # title('mean month')
     # axis('tight')
     show()
+    return d
 
 def top_things(df):
     a = df.sort_values('Amount', ascending=False)
@@ -170,10 +173,22 @@ def top_recent_things(df):
     return a[i].head(n=30).sort_values('Date', ascending=False)
 
 doplot()
-df = df.iloc[:,:-2]
+temp = df.iloc[:,:-2]
 print("\ntop recent things")
-print(top_recent_things(df))
+print(top_recent_things(temp))
 print("\ntop things all time")
-print(top_things(df).head(n=30))
+print(top_things(temp).head(n=30))
+
+figure(2)
+clf()
+gs = gridspec.GridSpec(2, 1, hspace=0.5, wspace=0.5)
+ax = subplot(gs[0])
+temp = df.groupby('taxyear')[['Amount_in', 'Amount_out']].sum()
+temp['net'] = temp.Amount_in - temp.Amount_out
+grid()
+temp.plot(kind='bar', ax=ax, grid=True)
+ax = subplot(gs[1])
+t = (temp.T / temp.Amount_in * 100).T
+t.plot(kind='bar', ax=ax, grid=True)
 
 
