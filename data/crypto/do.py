@@ -55,3 +55,6 @@ def load_raw():
             print('{} exists'.format(filename))
     return pq.read_table('./parsed') # test
 
+# id big ups big downs
+df = load_raw()
+df = df.sort_values('Date')
