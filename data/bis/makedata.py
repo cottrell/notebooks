@@ -19,7 +19,7 @@ def get_files():
     return glob.glob(os.path.join(mydir, 'text/*.text'))
 
 # do something dumb to try to detect good paragraphs
-def sample_paragraphs_collect_responses(n=10):
+def sample_generator(n=20):
     outdir = os.path.join(mydir, 'paragraphs')
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -27,35 +27,68 @@ def sample_paragraphs_collect_responses(n=10):
     data = list()
     while True:
         filename = numpy.random.choice(filenames)
+        print(filename)
         d = re.split('\n{2,}', open(filename).read().strip())
         for x in numpy.random.choice(d, min(n, len(d)), replace=False):
-            print(filename)
-            print('')
-            print(x)
-            print('')
-            res = None
-            while res not in ['y', 'n', 'q']:
-                res = input('is this good? y or n [q to quit]')
-            if res == 'q':
-                break
-            data.append([res, x])
+            yield x
+
+# do something dumb to try to detect good paragraphs
+def sample_paragraphs_collect_responses(n=10, learning_rate=0.1):
+    outdir = os.path.join(mydir, 'paragraphs')
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+    filenames = get_files()
+    data = list()
+    # accept sample at 2 * obs rate
+    alpha = 0.5
+    for i, x in enumerate(sample_generator()):
+        # TODO predict and check
+        # assert res in ['y', 'n']
+        if i % 10 == 0:
+            l = train_paragraphs() # TODO warm, re-use
+            model = l['model']
+        pred = model.predict(np.array([get_features(x)]))
+        pred = 'y' if pred == 1 else 'n'
+        r = numpy.random.rand()
+        theta = alpha if pred == 'y' else 1 - alpha
+        if r < theta:
+            print('skipping this one ({}, theta={}, model={}): {}'.format(r, theta, pred, x))
+            continue
+        else:
+            print('not skipping this one ({}, theta={}, model={}): {}'.format(r, theta, pred, x))
+
+        print('\nModel says {}'.format(pred))
+        print('')
+        print(x)
+        print('')
+        res = None
+        while res not in ['y', 'n', 'q']:
+            res = input('is this good? y or n [q to quit]')
         if res == 'q':
             break
+        alpha = alpha * (1 - learning_rate) + learning_rate * (2 * (res == 'y') - 1)
+        alpha = min(1, max(0, alpha))
+        print('\nalpha {}\n'.format(alpha))
+        data.append([res, x])
     filename = os.path.join(outdir, datetime.datetime.today().isoformat())
     print('writing {}'.format(filename))
     df = pd.DataFrame(data, columns=['y', 'x'])
     df.to_csv(filename, index=False)
 
-def get_paragraph_data():
-    files = glob.glob(os.path.join(mydir, 'paragraphs/*'))
-    df = pd.concat([pd.read_csv(f, dtype=str) for f in files])
-    df['x'] = df.x.astype(str)
-    # featurize
-    df['n'] = df.x.apply(lambda x: len(x))
+_feature_columns = ['n', 'nn']
+def get_features(x):
     def token_etc(x):
         x = nltk.tokenize.wordpunct_tokenize(re.sub('\W', ' ', x))
         return x
-    df['nn'] = df.x.apply(lambda x: len(token_etc(x)))
+    return [len(x), len(token_etc(x))]
+
+def get_paragraph_data():
+    files = glob.glob(os.path.join(mydir, 'paragraphs/*'))
+    df = pd.concat([pd.read_csv(f, dtype=str) for f in files])
+    df.index = range(df.shape[0]) # otherwise problems with non-uniques
+    df['x'] = df.x.astype(str)
+    _f = pd.DataFrame([get_features(x) for x in df.x.values], columns=_feature_columns)
+    df = pd.concat([df, _f], axis=1)
     df['y'] = np.where(df.y.values == 'y', 1, 0)
     from sklearn import model_selection
     df_train, df_test = model_selection.train_test_split(df)
