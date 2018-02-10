@@ -20,6 +20,8 @@ To see docker file from image:
 
 # cluster
 
+	See `do.sh`
+
 	docker-machine create --swarm-image ubuntu:16.04 --driver virtualbox vm0
 	docker-machine create --swarm-image ubuntu:16.04 --driver virtualbox vm1
 
@@ -53,14 +55,3 @@ To see docker file from image:
 	eval $(docker-machine env -u)     # Disconnect shell from VMs, use native docker
 	docker-machine stop $(docker-machine ls -q)               # Stop all running VMs
 	docker-machine rm $(docker-machine ls -q) # Delete all VMs and their disk images
-
-# rhel7 cluster
-
-	docker pull registry.access.redhat.com/rhel7/rhel
-
-	docker-machine create --swarm-image registry.access.redhat.com/rhel7/rhel:latest --driver virtualbox vm0
-	docker-machine create --swarm-image registry.access.redhat.com/rhel7/rhel:latest --driver virtualbox vm1
-	docker-machine create --swarm-image registry.access.redhat.com/rhel7/rhel:latest --driver virtualbox vm2
-
-	docker-machine ls
-
