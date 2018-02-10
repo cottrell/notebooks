@@ -18,6 +18,10 @@ To see docker file from image:
 
 	docker history --no-trunc <img>
 
+# quick playground
+
+	docker run -it centos /bin/bash
+
 # cluster
 
 	See `do.sh`
