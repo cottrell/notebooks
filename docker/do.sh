@@ -43,6 +43,10 @@ case $1 in
     stop)
         docker-machine stop $(vms)
         ;;
+    i)
+        # interactive
+        docker-machine ssh $manager -i /bin/bash
+        ;;
     delete_all)
         echo docker-machine rm $(vms)
         docker-machine rm $(vms) # Delete all VMs and their disk images
