@@ -75,12 +75,15 @@ def sample_paragraphs_collect_responses(n=10, learning_rate=0.1):
     df = pd.DataFrame(data, columns=['y', 'x'])
     df.to_csv(filename, index=False)
 
-_feature_columns = ['n', 'nn']
+_feature_columns = ['n', 'nn', 'un']
 def get_features(x):
     def token_etc(x):
         x = nltk.tokenize.wordpunct_tokenize(re.sub('\W', ' ', x))
         return x
-    return [len(x), len(token_etc(x))]
+    a = token_etc(x)
+    # TODO add character counts!
+    common_characters = ' etainors\nlchd.umfpg0yb,v1w2k()9-354TSx86I7ACB*PFE'
+    return [len(x), len(a), len(set(a))]
 
 def get_paragraph_data():
     files = glob.glob(os.path.join(mydir, 'paragraphs/*'))
@@ -94,6 +97,8 @@ def get_paragraph_data():
     df_train, df_test = model_selection.train_test_split(df)
     return df_train, df_test
 
+# TODO cv etc to remind of that flow
+
 def train_paragraphs():
     df_train, df_test = get_paragraph_data()
     import sklearn.linear_model as lm
@@ -101,11 +106,10 @@ def train_paragraphs():
           intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=1,
           penalty='l2', random_state=None, solver='liblinear', tol=0.0001,
           verbose=0, warm_start=False)
-    xcol = ['n', 'nn']
     ycol = ['y']
-    model.fit(df_train[xcol], df_train[ycol].squeeze())
-    ypred_train = model.predict(df_train[xcol])
-    ypred = model.predict(df_test[xcol])
+    model.fit(df_train[_feature_columns], df_train[ycol].squeeze())
+    ypred_train = model.predict(df_train[_feature_columns])
+    ypred = model.predict(df_test[_feature_columns])
     ytrue_train = df_train[ycol].values.squeeze()
     ytrue = df_test[ycol].values.squeeze()
     c = pd.DataFrame([ytrue, ypred]).T

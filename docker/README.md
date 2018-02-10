@@ -14,6 +14,9 @@ https://hub.docker.com/_/ubuntu/
 
 	docker run -i -t ubuntu:16.04 /bin/bash
 
+To see docker file from image:
+
+	docker history --no-trunc <img>
 
 # cluster
 
@@ -23,11 +26,9 @@ https://hub.docker.com/_/ubuntu/
 	docker-machine ls
 
 	docker-machine ssh vm0 "docker swarm init --advertise-addr 192.168.99.100"
-
 	docker-machine ssh vm1 "docker swarm join --token <token> 192.168.99.100:2377"
 
 	docker-machine ssh vm1 "docker node ls"
-
 	docker-machine env vm0
 
 	docker-machine create --driver virtualbox myvm1 # Create a VM (Mac, Win7, Linux)
@@ -52,3 +53,14 @@ https://hub.docker.com/_/ubuntu/
 	eval $(docker-machine env -u)     # Disconnect shell from VMs, use native docker
 	docker-machine stop $(docker-machine ls -q)               # Stop all running VMs
 	docker-machine rm $(docker-machine ls -q) # Delete all VMs and their disk images
+
+# rhel7 cluster
+
+	docker pull registry.access.redhat.com/rhel7/rhel
+
+	docker-machine create --swarm-image registry.access.redhat.com/rhel7/rhel:latest --driver virtualbox vm0
+	docker-machine create --swarm-image registry.access.redhat.com/rhel7/rhel:latest --driver virtualbox vm1
+	docker-machine create --swarm-image registry.access.redhat.com/rhel7/rhel:latest --driver virtualbox vm2
+
+	docker-machine ls
+
