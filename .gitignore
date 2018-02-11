@@ -3,6 +3,11 @@ metastore_db/
 .DS_Store
 .noseids
 authtoken.p
+*.rdb
+jupyterhub.sqlite
+jupyterhub_cookie_secret
+*nogit*
+*.tar.gz
 *.zip
 derby.log
 *.csv.gz
