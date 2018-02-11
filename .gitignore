@@ -2,6 +2,7 @@ metastore_db/
 *.carrays/
 .DS_Store
 .noseids
+authtoken.p
 *.zip
 derby.log
 *.csv.gz
