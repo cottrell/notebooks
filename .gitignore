@@ -8,6 +8,7 @@ jupyterhub.sqlite
 jupyterhub_cookie_secret
 *nogit*
 *.tar.gz
+*.text.gz
 *.zip
 derby.log
 *.csv.gz
