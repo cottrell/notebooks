@@ -28,3 +28,7 @@ __pycache__/
 *.blp
 old/
 nogit/
+node_modules/
+*.feather
+*.sqlite
+*.hdf5
