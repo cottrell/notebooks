@@ -1,0 +1,7 @@
+output/
+output-dist/
+*.bak
+*.txt.gz
+*.touch
+*.index
+*.meta
