@@ -1,4 +1,8 @@
 metastore_db/
+*.carrays/
+.DS_Store
+.noseids
+*.zip
 derby.log
 *.csv.gz
 *.dat

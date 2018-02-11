@@ -1,4 +1,5 @@
 data/
+examples
 spark-warehouse
 checkpoints/
 data.parquet/
