@@ -7,3 +7,6 @@
 [submodule "consul_examples"]
 	path = consul_examples
 	url = https://github.com/cottrell/consul_examples.git
+[submodule "ml/cloudml-dist-mnist-example"]
+	path = ml/cloudml-dist-mnist-example
+	url = https://github.com/GoogleCloudPlatform/cloudml-dist-mnist-example

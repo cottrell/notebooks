@@ -32,3 +32,4 @@ node_modules/
 *.feather
 *.sqlite
 *.hdf5
+*.egg-info
