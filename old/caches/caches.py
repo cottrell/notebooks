@@ -9,7 +9,7 @@ from dask import delayed
 import pickle
 import hashlib
 
-# key is good in dask now. the other stuff not yet 
+# key is good in dask now. the other stuff not yet
 
 class Helper():
     def __init__(self, version, func, *args, **kwargs):
