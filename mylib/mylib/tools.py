@@ -1,4 +1,5 @@
 import logging
+import concurrent.futures
 import subprocess
 import time
 import pandas as pd
@@ -127,12 +128,6 @@ def run_in_background(non_co_callable, loop=None, executor=None):
     raise TypeError("target must be a callable, not {!r}".format(type(target)))
 
 def run_in_foreground(*tasks, loop=None):
-    """Runs event loop in current thread until the given task completes
-
-    Returns the result of the task.
-    For more complex conditions, combine with asyncio.wait()
-    To include a timeout, combine with asyncio.wait_for()
-    """
     if loop is None:
         loop = asyncio.get_event_loop()
     tasks = [asyncio.ensure_future(task, loop=loop) for task in tasks]
@@ -144,8 +139,15 @@ def run_in_foreground(*tasks, loop=None):
         tasks.cancel()
         loop.run_forever()
         tasks.exception()
-    # finally:
-    #     loop.close()
+
+def run_tasks_in_parallel(*tasks, max_workers=10, wait=True):
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
+    fut = [executor.submit(task) for task in tasks]
+    # executor.shutdown(wait=wait) # apparently just returning .result triggers the wait. probably the context manager.
+    if wait:
+        return [x.result() for x in fut]
+    else:
+        return fut
 
 
 @contextlib.contextmanager

@@ -173,6 +173,7 @@ def top_recent_things(df):
     return a[i].head(n=30).sort_values('Date', ascending=False)
 
 doplot()
+savefig(os.path.join(_mydir, 'figure_1.png'))
 temp = df.iloc[:,:-2]
 print("\ntop recent things")
 print(top_recent_things(temp))
@@ -190,5 +191,6 @@ temp.plot(kind='bar', ax=ax, grid=True)
 ax = subplot(gs[1])
 t = (temp.T / temp.Amount_in * 100).T
 t.plot(kind='bar', ax=ax, grid=True)
+savefig(os.path.join(_mydir, 'figure_2.png'))
 
 
