@@ -12,3 +12,7 @@ for x in $(grep DoS $DIR/20*.log | cut -d: -f6- | cut -d' ' -f2 | cut -d: -f1 | 
 done
 
 grep Organization $DIR/whois/* | cut -d: -f3 | sed -e 's/ *//' | sort | uniq -c | sort -g
+
+echo 'ip:key:value' > data.csv
+cd $DIR/whois && grep '^[^%#]' * | grep -v '^$' | sed -e 's/: */:/g' >> ../data.csv
+cd -
