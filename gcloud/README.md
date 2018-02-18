@@ -36,10 +36,7 @@ See what models you have: `gcloud ml-engine models list`
 
 1. Creating a Cloud Storage bucket
 
-	# PROJECT_ID=$(gcloud config list project --format "value(core.project)")
-	# BUCKET="${PROJECT_ID}-ml"
 	BUCKET="misc-data-ml"
-	# or use UI
 	gsutil mb -c regional -l europe-west1 gs://${BUCKET}
 	gsutil cp all.text.gz gs://${BUCKET}/data/bis.text.gz
 
@@ -91,4 +88,11 @@ See what models you have: `gcloud ml-engine models list`
 
 
 	https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/init-actions
+
+# dataflow
+
+	conda create -n py27 python=2.7
+	source activate py27
+	enable a bunch of APIs as above
+	pip install google-cloud-dataflow
 
