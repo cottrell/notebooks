@@ -18,12 +18,16 @@ case $1 in
         # or setup a tunnel and launch a notebook
         gcloud compute ssh "${CLUSTERNAME}-m" --project ${PROJECT} --zone=$ZONE -- -D 10000 -N -n &
         /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-        "http://${CLUSTERNAME}-m:8123" \
-        --proxy-server="socks5://localhost:10000" \
-        --host-resolver-rules="MAP * 0.0.0.0 , EXCLUDE localhost" \
-        --user-data-dir=/tmp/
+            "http://${CLUSTERNAME}-m:8123" \
+            --proxy-server="socks5://localhost:10000" \
+            --host-resolver-rules="MAP * 0.0.0.0 , EXCLUDE localhost" \
+            --user-data-dir=/tmp/
         ;;
     delete)
         gcloud dataproc clusters delete ${CLUSTERNAME}
+        ;;
+    *)
+        echo "usage: dataproc.sh {create|ssh|notebook|delete}"
+        exit 1
         ;;
 esac
