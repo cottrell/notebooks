@@ -26,6 +26,9 @@ case $1 in
     delete)
         gcloud dataproc clusters delete ${CLUSTERNAME}
         ;;
+    listjobs)
+        gcloud dataproc jobs list --cluster ${CLUSTERNAME}
+        ;;
     describe)
         gcloud dataproc clusters describe ${CLUSTERNAME}
         ;;
