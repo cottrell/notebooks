@@ -26,6 +26,12 @@ case $1 in
     delete)
         gcloud dataproc clusters delete ${CLUSTERNAME}
         ;;
+    describe)
+        gcloud dataproc clusters describe ${CLUSTERNAME}
+        ;;
+    addworkers)
+        gcloud dataproc clusters update ${CLUSTERNAME} --num-preemptible-workers=2
+        ;;
     *)
         echo "usage: dataproc.sh {create|ssh|notebook|delete}"
         exit 1
