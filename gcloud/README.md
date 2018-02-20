@@ -44,6 +44,8 @@ See what models you have: `gcloud ml-engine models list`
 
 	see `dataproc.sh`
 
+	This is very relevant https://cloud.google.com/dataproc/docs/tutorials/python-library-example
+
 	https://cloud.google.com/dataproc/docs/tutorials/jupyter-notebook
 
 	MISC
