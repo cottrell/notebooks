@@ -6,8 +6,9 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 case $1 in
     create)
-        gcloud dataproc clusters create ${CLUSTERNAME} --project $PROJECT --bucket $BUCKET --scopes=cloud-platform \
-        --initialization-actions gs://dataproc-initialization-actions/jupyter/jupyter.sh,gs://misc-data-ml/init_action.sh
+        # --scopes=cloud-platform \
+        gcloud dataproc clusters create ${CLUSTERNAME} --project $PROJECT --bucket $BUCKET --initialization-actions gs://dataproc-initialization-actions/jupyter/jupyter.sh
+        # --initialization-actions gs://misc-data-ml/init_action.sh
         ;;
     ssh)
         # plain ssh as your current user !?
