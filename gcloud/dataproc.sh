@@ -45,7 +45,10 @@ case $1 in
         gcloud dataproc clusters describe ${CLUSTERNAME}
         ;;
     addworkers)
-        gcloud dataproc clusters update ${CLUSTERNAME} --num-preemptible-workers=2
+        workers=2
+        [[ "$2" ]] && workers=$2
+        echo adding $2 preemptible workers
+        gcloud dataproc clusters update ${CLUSTERNAME} --num-preemptible-workers=$2
         ;;
     *)
         echo "usage: dataproc.sh {create|ssh|notebook|delete}"
