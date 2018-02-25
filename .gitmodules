@@ -10,3 +10,6 @@
 [submodule "ml/cloudml-dist-mnist-example"]
 	path = ml/cloudml-dist-mnist-example
 	url = https://github.com/GoogleCloudPlatform/cloudml-dist-mnist-example
+[submodule "uk_land_registry"]
+	path = uk_land_registry
+	url = https://github.com/cottrell/uk_land_registry.git
