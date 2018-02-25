@@ -56,4 +56,7 @@ fi
 # gsutil cp init_action.sh gs://misc-data-ml/init_action.sh
 conda install pandas scikit-learn pandas cython numba
 pip install --upgrade pip
+# there is some bug in google cloud
+touch /opt/conda/lib/python3.5/site-packages/setuptools-27.2.0-py3.5.egg
+touch /opt/conda/lib/python3.5/site-packages/easy-install.pth
 pip install argh pandas xgboost pyarrow keras tensorflow google-cloud-storage
