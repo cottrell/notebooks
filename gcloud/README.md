@@ -1,8 +1,10 @@
 # google cloud workflow
 
-1. Buckets
+1. listing things
 
 	gsutil ls
+	gcloud compute instances list
+	gcloud dataproc clusters list
 
 1. Select or create a Cloud Platform project. Either go here: https://console.cloud.google.com/cloud-resource-manager or:
 
