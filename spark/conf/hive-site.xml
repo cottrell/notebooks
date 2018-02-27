@@ -1,0 +1,30 @@
+<configuration>
+<property>
+	<name>javax.jdo.option.ConnectionURL</name>
+	<value>jdbc:postgresql://localhost:5432/metastore</value>
+	<description>Enter your JDBC connection string.</description>
+</property>
+
+<property>
+	<name>javax.jdo.option.ConnectionDriverName</name>
+	<value>org.postgresql.Driver</value>
+	<description>JDBC Connection Driver Name.</description>
+</property>
+
+<property>
+	<name>javax.jdo.option.ConnectionUserName</name>
+	<value>hive</value>
+	<description>username to use against metastore database</description>
+</property>
+
+<property>
+	<name>javax.jdo.option.ConnectionPassword</name>
+	<value>hive_password</value>
+	<description> specify your root password to use against metastore database</description>
+</property>
+
+<property>
+	<name>datanucleus.autoCreateSchema</name>
+	<value>true</value>
+</property>
+</configuration>
