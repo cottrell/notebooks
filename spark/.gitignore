@@ -1,4 +1,5 @@
 data/
+KEYS
 examples
 spark-warehouse
 checkpoints/
