@@ -1,5 +1,7 @@
 # setup
 
+	not sure yet
+
 	brew install postgres
 
 	./metatore_db.sh
