@@ -9,4 +9,8 @@ export SPARK_CONF_DIR=$DIR/conf
 export HIVE_CONF_DIR=$SPARK_CONF_DIR
 export PYSPARK_DRIVER_PYTHON=ipython
 env
-pyspark --verbose --packages  org.postgresql:postgresql:42.2.1.jre7
+# works
+pyspark --verbose --packages  org.postgresql:postgresql:42.2.1.jre7 --master spark://MacBook-Pro-3.local:7077
+# does not work
+# pyspark --verbose --packages  org.postgresql:postgresql:42.2.1.jre7 --master spark://localhost:7077
+spark://localhost:7077
