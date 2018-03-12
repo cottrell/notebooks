@@ -1,0 +1,2 @@
+THIS=here
+PYTHONPATH=$PYTHONPATH:more

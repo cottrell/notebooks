@@ -5,10 +5,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 case $1 in
     start)
         start-master.sh
-        start-slave.sh localhost:7077
+        start-slave.sh $SPARK_MASTER_URL
         ;;
     stop)
         stop-master.sh
-        stop-slave.sh localhost:7077
+        stop-slave.sh $SPARK_MASTER_URL
         ;;
 esac
