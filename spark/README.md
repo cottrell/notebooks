@@ -1,5 +1,8 @@
 # setup
 
+Spark cluster manager is buggy and seems to run as user that spins up the cluster.
+
+
 	not sure yet
 
 	brew install postgres
