@@ -6,12 +6,12 @@ from distributed import Client
 import dask.bag as db
 
 def print_and_return_message(msg):
-    print("msg:", msg)
-    return "print: [{}]".format(msg)
+    print("msg ".format(msg))
+    return "print sys.path={}: {}".format(sys.path, msg)
 
 def submit(client):
     r = client.submit(print_and_return_message, 'what')
-    print("r", r.result())
+    print("res=", r.result())
 
 def test():
     b = db.from_sequence([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
