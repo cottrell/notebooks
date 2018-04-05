@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -16,6 +16,10 @@ done
 
 grep Organization $DIR/whois/* | cut -d: -f3 | sed -e 's/ *//' | sort | uniq -c | sort -g
 
-echo 'ip,key,value' > data.csv
-cd $DIR/whois && grep '^[^%#]' * | grep -v '^$' | sed -E 's/: {1,}/,"/g;s/$/"/' | sed -e 's/:/,/' >> ../data.csv
-cd -
+# echo 'ip,key,value' > data.csv
+# cd $DIR/whois
+# for x in *; do
+#     echo $x
+#     grep '^[^%#]' $x | grep -v '^$' | sed -E 's/: {1,}/,"/g;s/$/"/' | sed -e 's/:/,/' >> ../data.csv
+# done
+# cd -
