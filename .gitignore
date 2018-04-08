@@ -33,3 +33,5 @@ node_modules/
 *.sqlite
 *.hdf5
 *.egg-info
+.*.pid
+*.lock
