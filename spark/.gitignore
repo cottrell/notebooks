@@ -4,3 +4,8 @@ examples
 spark-warehouse
 checkpoints/
 data.parquet/
+*.jar
+*.tgz
+*.asc
+*.md5
+*.sha512
