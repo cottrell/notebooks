@@ -9,8 +9,9 @@ PYTHONPATH=$ENVDIR:$PYTHONPATH
 case $1 in
     pyspark_ipython)
         export PYSPARK_DRIVER_PYTHON=ipython
+        # I HAVE NO IDEA ABOUT THIS SETTINGS IN STANDALONE MODE
+        # --conf spark.sql.shuffle.partitions=8 \
         pyspark \
-            --conf spark.sql.shuffle.partitions=8 \
             --conf spark.sql.execution.arrow.enabled=true \
             --conf spark.driver.memory='16g'
         ;;
