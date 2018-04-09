@@ -8,7 +8,7 @@ case $1 in
     create)
         # --scopes=cloud-platform \
         gcloud dataproc clusters create ${CLUSTERNAME} --project $PROJECT --bucket $BUCKET --initialization-actions gs://misc-data-ml/init_action.sh \
-        --num-preemptible-workers 3
+        --num-preemptible-workers 6
         # --initialization-actions gs://dataproc-initialization-actions/jupyter/jupyter.sh
         ;;
     ssh)

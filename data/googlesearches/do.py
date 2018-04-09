@@ -24,6 +24,8 @@ def read_search_data():
     d = pd.DataFrame(d)
     d.columns = ['datetime', 'query']
     d['date'] = d.datetime.apply(lambda x: x.date())
+    d['w'] = d.datetime.dt.round('7d')
+    d['m'] = d.datetime.dt.strftime('%Y-%m')
     for k in ['day', 'hour', 'month', 'dayofweek', 'dayofyear', 'week']:
         d[k] = d.datetime.apply(lambda x: getattr(x, k))
     return d
@@ -37,7 +39,7 @@ from pylab import *
 
 def doplots(d):
     ion()
-    for i, k in enumerate(['date', 'day', 'hour', 'month', 'dayofweek', 'dayofyear', 'week']):
+    for i, k in enumerate(['date', 'w', 'm', 'day', 'hour', 'month', 'dayofweek', 'dayofyear', 'week']):
         print(k)
         figure(i)
         ax = gca()
