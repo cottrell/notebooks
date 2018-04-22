@@ -8,7 +8,7 @@ case $1 in
     create)
         # --scopes=cloud-platform \
         gcloud dataproc clusters create ${CLUSTERNAME} --project $PROJECT --bucket $BUCKET --initialization-actions gs://misc-data-ml/init_action.sh \
-        --num-preemptible-workers 3
+        --num-preemptible-workers 3 --num-workers 3
         # --initialization-actions gs://dataproc-initialization-actions/jupyter/jupyter.sh
         ;;
     ssh)
@@ -45,10 +45,20 @@ case $1 in
     describe)
         gcloud dataproc clusters describe ${CLUSTERNAME}
         ;;
-    addworkers)
-        workers=2
-        [[ "$2" ]] && workers=$2
-        echo adding $2 preemptible workers
+    update)
+        if [[ ! "$2" ]]; then
+            echo update num
+            exit
+        fi
+        echo updating to $2 workers
+        gcloud dataproc clusters update ${CLUSTERNAME} --num-workers=$2
+        ;;
+    updatepreemptible)
+        if [[ ! "$2" ]]; then
+            echo update num
+            exit
+        fi
+        echo updating to $2 preemptible workers
         gcloud dataproc clusters update ${CLUSTERNAME} --num-preemptible-workers=$2
         ;;
     *)

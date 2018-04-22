@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import cloudpickle
+import pdb
 import pickle
 import hashlib
 import os
@@ -7,14 +9,28 @@ import dask
 from distributed import Client
 # from dask.distributed import Client
 import dask.bag as db
+import inspect
+import traceback
+
+from distributed import Worker
+from tornado.ioloop import IOLoop
+from threading import Thread
+def get_repl_worker():
+    loop = IOLoop.current()
+    t = Thread(target=loop.start, daemon=True)
+    t.start()
+    w = Worker('tcp://127.0.0.1:8786', loop=loop)
+    w.start()  # choose randomly assigned port
+    return w
 
 def print_and_return_message(msg):
-    return '/Users/davidcottrell/projects/notebooks/dask' in sys.path
+    # for line in traceback.format_stack():
+    #     print(line.strip())
+    # raise Exception('something')
+    return '/Users/davidcottrell/projects/notebooks/dask' in sys.path, msg
 
 def submit(client):
     r = client.run(print_and_return_message, 'what')
-    print(r)
-    # print("res=", r.result())
     return r
 
 def test():
@@ -32,10 +48,24 @@ def local():
     client = Client(processes=False)
     return submit(client)
 
+def pickletest():
+    # import pdb; pdb.set_trace()
+    return cloudpickle.dumps(print_and_return_message)
+    # c = cloudpickle.CloudPickler(open('j', 'wb'))
+    # return c.extract_func_data(print_and_return_message)
+
 if __name__ == '__main__':
-    if len(sys.argv) > 1 and sys.argv[1] == 'local':
+    arg = sys.argv[1]
+    if arg == 'local':
         print("running local mode")
-        local()
-    else:
-        cluster()
+        r  = local()
+        print(r)
+    elif arg == 'cluster':
         print("running cluster mode")
+        r = cluster()
+        print(r)
+    elif arg == 'pickletest':
+        r = pickletest()
+        print(r)
+    else:
+        print('no arg? {}'.format(arg))
