@@ -1,3 +1,7 @@
+#!/bin/sh
+# had to force the link to update it
+# brew install kubectl
+# brew link --overwrite kubernetes-cli
 minikube stop
 minikube delete
 minikube start
