@@ -25,4 +25,22 @@ RUN CONDA_VERSION="4.3.14" && \
     \
     mkdir -p "$CONDA_DIR/locks" && \
     chmod 777 "$CONDA_DIR/locks"
+# everything in one is bad idea ... just for notes
+RUN pip install pip -U
 RUN pip install pandas
+RUN pip install argh
+RUN pip install sklearn
+# https://github.com/Nexosis/alpine-xgboost
+RUN apk add --update --no-cache \
+    --virtual=.build-dependencies \
+    make gfortran \
+    python3-dev \
+    py-setuptools g++ && \
+    apk add --no-cache openblas lapack-dev libexecinfo-dev libstdc++ libgomp && \
+    pip install xgboost --no-build-isolation && \
+    apk del .build-dependencies
+RUN pip install tensorflow
+RUN pip install catboost
+RUN pip install lightgbm
+RUN pip install pytorch
+RUN pip install pyro
