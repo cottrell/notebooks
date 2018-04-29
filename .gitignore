@@ -23,7 +23,6 @@ __pycache__/
 *.png
 *.swp
 *.csv
-*.txt
 *.things
 *.blp
 old/
