@@ -1,4 +1,5 @@
 #!/bin/sh
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # had to force the link to update it
 case $1 in
     install)
@@ -20,8 +21,20 @@ case $1 in
         kubectl get pods
         pachctl port-forward &
         ;;
+    update_pipelines)
+        # how to do all at once?
+        for x in $(ls $DIR/pipelines/*); do
+            pachctl update-pipeline -f $x
+        done
+        ;;
     *)
         echo "do.sh install|pachctl_start|minikube_start"
+        echo "do you want to bounce restart (y/n)? "
+        read answer
+        if [[ "$answer" = 'y' ]]; then
+            ${BASH_SOURCE[0]} minikube_start
+            ${BASH_SOURCE[0]} pachtl_start
+        fi
         ;;
 esac
 

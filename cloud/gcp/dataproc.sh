@@ -1,15 +1,24 @@
 #!/bin/sh
 
+ME_SHORT=${BASH_SOURCE[0]}
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+ME=$DIR/$(basename ${BASH_SOURCE[0]})
 
 . $DIR/env_bisrnn.sh
 
 case $1 in
+    vanilla)
+        # for debug of init actions for example
+        gcloud dataproc clusters create ${CLUSTERNAME} --project $PROJECT --bucket $BUCKET --zone $ZONE
+        ;;
     create)
         # --scopes=cloud-platform \
         gcloud dataproc clusters create ${CLUSTERNAME} --project $PROJECT --bucket $BUCKET --initialization-actions gs://misc-data-ml/init_action.sh \
-        --num-preemptible-workers 3 --num-workers 3
+        --num-preemptible-workers 3 --num-workers 3 --zone $ZONE
         # --initialization-actions gs://dataproc-initialization-actions/jupyter/jupyter.sh
+        ;;
+    list)
+        gcloud dataproc clusters list
         ;;
     ssh)
         # plain ssh as your current user !?
@@ -62,7 +71,8 @@ case $1 in
         gcloud dataproc clusters update ${CLUSTERNAME} --num-preemptible-workers=$2
         ;;
     *)
-        echo "usage: dataproc.sh {create|ssh|notebook|delete}"
+        # echo "usage: dataproc.sh {create|ssh|notebook|delete}"
+        echo usage: $ME_SHORT $(cat $ME | awk '/^case .* in$/{flag=1;next}/^esac/{flag=0}flag' | sed -n 's/^ *\([^\s]*\))/\1/p' | grep -v '*' | paste -sd '|' -)
         exit 1
         ;;
 esac
