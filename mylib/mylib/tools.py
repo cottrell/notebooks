@@ -8,6 +8,9 @@ import contextlib
 import asyncio
 import collections
 
+# https://fredrikaverpil.github.io/2017/06/20/async-and-await-with-subprocesses/
+# https://docs.python.org/3/library/asyncio-subprocess.html
+
 def run_command_get_output(cmd, shell=True, splitlines=True):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell)
     out, err = p.communicate()
@@ -141,6 +144,8 @@ def run_in_foreground(*tasks, loop=None):
         tasks.exception()
 
 def run_tasks_in_parallel(*tasks, max_workers=10, wait=True):
+    # http://masnun.rocks/2016/10/06/async-python-the-different-forms-of-concurrency/
+    # https://www.reddit.com/r/learnpython/comments/72a8ek/why_bother_using_asyncio_when/
     executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
     fut = [executor.submit(task) for task in tasks]
     # executor.shutdown(wait=wait) # apparently just returning .result triggers the wait. probably the context manager.

@@ -11,6 +11,8 @@ app.blueprint(swagger_blueprint)
 CORS(app)
 app.debug = True
 
+_fswatch_cmd = 'fswatch -Ltux {}'
+
 @app.route("/")
 async def test(request):
     return json({"hello": "world"})
