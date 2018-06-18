@@ -111,17 +111,20 @@ async def bleep(x):
         print('bleep', x)
 
 async def shell_bleep():
+    # this one here does not work! need one below!
+    # asyncio.get_child_watcher().attach_loop(loop)
     try:
         process = await asyncio.create_subprocess_shell(_cmd)
     except Exception as e:
         print('got shell bleep exception {}'.format(e))
 
 def start_bleeps(x):
-    asyncio.get_child_watcher().attach_loop(loop)
+    # asyncio.get_child_watcher().attach_loop(loop)
     loop.call_soon_threadsafe(asyncio.ensure_future, bleep(x))
 
 def start_shell_bleeps():
     # you need the child watcher somewhere like here? not sure. it is to do with the shell exec stuff
+    # IMPORTANT IMPORTANT IMPORANT !!!! MUST BE HERE THE LINE BELOW!
     asyncio.get_child_watcher().attach_loop(loop)
     loop.call_soon_threadsafe(asyncio.ensure_future, shell_bleep())
 
