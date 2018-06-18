@@ -77,7 +77,7 @@ class ExtProgramRunner:
     async def run_external_programs(self):
         print('run external program start')
         # schedule tasks for execution
-        asyncio.Task(self.run_cmd_forever(_cmd))
+        asyncio.ensure_future(self.run_cmd_forever(_cmd))
 
     async def run_cmd_forever(self, cmd):
         print('run cmd forever start')
