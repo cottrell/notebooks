@@ -13,6 +13,10 @@ logging.getLogger('asyncio').setLevel(logging.DEBUG)
 
 def get_event_loop():
     loop = asyncio.get_event_loop()
+    if loop.is_closed():
+        print('opening new loop')
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
     def debug_exception_handler(loop, context):
         print(context)
@@ -51,7 +55,12 @@ class ExtProgramRunner:
         self.run = False
         for process in self.processes:
             print("sending SIGTERM signal to the process with pid {}".format(process.pid))
-            process.send_signal(signal.SIGTERM)
+            try:
+                # process.send_signal(signal.SIGTERM)
+                process.kill()
+            except ProcessLookupError as e:
+                # process already dead? how to check?
+                pass
         print("Canceling all tasks")
         for task in asyncio.Task.all_tasks():
             task.cancel()
@@ -76,14 +85,14 @@ class ExtProgramRunner:
     @asyncio.coroutine
     def run_cmd_forever(self, cmd):
         args = shlex.split(cmd)
-        while self.run:
+        while self.run: # for now do not run like this, just let it die
             process = yield from asyncio.create_subprocess_exec(*args)
             self.processes.append(process)
             exit_code = yield from process.wait()
             for idx, p in enumerate(self.processes):
                 if process.pid == p.pid:
                     self.processes.pop(idx)
-            print("External program '{}' exited with exit code {}, relauching".format(cmd, exit_code))
+            print("External program '{}' exited with exit code {}, relaunching".format(cmd, exit_code))
 
 loop = asyncio.get_event_loop()
 
