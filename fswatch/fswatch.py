@@ -65,6 +65,7 @@ class ExtProgramRunner:
             task.cancel()
 
     async def cancel_monitor(self):
+        print('cancel monitor start')
         while True:
             try:
                 await asyncio.sleep(0.05)
@@ -74,12 +75,12 @@ class ExtProgramRunner:
         self.current_loop.stop()
 
     async def run_external_programs(self):
-        os.makedirs("/tmp/files0", exist_ok=True)
-        os.makedirs("/tmp/files1", exist_ok=True)
+        print('run external program start')
         # schedule tasks for execution
         asyncio.Task(self.run_cmd_forever(_cmd))
 
     async def run_cmd_forever(self, cmd):
+        print('run cmd forever start')
         args = shlex.split(cmd)
         while self.run: # for now do not run like this, just let it die
             process = await asyncio.create_subprocess_exec(*args)
@@ -96,7 +97,7 @@ def run(background=False):
     # for REPL
     asyncio.get_child_watcher().attach_loop(loop)
     daemon = ExtProgramRunner()
-    loop.call_soon(daemon.start, loop)
+    loop.call_soon(asyncio.ensure_future, daemon.start(loop))
     # start main event loop
     if not background:
         loop.run_forever()
