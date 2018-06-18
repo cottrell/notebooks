@@ -49,8 +49,7 @@ class ExtProgramRunner:
         asyncio.async(self.cancel_monitor())
         asyncio.Task(self.run_external_programs())
 
-    @asyncio.coroutine
-    def stop(self, sig):
+    async def stop(self, sig):
         print("Got {} signal".format(sig))
         self.run = False
         for process in self.processes:
@@ -65,30 +64,27 @@ class ExtProgramRunner:
         for task in asyncio.Task.all_tasks():
             task.cancel()
 
-    @asyncio.coroutine
-    def cancel_monitor(self):
+    async def cancel_monitor(self):
         while True:
             try:
-                yield from asyncio.sleep(0.05)
+                await asyncio.sleep(0.05)
             except asyncio.CancelledError:
                 break
         print("Stopping loop")
         self.current_loop.stop()
 
-    @asyncio.coroutine
-    def run_external_programs(self):
+    async def run_external_programs(self):
         os.makedirs("/tmp/files0", exist_ok=True)
         os.makedirs("/tmp/files1", exist_ok=True)
         # schedule tasks for execution
         asyncio.Task(self.run_cmd_forever(_cmd))
 
-    @asyncio.coroutine
-    def run_cmd_forever(self, cmd):
+    async def run_cmd_forever(self, cmd):
         args = shlex.split(cmd)
         while self.run: # for now do not run like this, just let it die
-            process = yield from asyncio.create_subprocess_exec(*args)
+            process = await asyncio.create_subprocess_exec(*args)
             self.processes.append(process)
-            exit_code = yield from process.wait()
+            exit_code = await process.wait()
             for idx, p in enumerate(self.processes):
                 if process.pid == p.pid:
                     self.processes.pop(idx)
