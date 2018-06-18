@@ -1,24 +1,10 @@
-# https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-using-streams
 # https://stackoverflow.com/questions/41536151/terminate-external-program-run-through-asyncio-with-specific-signal
-# https://stackoverflow.com/questions/45711041/how-to-use-a-read-write-stream-between-two-python-asyncio-coroutines
-# https://www.programcreek.com/python/example/82526/asyncio.create_subprocess_exec
-# https://stackoverflow.com/questions/43826254/exit-program-while-tasks-in-default-executor-are-still-running
-# https://stackoverflow.com/questions/40016501/how-to-schedule-and-cancel-tasks-with-asyncio
-# https://stackoverflow.com/questions/43826254/exit-program-while-tasks-in-default-executor-are-still-running
-# https://docs.python.org/3/library/asyncio-eventloop.html#watch-a-file-descriptor-for-read-events
-import shlex
 import asyncio
-import asyncio.subprocess
-import sys
-import os
-import time
-import threading
 import concurrent
-import functools
-import signal
-import concurrent.futures
 import logging
-logging.basicConfig(level=logging.DEBUG)
+import signal
+import shlex
+import asyncio.subprocess
 logging.getLogger('asyncio').setLevel(logging.DEBUG)
 
 def get_event_loop():
@@ -27,121 +13,91 @@ def get_event_loop():
         print('opening new loop')
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-    executor = concurrent.futures.ThreadPoolExecutor(5)
-    loop.set_default_executor(executor)
 
     def debug_exception_handler(loop, context):
         print(context)
-
-    def ask_exit(signame):
-        print("got signal %s: exit" % signame)
-        print('cancelling tasks ...')
-        for task in asyncio.Task.all_tasks():
-            task.cancel()
-        print('stopping and closing loop ...')
-        print('running:', loop.is_running())
-        executor.shutdown(wait=True)
-        loop.stop()
-        # loop.close()
-
-    for signame in ('SIGINT', 'SIGTERM'):
-        loop.add_signal_handler(getattr(signal, signame), functools.partial(ask_exit, signame))
 
     loop.set_debug(True) # HERE
     loop.set_exception_handler(debug_exception_handler)
     return loop
 
+class App():
+    def __init__(self):
+        self.loop = None
+        self.started = False
+        self.output = dict()
+        self.processes = list()
+    def _wrapped_runner(self):
+    	try:
+    	    self.loop.run_forever()
+    	except KeyboardInterrupt:
+    	    pass
+    	except asyncio.CancelledError as exc:
+    	    print("asyncio.CancelledError")
+    	except Exception as exc:
+    	    print(exc, file=sys.stderr)
+    	    print("====", file=sys.stderr)
+    	    print(traceback.format_exc(), file=sys.stderr)
+    	finally:
+    	    print("Stopping daemon...")
+    	    loop.close()
+    def start(self, loop, background=True):
+        self.loop = loop
+        self.loop.add_signal_handler(signal.SIGINT, lambda: asyncio.async(self.stop('SIGINT')))
+        self.loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.async(self.stop('SIGTERM')))
+        asyncio.ensure_future(self.cancel_monitor())
+        if background:
+            executor = None
+            self.loop.run_in_executor(executor, self._wrapped_runner)
+        else:
+            self.loop._wrapped_runner()
+    async def stop(self, sig):
+        print("Got {} signal".format(sig))
+        for process in self.processes:
+            print("sending SIGTERM signal to the process with pid {}".format(process.pid))
+            process.send_signal(signal.SIGTERM)
+        print("Canceling all tasks")
+        for task in asyncio.Task.all_tasks():
+            if task != asyncio.Task.current_task():
+                task.cancel()
+    async def cancel_monitor(self):
+        while True:
+            try:
+                await asyncio.sleep(0.05)
+                # print('cancel monitor running') # debug only, prints a lot
+            except asyncio.CancelledError:
+                break
+        print("Stopping loop")
+        self.loop.stop()
+    async def _handle_stdout(self, process, cmd):
+        line = await process.stdout.readline()
+        line = line.strip().decode()
+        self.output[cmd]['stdout'].append(line)
+        print(line)
+    async def _handle_stderr(self, process, cmd):
+        line = await process.stderr.readline()
+        line = line.strip().decode()
+        self.output[cmd]['stderr'].append(line)
+        print(line)
+    async def _add_cmd(self, cmd):
+        assert self.loop is not None, 'loop is None'
+        self.output[cmd] = dict(stdout=list(), stderr=list())
+        args = shlex.split(cmd)
+        process = await asyncio.create_subprocess_exec(
+                *args,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+                )
+        while True:
+            self._handle_stdout(process, cmd)
+            asyncio.ensure_future(self._handle_stderr(process, cmd), loop=self.loop)
+
 loop = get_event_loop()
-
-def another_way():
-    tasks = dict()
-    # tasks['sleep'] = asyncio.ensure_future(sleep(), loop=loop)
-    tasks['watch'] = asyncio.ensure_future(watch(), loop=loop)
-    loop.run_forever()
-
-async def watch():
-    cmd = 'fswatch -Ltux tmp'
-    # cmd = shlex.split(cmd)
-    # print(cmd)
-    # asdfadsf # why exception not appear
-    proc = await asyncio.create_subprocess_shell(cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, preexec_fn=os.setpgrp)
-    while True:
-        line = await proc.stdout.readline()
-        print('STDOUT', line)
-        # yield line # this breaks something
-
-def run(task, background=True, executor=None):
-    """
-    runs in foreground if there are awaits.
-    child proc is killed when python exits.
-    """
-    loop = get_event_loop()
-    # is there a better pattern?
-    task = asyncio.ensure_future(task) # when is this needed?
-    _callable = lambda : loop.run_until_complete(task)
-    if background:
-        loop.run_in_executor(executor, _callable)
-    else:
-        _callable()
-
-async def sleep():
-    while True:
-        await asyncio.sleep(1)
-        print('sleep')
-
-# def stop_all():
-#     loop = get_event_loop()
-#     loop.stop()
-#     # nope does not work
-
-# 
-# _global_state = dict(a=0)
-# 
-# async def sleep():
-#     while True:
-#         await asyncio.sleep(1)
-#         print('sleep')
-
-# async def touch():
-#     cmd = 'while true; do touch tmp/$(date -u +"%Y-%m-%dT%H:%M:%SZ"); sleep 1; done'
-#     cmd = shlex.split(cmd)
-#     create = asyncio.create_subprocess_exec(cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, preexec_fn=os.setpgrp)
-#     proc = await create
-#     while True:
-#         x = await proc.stdout.readline()
-#         # y = await proc.stderr.readline() # can not do this as whole thing will wait for y
-#         if x:
-#             print('here', x)
-#         else:
-#             print('process done. breaking loop')
-#             break
-#     return proc
-
-# def run_get_date():
-#     if sys.platform == "win32":
-#         loop = asyncio.ProactorEventLoop()
-#         asyncio.set_event_loop(loop)
-#     else:
-#         loop = get_event_loop()
-#     date = loop.run_until_complete(get_date())
-#     print("Current date: %s" % date)
-#     loop.close()
+app = App()
+def run():
+    app.start(loop)
+    asyncio.ensure_future(app.add_cmd('fswatch -Ltux tmp'))
 
 if __name__ == '__main__':
-    # run(sleep())
-    run(watch())
-    # another_way()
-
-async def get_date():
-    code = 'import datetime; print(datetime.datetime.now())'
-    # Create the subprocess, redirect the standard output into a pipe
-    create = asyncio.create_subprocess_exec(sys.executable, '-c', code, stdout=asyncio.subprocess.PIPE)
-    proc = await create
-    # Read one line of output
-    data = await proc.stdout.readline()
-    line = data.decode('ascii').rstrip()
-    # Wait for the subprocess exit
-    await proc.wait()
-    return line
-
+    run()
 
