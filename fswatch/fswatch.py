@@ -1,30 +1,13 @@
 import asyncio
-import asyncio.subprocess
-import concurrent
-import logging
+import traceback
 import os
 import os.path
-import shlex
-import signal
 import sys
 import time
-import traceback
+import signal
+import shlex
+
 from functools import partial
-logging.getLogger('asyncio').setLevel(logging.DEBUG)
-
-def get_event_loop():
-    loop = asyncio.get_event_loop()
-    if loop.is_closed():
-        print('opening new loop')
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-    def debug_exception_handler(loop, context):
-        print(context)
-
-    loop.set_debug(True)
-    loop.set_exception_handler(debug_exception_handler)
-    return loop
 
 _cmd = """
 python -c "
@@ -49,7 +32,8 @@ class ExtProgramRunner:
         asyncio.async(self.cancel_monitor())
         asyncio.Task(self.run_external_programs())
 
-    async def stop(self, sig):
+    @asyncio.coroutine
+    def stop(self, sig):
         print("Got {} signal".format(sig))
         self.run = False
         for process in self.processes:
@@ -59,44 +43,45 @@ class ExtProgramRunner:
         for task in asyncio.Task.all_tasks():
             task.cancel()
 
-    async def cancel_monitor(self):
+    @asyncio.coroutine
+    def cancel_monitor(self):
         while True:
             try:
-                await asyncio.sleep(0.05)
+                yield from asyncio.sleep(0.05)
             except asyncio.CancelledError:
                 break
         print("Stopping loop")
         self.current_loop.stop()
 
-    async def run_external_programs(self):
+    @asyncio.coroutine
+    def run_external_programs(self):
+        os.makedirs("/tmp/files0", exist_ok=True)
+        os.makedirs("/tmp/files1", exist_ok=True)
+        # schedule tasks for execution
         asyncio.Task(self.run_cmd_forever(_cmd))
 
-    async def run_cmd_forever(self, cmd):
+    @asyncio.coroutine
+    def run_cmd_forever(self, cmd):
         args = shlex.split(cmd)
         while self.run:
-            process = await asyncio.create_subprocess_exec(*args)
+            process = yield from asyncio.create_subprocess_exec(*args)
             self.processes.append(process)
-            exit_code = await process.wait()
+            exit_code = yield from process.wait()
             for idx, p in enumerate(self.processes):
                 if process.pid == p.pid:
                     self.processes.pop(idx)
             print("External program '{}' exited with exit code {}, relauching".format(cmd, exit_code))
 
-loop = get_event_loop()
-
-def run(background=False):
-    daemon = ExtProgramRunner()
-    loop.call_soon(daemon.start, loop)
-    # start main event loop
-    if background:
-        executor = None
-        loop.run_in_executor(executor, loop.run_forever)
-    else:
-        loop.run_forever()
 
 def main():
+    loop = asyncio.get_event_loop()
+
     try:
-        run(background=False)
+        daemon = ExtProgramRunner()
+        loop.call_soon(daemon.start, loop)
+
+        # start main event loop
+        loop.run_forever()
     except KeyboardInterrupt:
         pass
     except asyncio.CancelledError as exc:
@@ -109,6 +94,6 @@ def main():
         print("Stopping daemon...")
         loop.close()
 
+
 if __name__ == '__main__':
-    import argh
-    argh.dispatch_command(main)
+    main()

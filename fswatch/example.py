@@ -1,50 +1,99 @@
-# python example.py produce | python ./example.py consume
-# wrapper.py
-
-python example.py produce | python ./example.py consume
-
 import asyncio
-import random
+import traceback
+import os
+import os.path
 import sys
+import time
+import signal
+import shlex
+
+from functools import partial
+
+_cmd = """
+python -c "
+import time
+while True:
+    print('more')
+    time.sleep(1)
+"
+"""
+
+class ExtProgramRunner:
+    run = True
+    processes = []
+
+    def __init__(self):
+        pass
+
+    def start(self, loop):
+        self.current_loop = loop
+        self.current_loop.add_signal_handler(signal.SIGINT, lambda: asyncio.async(self.stop('SIGINT')))
+        self.current_loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.async(self.stop('SIGTERM')))
+        asyncio.async(self.cancel_monitor())
+        asyncio.Task(self.run_external_programs())
+
+    @asyncio.coroutine
+    def stop(self, sig):
+        print("Got {} signal".format(sig))
+        self.run = False
+        for process in self.processes:
+            print("sending SIGTERM signal to the process with pid {}".format(process.pid))
+            process.send_signal(signal.SIGTERM)
+        print("Canceling all tasks")
+        for task in asyncio.Task.all_tasks():
+            task.cancel()
+
+    @asyncio.coroutine
+    def cancel_monitor(self):
+        while True:
+            try:
+                yield from asyncio.sleep(0.05)
+            except asyncio.CancelledError:
+                break
+        print("Stopping loop")
+        self.current_loop.stop()
+
+    @asyncio.coroutine
+    def run_external_programs(self):
+        os.makedirs("/tmp/files0", exist_ok=True)
+        os.makedirs("/tmp/files1", exist_ok=True)
+        # schedule tasks for execution
+        asyncio.Task(self.run_cmd_forever(_cmd))
+
+    @asyncio.coroutine
+    def run_cmd_forever(self, cmd):
+        args = shlex.split(cmd)
+        while self.run:
+            process = yield from asyncio.create_subprocess_exec(*args)
+            self.processes.append(process)
+            exit_code = yield from process.wait()
+            for idx, p in enumerate(self.processes):
+                if process.pid == p.pid:
+                    self.processes.pop(idx)
+            print("External program '{}' exited with exit code {}, relauching".format(cmd, exit_code))
 
 
-async def produce():
-    for i in range(10000):
-        await asyncio.sleep(random.randint(0, 3))
-        yield str(i)
-
-
-async def consume(generator):
-    async for value in generator:
-        print(int(value.strip().decode()) ** 2)
-
-
-async def system_out_generator(loop, stdout, generator):
-    async for line in generator:
-        print(line, file=stdout, flush=True)
-
-
-async def system_in_generator(loop, stdin):
-    reader = asyncio.StreamReader(loop=loop)
-    reader_protocol = asyncio.StreamReaderProtocol(reader)
-    await loop.connect_read_pipe(lambda: reader_protocol, stdin)
-    while True:
-        line = await reader.readline()
-        if not line:
-            break
-        yield line
-
-
-async def main(loop):
-    try:
-        if sys.argv[1] == "produce":
-            await system_out_generator(loop, sys.stdout, produce())
-        elif sys.argv[1] == "consume":
-            await consume(system_in_generator(loop, sys.stdin))
-    except IndexError:
-        await consume(produce())
-
-
-if __name__ == "__main__":
+def main():
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(loop))
+
+    try:
+        daemon = ExtProgramRunner()
+        loop.call_soon(daemon.start, loop)
+
+        # start main event loop
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except asyncio.CancelledError as exc:
+        print("asyncio.CancelledError")
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        print("====", file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
+    finally:
+        print("Stopping daemon...")
+        loop.close()
+
+
+if __name__ == '__main__':
+    main()
