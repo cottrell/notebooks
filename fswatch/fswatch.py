@@ -42,7 +42,7 @@ class ExtProgramRunner:
     def __init__(self):
         pass
 
-    def start(self, loop):
+    async def start(self, loop):
         self.current_loop = loop
         self.current_loop.add_signal_handler(signal.SIGINT, lambda: asyncio.ensure_future(self.stop('SIGINT')))
         self.current_loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.ensure_future(self.stop('SIGTERM')))
