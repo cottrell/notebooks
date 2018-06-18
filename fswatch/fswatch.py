@@ -83,7 +83,7 @@ class ExtProgramRunner:
             print("External program '{}' exited with exit code {}, relauching".format(cmd, exit_code))
 
 
-def main():
+def main(background=False):
     loop = get_event_loop()
     try:
         daemon = ExtProgramRunner()
@@ -103,4 +103,5 @@ def main():
         loop.close()
 
 if __name__ == '__main__':
-    main()
+    import argh
+    argh.dispatch_command(main)
