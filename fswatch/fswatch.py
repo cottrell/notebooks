@@ -30,7 +30,7 @@ _cmd = """
 python -c "
 import time
 while True:
-    print('more')
+    print('shell bleep')
     time.sleep(1)
 "
 """
@@ -98,6 +98,7 @@ def start_loop_in_background_thread():
     loop.run_in_executor(executor, loop.run_forever)
 
 def cancel_all():
+    # THIS DOES NOT KILL THE SHELL STUFF! NEED .kill on procs for that!
     for x in asyncio.Task.all_tasks():
         if x == asyncio.Task.current_task():
             print('not cancel current task')
@@ -109,23 +110,32 @@ async def bleep(x):
         await asyncio.sleep(1)
         print('bleep', x)
 
+async def shell_bleep():
+    try:
+        process = await asyncio.create_subprocess_shell(_cmd)
+    except Exception as e:
+        print('got shell bleep exception {}'.format(e))
+
 def start_bleeps(x):
+    asyncio.get_child_watcher().attach_loop(loop)
     loop.call_soon_threadsafe(asyncio.ensure_future, bleep(x))
 
-def run(background=False):
-    # for REPL
+def start_shell_bleeps():
+    # you need the child watcher somewhere like here? not sure. it is to do with the shell exec stuff
     asyncio.get_child_watcher().attach_loop(loop)
+    loop.call_soon_threadsafe(asyncio.ensure_future, shell_bleep())
+
+daemon = None
+def setup():
+    global daemon
+    # asyncio.get_child_watcher().attach_loop(loop)
     daemon = ExtProgramRunner()
-    loop.call_soon(asyncio.ensure_future, daemon.start(loop))
-    # start main event loop
-    if not background:
-        loop.run_forever()
-    else:
-        loop.run_in_executor(None, loop.run_forever)
+    loop.call_soon_threadsafe(asyncio.ensure_future, daemon.start(loop))
 
 def main():
     try:
-        run(background=False)
+        setup()
+        loop.run_forever()
     except KeyboardInterrupt:
         pass
     except asyncio.CancelledError as exc:
