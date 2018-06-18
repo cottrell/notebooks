@@ -82,14 +82,21 @@ class ExtProgramRunner:
                     self.processes.pop(idx)
             print("External program '{}' exited with exit code {}, relauching".format(cmd, exit_code))
 
+loop = get_event_loop()
 
-def main(background=False):
-    loop = get_event_loop()
-    try:
-        daemon = ExtProgramRunner()
-        loop.call_soon(daemon.start, loop)
-        # start main event loop
+def run(background=False):
+    daemon = ExtProgramRunner()
+    loop.call_soon(daemon.start, loop)
+    # start main event loop
+    if background:
+        executor = None
+        loop.run_in_executor(executor, loop.run_forever)
+    else:
         loop.run_forever()
+
+def main():
+    try:
+        run(background=False)
     except KeyboardInterrupt:
         pass
     except asyncio.CancelledError as exc:
