@@ -17,7 +17,7 @@ def get_event_loop():
     def debug_exception_handler(loop, context):
         print(context)
 
-    loop.set_debug(True) # HERE
+    loop.set_debug(True)
     loop.set_exception_handler(debug_exception_handler)
     return loop
 
@@ -45,12 +45,12 @@ class App():
         self.loop = loop
         self.loop.add_signal_handler(signal.SIGINT, lambda: asyncio.async(self.stop('SIGINT')))
         self.loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.async(self.stop('SIGTERM')))
-        asyncio.ensure_future(self.cancel_monitor())
+        asyncio.ensure_future(self.cancel_monitor(), loop=self.loop)
         if background:
             executor = None
             self.loop.run_in_executor(executor, self._wrapped_runner)
         else:
-            self.loop._wrapped_runner()
+            self._wrapped_runner()
     async def stop(self, sig):
         print("Got {} signal".format(sig))
         for process in self.processes:
@@ -74,12 +74,7 @@ class App():
         line = line.strip().decode()
         self.output[cmd]['stdout'].append(line)
         print(line)
-    async def _handle_stderr(self, process, cmd):
-        line = await process.stderr.readline()
-        line = line.strip().decode()
-        self.output[cmd]['stderr'].append(line)
-        print(line)
-    async def _add_cmd(self, cmd):
+    async def add_cmd(self, cmd):
         assert self.loop is not None, 'loop is None'
         self.output[cmd] = dict(stdout=list(), stderr=list())
         args = shlex.split(cmd)
@@ -89,14 +84,28 @@ class App():
                 stderr=asyncio.subprocess.PIPE
                 )
         while True:
-            self._handle_stdout(process, cmd)
-            asyncio.ensure_future(self._handle_stderr(process, cmd), loop=self.loop)
+            # self._handle_stdout(process, cmd)
+            await asyncio.ensure_future(self._handle_stdout(process, cmd), loop=self.loop)
+            # line = await process.stdout.readline()
+            # line = line.strip().decode()
+            # self.output[cmd]['stderr'].append(line)
+            # print(line)
 
+cmd = """
+python -c "
+import time
+while True:
+    print('more')
+    time.sleep(1)
+"
+"""
 loop = get_event_loop()
 app = App()
 def run():
-    app.start(loop)
-    asyncio.ensure_future(app.add_cmd('fswatch -Ltux tmp'))
+    # asyncio.ensure_future(app.add_cmd('fswatch -Ltux tmp'), loop=loop)
+    asyncio.ensure_future(app.add_cmd(cmd), loop=loop)
+    app.start(loop, background=False)
+    # loop.call_soon(app.add_cmd('fswatch -Ltux tmp'))
 
 if __name__ == '__main__':
     run()
