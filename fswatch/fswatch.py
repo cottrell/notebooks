@@ -46,8 +46,8 @@ class ExtProgramRunner:
         self.current_loop = loop
         self.current_loop.add_signal_handler(signal.SIGINT, lambda: asyncio.async(self.stop('SIGINT')))
         self.current_loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.async(self.stop('SIGTERM')))
-        asyncio.async(self.cancel_monitor())
-        asyncio.Task(self.run_external_programs())
+        loop.call_son(asyncio.ensure_future, self.cancel_monitor())
+        loop.call_son(asyncio.ensure_future, self.run_external_programs())
 
     async def stop(self, sig):
         print("Got {} signal".format(sig))
