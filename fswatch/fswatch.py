@@ -6,8 +6,21 @@ import sys
 import time
 import signal
 import shlex
-
 from functools import partial
+import concurrent
+import logging
+logging.getLogger('asyncio').setLevel(logging.DEBUG)
+
+def get_event_loop():
+    loop = asyncio.get_event_loop()
+
+    def debug_exception_handler(loop, context):
+        print(context)
+
+    loop.set_debug(True)
+    loop.set_exception_handler(debug_exception_handler)
+    return loop
+
 
 _cmd = """
 python -c "
