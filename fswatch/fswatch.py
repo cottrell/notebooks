@@ -44,8 +44,8 @@ class ExtProgramRunner:
 
     def start(self, loop):
         self.current_loop = loop
-        self.current_loop.add_signal_handler(signal.SIGINT, lambda: asyncio.async(self.stop('SIGINT')))
-        self.current_loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.async(self.stop('SIGTERM')))
+        self.current_loop.add_signal_handler(signal.SIGINT, lambda: asyncio.ensure_future(self.stop('SIGINT')))
+        self.current_loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.ensure_future(self.stop('SIGTERM')))
         loop.call_soon(asyncio.ensure_future, self.cancel_monitor())
         loop.call_soon(asyncio.ensure_future, self.run_external_programs())
 
@@ -90,14 +90,18 @@ class ExtProgramRunner:
                     self.processes.pop(idx)
             print("External program '{}' exited with exit code {}, relaunching".format(cmd, exit_code))
 
-loop = asyncio.get_event_loop()
+loop = get_event_loop()
 
 def run(background=False):
     # for REPL
+    asyncio.get_child_watcher().attach_loop(loop)
     daemon = ExtProgramRunner()
     loop.call_soon(daemon.start, loop)
     # start main event loop
-    loop.run_forever()
+    if not background:
+        loop.run_forever()
+    else:
+        loop.run_in_executor(None, loop.run_forever)
 
 def main():
     try:
