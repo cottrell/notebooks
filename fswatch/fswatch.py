@@ -109,4 +109,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import argh
+    argh.dispatch_command(main)
