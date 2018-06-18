@@ -1,10 +1,15 @@
-# https://stackoverflow.com/questions/41536151/terminate-external-program-run-through-asyncio-with-specific-signal
 import asyncio
+import asyncio.subprocess
 import concurrent
 import logging
-import signal
+import os
+import os.path
 import shlex
-import asyncio.subprocess
+import signal
+import sys
+import time
+import traceback
+from functools import partial
 logging.getLogger('asyncio').setLevel(logging.DEBUG)
 
 def get_event_loop():
@@ -21,77 +26,7 @@ def get_event_loop():
     loop.set_exception_handler(debug_exception_handler)
     return loop
 
-class App():
-    def __init__(self):
-        self.loop = None
-        self.started = False
-        self.output = dict()
-        self.processes = list()
-    def _wrapped_runner(self):
-    	try:
-    	    self.loop.run_forever()
-    	except KeyboardInterrupt:
-    	    pass
-    	except asyncio.CancelledError as exc:
-    	    print("asyncio.CancelledError")
-    	except Exception as exc:
-    	    print(exc, file=sys.stderr)
-    	    print("====", file=sys.stderr)
-    	    print(traceback.format_exc(), file=sys.stderr)
-    	finally:
-    	    print("Stopping daemon...")
-    	    loop.close()
-    def start(self, loop, background=True):
-        self.loop = loop
-        self.loop.add_signal_handler(signal.SIGINT, lambda: asyncio.async(self.stop('SIGINT')))
-        self.loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.async(self.stop('SIGTERM')))
-        asyncio.ensure_future(self.cancel_monitor(), loop=self.loop)
-        if background:
-            executor = None
-            self.loop.run_in_executor(executor, self._wrapped_runner)
-        else:
-            self._wrapped_runner()
-    async def stop(self, sig):
-        print("Got {} signal".format(sig))
-        for process in self.processes:
-            print("sending SIGTERM signal to the process with pid {}".format(process.pid))
-            process.send_signal(signal.SIGTERM)
-        print("Canceling all tasks")
-        for task in asyncio.Task.all_tasks():
-            if task != asyncio.Task.current_task():
-                task.cancel()
-    async def cancel_monitor(self):
-        while True:
-            try:
-                await asyncio.sleep(0.05)
-                # print('cancel monitor running') # debug only, prints a lot
-            except asyncio.CancelledError:
-                break
-        print("Stopping loop")
-        self.loop.stop()
-    async def _handle_stdout(self, process, cmd):
-        line = await process.stdout.readline()
-        line = line.strip().decode()
-        self.output[cmd]['stdout'].append(line)
-        print(line)
-    async def add_cmd(self, cmd):
-        assert self.loop is not None, 'loop is None'
-        self.output[cmd] = dict(stdout=list(), stderr=list())
-        args = shlex.split(cmd)
-        process = await asyncio.create_subprocess_exec(
-                *args,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-                )
-        while True:
-            # self._handle_stdout(process, cmd)
-            await asyncio.ensure_future(self._handle_stdout(process, cmd), loop=self.loop)
-            # line = await process.stdout.readline()
-            # line = line.strip().decode()
-            # self.output[cmd]['stderr'].append(line)
-            # print(line)
-
-cmd = """
+_cmd = """
 python -c "
 import time
 while True:
@@ -99,14 +34,77 @@ while True:
     time.sleep(1)
 "
 """
-loop = get_event_loop()
-app = App()
-def run():
-    # asyncio.ensure_future(app.add_cmd('fswatch -Ltux tmp'), loop=loop)
-    asyncio.ensure_future(app.add_cmd(cmd), loop=loop)
-    app.start(loop, background=False)
-    # loop.call_soon(app.add_cmd('fswatch -Ltux tmp'))
+
+class ExtProgramRunner:
+    run = True
+    processes = []
+
+    def __init__(self):
+        pass
+
+    def start(self, loop):
+        self.current_loop = loop
+        self.current_loop.add_signal_handler(signal.SIGINT, lambda: asyncio.async(self.stop('SIGINT')))
+        self.current_loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.async(self.stop('SIGTERM')))
+        asyncio.async(self.cancel_monitor())
+        asyncio.Task(self.run_external_programs())
+
+    @asyncio.coroutine
+    def stop(self, sig):
+        print("Got {} signal".format(sig))
+        self.run = False
+        for process in self.processes:
+            print("sending SIGTERM signal to the process with pid {}".format(process.pid))
+            process.send_signal(signal.SIGTERM)
+        print("Canceling all tasks")
+        for task in asyncio.Task.all_tasks():
+            task.cancel()
+
+    @asyncio.coroutine
+    def cancel_monitor(self):
+        while True:
+            try:
+                yield from asyncio.sleep(0.05)
+            except asyncio.CancelledError:
+                break
+        print("Stopping loop")
+        self.current_loop.stop()
+
+    @asyncio.coroutine
+    def run_external_programs(self):
+        asyncio.Task(self.run_cmd_forever(_cmd))
+
+    @asyncio.coroutine
+    def run_cmd_forever(self, cmd):
+        args = shlex.split(cmd)
+        while self.run:
+            process = yield from asyncio.create_subprocess_exec(*args)
+            self.processes.append(process)
+            exit_code = yield from process.wait()
+            for idx, p in enumerate(self.processes):
+                if process.pid == p.pid:
+                    self.processes.pop(idx)
+            print("External program '{}' exited with exit code {}, relauching".format(cmd, exit_code))
+
+
+def main():
+    loop = get_event_loop()
+    try:
+        daemon = ExtProgramRunner()
+        loop.call_soon(daemon.start, loop)
+        # start main event loop
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except asyncio.CancelledError as exc:
+        print("asyncio.CancelledError")
+    except Exception as exc:
+        print(exc, file=sys.stderr)
+        print("====", file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
+    finally:
+        print("Stopping daemon...")
+        loop.close()
 
 if __name__ == '__main__':
-    run()
-
+    main()
