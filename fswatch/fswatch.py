@@ -93,6 +93,25 @@ class ExtProgramRunner:
 
 loop = get_event_loop()
 
+def start_loop_in_background_thread():
+    executor = None
+    loop.run_in_executor(executor, loop.run_forever)
+
+def cancel_all():
+    for x in asyncio.Task.all_tasks():
+        if x == asyncio.Task.current_task():
+            print('not cancel current task')
+        else:
+            loop.call_soon_threadsafe(x.cancel)
+
+async def bleep(x):
+    while True:
+        await asyncio.sleep(1)
+        print('bleep', x)
+
+def start_bleeps(x):
+    loop.call_soon_threadsafe(asyncio.ensure_future, bleep(x))
+
 def run(background=False):
     # for REPL
     asyncio.get_child_watcher().attach_loop(loop)
