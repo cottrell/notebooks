@@ -12,6 +12,8 @@ import logging
 logging.getLogger('asyncio').setLevel(logging.DEBUG)
 
 def get_event_loop():
+    # https://stackoverflow.com/questions/44684898/python-asyncio-running-subprocess-exec-on-a-worker-thread
+    asyncio.get_child_watcher()
     loop = asyncio.get_event_loop()
     if loop.is_closed():
         print('opening new loop')
@@ -46,7 +48,7 @@ class ExtProgramRunner:
         self.current_loop = loop
         self.current_loop.add_signal_handler(signal.SIGINT, lambda: asyncio.ensure_future(self.stop('SIGINT')))
         self.current_loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.ensure_future(self.stop('SIGTERM')))
-        loop.call_soon(asyncio.ensure_future, self.cancel_monitor())
+        loop.call_soon_threadsafe(asyncio.ensure_future, self.cancel_monitor())
         loop.call_soon(asyncio.ensure_future, self.run_external_programs())
 
     async def stop(self, sig):
@@ -91,11 +93,8 @@ class ExtProgramRunner:
                     self.processes.pop(idx)
             print("External program '{}' exited with exit code {}, relaunching".format(cmd, exit_code))
 
+asyncio.get_child_watcher()
 loop = get_event_loop()
-
-def start_loop_in_background_thread():
-    executor = None
-    loop.run_in_executor(executor, loop.run_forever)
 
 def cancel_all():
     # THIS DOES NOT KILL THE SHELL STUFF! NEED .kill on procs for that!
@@ -134,6 +133,11 @@ def setup():
     # asyncio.get_child_watcher().attach_loop(loop)
     daemon = ExtProgramRunner()
     loop.call_soon_threadsafe(asyncio.ensure_future, daemon.start(loop))
+
+def start_loop_in_background_thread():
+    executor = None
+    loop.run_in_executor(executor, loop.run_forever)
+
 
 def main():
     try:
