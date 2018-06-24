@@ -63,6 +63,8 @@ def one_hot_to_tags(df, cols, sep='|'):
 
 abbrev = json.load(open('abbreviations.json'))['data']
 
+import trainer
+
 def enrich(df):
     # booleans
     d = df.Account.value_counts().index.tolist()
@@ -86,6 +88,7 @@ def enrich(df):
     assert df[bool_cols].sum(axis=1).min() == 1, 'not proper partions'
     df['cat'] = one_hot_to_tags(df, bool_cols)
 
+    # manual Memo stuff for fun
     reg = re.compile('^PEACH .*$')
     reg2 = re.compile('.*PACTC.*')
     reg3 = re.compile('.*WESTJET.*')
@@ -102,12 +105,21 @@ def enrich(df):
     i = df.Subcategory == 'CASH'
     df.loc[i, 'msub'] = 'CASH'
 
+    # manglings
+    documents, texts = trainer.preproc_docs(df.Memo.unique())
+    d = dict(zip(documents, texts))
+    df['Memo_'] = df.Memo.map(d)
+    # # map to most common (no need)
+    # s = df.groupby(['Memo', 'Memo_']).size().sort_values().reset_index().drop_duplicates(['Memo_'], keep='last').set_index('Memo')
+
     # time cats
     df['month'] = df.Date.apply(lambda x: datetime.datetime(x.year, x.month, 1))
     df['week'] = df.Date.apply(lambda x: '{}-W{}'.format(x.year, x.week))
     df['dayofweek'] = df.Date.apply(lambda x: x.strftime('%w-%a'))
     df['taxyear'] = np.where(df.Date.apply(lambda x: x < datetime.datetime(x.year, 4, 6)).values, df.Date.dt.year - 1, df.Date.dt.year)
     df['taxyear'] = df.taxyear.apply(lambda x: str(x) + '-' + str(x+1)[-2:])
+    reg = re.compile('\W*ON\W(\d\d\W[A-Z]{3})\W*')
+    df['on_date'] = df.Memo.str.extract(reg)
 
     return df
 

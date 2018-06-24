@@ -12,6 +12,8 @@
 		"DR": "debit balance (overdrawn)",
 		"IBAN": "International Bank Account Number (you can find this on your statement)",
 		"IMO": "International Money Order",
+		"BCC": "Barclays Connect Card",
+		"CLP": "Contactless Payment?",
 		"ISA": "Individual Savings Account",
 		"REM": "remittance: a cheque credited to your account that was not paid in at your account-holding branch or bank",
 		"REV": "reversal: a standing order or Direct Debit has been recalled",
