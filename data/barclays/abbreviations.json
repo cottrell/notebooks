@@ -1,18 +1,21 @@
 {
-    "APR": "Annual Percentage Rate (relates to credit interest)",
-    "BBP": "bill payment",
-    "BGC": "bank giro credit",
-    "CAT": "a standard applied to ISAs that stands for reasonable Charges, easy Access, fair Terms",
-    "CDL": "Career Development Loan",
-    "CHAPS": "Clearing House Automated Payment System (a means of transferring money)",
-    "CRE": "Credit payment",
-    "DDR": "Direct Debit",
-    "DR": "debit balance (overdrawn)",
-    "IBAN": "International Bank Account Number (you can find this on your statement)",
-    "IMO": "International Money Order",
-    "ISA": "Individual Savings Account",
-    "REM": "remittance: a cheque credited to your account that was not paid in at your account-holding branch or bank",
-    "REV": "reversal: a standing order or Direct Debit has been recalled",
-    "STO": "standing order",
-    "UNP": "unpaid"
+	"info": "https://www.barclays.co.uk/help/accounts/statements-balances/abbreviations/",
+	"data" : {
+		"APR": "Annual Percentage Rate (relates to credit interest)",
+		"BBP": "bill payment",
+		"BGC": "bank giro credit",
+		"CAT": "a standard applied to ISAs that stands for reasonable Charges, easy Access, fair Terms",
+		"CDL": "Career Development Loan",
+		"CHAPS": "Clearing House Automated Payment System (a means of transferring money)",
+		"CRE": "Credit payment",
+		"DDR": "Direct Debit",
+		"DR": "debit balance (overdrawn)",
+		"IBAN": "International Bank Account Number (you can find this on your statement)",
+		"IMO": "International Money Order",
+		"ISA": "Individual Savings Account",
+		"REM": "remittance: a cheque credited to your account that was not paid in at your account-holding branch or bank",
+		"REV": "reversal: a standing order or Direct Debit has been recalled",
+		"STO": "standing order",
+		"UNP": "unpaid"
+	}
 }
