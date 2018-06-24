@@ -16,6 +16,7 @@
 		"REM": "remittance: a cheque credited to your account that was not paid in at your account-holding branch or bank",
 		"REV": "reversal: a standing order or Direct Debit has been recalled",
 		"STO": "standing order",
-		"UNP": "unpaid"
+		"UNP": "unpaid",
+		"FT": "funds transfer"
 	}
 }

@@ -1,4 +1,6 @@
 import os
+import re
+import json
 import numpy as np
 import glob
 import subprocess
@@ -59,6 +61,8 @@ def one_hot_to_tags(df, cols, sep='|'):
     s = list(map(lambda x: x.rstrip('|'), s)) # ugh, how to np
     return s
 
+abbrev = json.load(open('abbreviations.json'))['data']
+
 def enrich(df):
     # booleans
     d = df.Account.value_counts().index.tolist()
@@ -82,6 +86,22 @@ def enrich(df):
     assert df[bool_cols].sum(axis=1).min() == 1, 'not proper partions'
     df['cat'] = one_hot_to_tags(df, bool_cols)
 
+    reg = re.compile('^PEACH .*$')
+    reg2 = re.compile('.*PACTC.*')
+    reg3 = re.compile('.*WESTJET.*')
+    df['msub'] = df.Memo.str[:22].str.strip().str.split('  ').apply(lambda x: x[0]) # .replace(reg, 'PEACH').replace(reg2, 'PACT')
+    def do_thing(x, y):
+        return df.msub.str.replace(re.compile(x), y)
+    df['msub'] = do_thing('^PEACH .*$', 'PEACH')
+    df['msub'] = do_thing('.*PACTC.*', 'PACT')
+    df['msub'] = do_thing('.*WESTJET.*', 'WESTJET')
+    df['msub'] = do_thing('.*EASYJET.*', 'EASYJET')
+    df['msub'] = do_thing('.*TESCO.*', 'TESCO')
+    df['msub'] = do_thing('.*BOOTS.*', 'BOOTS')
+    df['msub'] = do_thing('.*NETFLIX.*', 'NETFLIX')
+    i = df.Subcategory == 'CASH'
+    df.loc[i, 'msub'] = 'CASH'
+
     # time cats
     df['month'] = df.Date.apply(lambda x: datetime.datetime(x.year, x.month, 1))
     df['week'] = df.Date.apply(lambda x: '{}-W{}'.format(x.year, x.week))
@@ -93,10 +113,9 @@ def enrich(df):
 
 try:
     df
-    asdf
 except NameError as e:
     df_orig = load_files()
-    df = enrich(df_orig)
+df = enrich(df_orig)
 
 if 'Number' in df.columns:
     df = df.drop('Number', axis=1)
