@@ -5,11 +5,13 @@ do it yourself or copy https://radimrehurek.com/gensim/tut1.html
 import pandas as pd
 import os
 import re
-from gensim import corpora
+from gensim import corpora, matutils # matutils.corpus2sparse, corpus2dense
 import toolz
 from collections import defaultdict
 import functools
 import hashlib
+import sklearn.svm
+import pickle
 
 def sub_chainer(subs):
     """ chain regex subs """
@@ -37,12 +39,13 @@ def get_word_counts(texts):
     return pd.Series([token for text in texts for token in text]).value_counts()
 
 def get_dictionary(texts, min_count=1):
-    """ make corpora """
+    """ make corpora. texts = df.Memo_ """
     texts = list(set(texts))
     # remove words that appear only min_count times
-    wc = get_word_counts(texts).sort_values()
+    wc = get_word_counts(texts).sort_index()
     # if need to hash the dict for filename saving
-    _hash = hashlib.sha1(pd.util.hash_pandas_object(wc, index=True).values).hexdigest()
+    # or https://stackoverflow.com/questions/16589791/most-efficient-property-to-hash-for-numpy-array
+    _hash = hashlib.sha1(pickle.dumps(pd.util.hash_pandas_object(wc, index=True).values)).hexdigest() # this is not stable if you don't sort above!
     filename = 'dictionary_{}.dict'.format(_hash)
     if os.path.exists(filename):
         print('reading {}'.format(filename))
@@ -52,7 +55,34 @@ def get_dictionary(texts, min_count=1):
         dictionary = corpora.Dictionary(texts)
         print('writing {}'.format(filename))
         dictionary.save(filename)
+    texts = [[token for token in text if wc[token] > min_count] for text in texts]
+    dictionary = corpora.Dictionary(texts)
     return dictionary
 
 def get_corpus(texts, dictionary):
-    return dictionary
+    """
+    get_corpuse(df.Memo_.unique(), dictionary)
+    """
+    corpus = [dictionary.doc2bow(text) for text in texts]
+    # corpora.MmCorpus.serialize(filename, corpus)
+    return corpus
+
+def setup_data():
+    return dictionary, corpus
+
+def sample_data_and_collect_responses(texts):
+    texts = sorted(list(set(texts)))
+    dictionary = get_dictionary()
+    corpus = get_corpuse(texts, dictionary)
+    model = svm.LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+     multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
+     verbose=0)
+
+if __name__ == '__main__':
+    import do
+    df = do.df
+    texts = sorted(list(df.Memo_.unique()))
+    wc = get_word_counts(texts).sort_values()
+    dictionary = get_dictionary(texts)
+    corpus = get_corpus(texts, dictionary)

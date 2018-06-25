@@ -45,7 +45,7 @@ def sample_paragraphs_collect_responses(n=10, learning_rate=0.1):
         # TODO predict and check
         # assert res in ['y', 'n']
         if i % 10 == 0:
-            l = train_paragraphs() # TODO warm, re-use
+            l = train_paragraphs() # TODO warm, re-use REDUNDANCY BUG HERE
             model = l['model']
         pred = model.predict(np.array([get_features(x)]))
         pred = 'y' if pred == 1 else 'n'
