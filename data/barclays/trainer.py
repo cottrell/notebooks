@@ -5,7 +5,7 @@ do it yourself or copy https://radimrehurek.com/gensim/tut1.html
 import pandas as pd
 import os
 import re
-from gensim import corpora, matutils # matutils.corpus2sparse, corpus2dense
+from gensim import corpora, matutils # matutils.corpus2csc, corpus2dense
 import toolz
 from collections import defaultdict
 import functools
@@ -67,17 +67,27 @@ def get_corpus(texts, dictionary):
     # corpora.MmCorpus.serialize(filename, corpus)
     return corpus
 
+texts = None
+dictionary = None
+corpus = None
+X = None
+
 def setup_data():
-    return dictionary, corpus
+    global texts, dictionary, corpus, X
+    df = pd.read_pickle('data.pickle')
+    texts = df.Memo_.tolist()
+    dictionary = get_dictionary(texts)
+    corpus = get_corpus(texts, dictionary)
+    X = matutils.corpus2csc
 
 def sample_data_and_collect_responses(texts):
     texts = sorted(list(set(texts)))
     dictionary = get_dictionary()
-    corpus = get_corpuse(texts, dictionary)
+    corpus = get_corpus(texts, dictionary)
     model = svm.LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
-     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
-     multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
-     verbose=0)
+                    intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+                    multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
+                    verbose=0)
 
 if __name__ == '__main__':
     import do
@@ -85,4 +95,3 @@ if __name__ == '__main__':
     texts = sorted(list(df.Memo_.unique()))
     wc = get_word_counts(texts).sort_values()
     dictionary = get_dictionary(texts)
-    corpus = get_corpus(texts, dictionary)

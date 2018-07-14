@@ -128,6 +128,10 @@ try:
 except NameError as e:
     df_orig = load_files()
 df = enrich(df_orig)
+# for the learn bit
+filename = 'data.pickle'
+print('writing {}'.format(filename))
+df.to_pickle(filename)
 
 if 'Number' in df.columns:
     df = df.drop('Number', axis=1)
