@@ -41,9 +41,9 @@ def clone_user(user=libcache._username):
         if not x['fork']:
             print('\t{}'.format(x['full_name']))
     for x in repos:
-        res = run_command_get_output('cd {} && [[ -e {} ]] || git submodule add {}'.format(userdir, x['name'], x['git_url']), do_raise=False)
+        res = run_command_get_output('cd {} && [[ -e {} ]] || git submodule add {}'.format(userdir, x['name'], x['git_url']), do_raise=False, splitlines=False)
         if res['status'] != 0:
-            if 'You appear to have cloned an empty repository' in res['stdout']:
+            if 'You appear to have cloned an empty repository' in res['out']:
                 pass
             else:
                 raise Exception("some problem: {}".format(res))

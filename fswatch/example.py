@@ -6,7 +6,6 @@ import sys
 import time
 import signal
 import shlex
-
 from functools import partial
 
 _cmd = """
@@ -21,9 +20,6 @@ while True:
 class ExtProgramRunner:
     run = True
     processes = []
-
-    def __init__(self):
-        pass
 
     def start(self, loop):
         self.current_loop = loop
@@ -50,13 +46,12 @@ class ExtProgramRunner:
                 yield from asyncio.sleep(0.05)
             except asyncio.CancelledError:
                 break
-        print("Stopping loop")
-        self.current_loop.stop()
+        # do we need stop loop?
+        # print("Stopping loop")
+        # self.current_loop.stop()
 
     @asyncio.coroutine
     def run_external_programs(self):
-        os.makedirs("/tmp/files0", exist_ok=True)
-        os.makedirs("/tmp/files1", exist_ok=True)
         # schedule tasks for execution
         asyncio.Task(self.run_cmd_forever(_cmd))
 
@@ -72,13 +67,20 @@ class ExtProgramRunner:
                     self.processes.pop(idx)
             print("External program '{}' exited with exit code {}, relauching".format(cmd, exit_code))
 
+def sss():
+    loop = asyncio.get_event_loop()
+    daemon = ExtProgramRunner()
+    loop.call_soon_threadsafe(daemon.start, loop)
+    import concurrent.futures
+    executor = concurrent.futures.ThreadPoolExecutor()
+    fut = executor.submit(loop.run_forever)
+    return fut
 
 def main():
     loop = asyncio.get_event_loop()
-
     try:
         daemon = ExtProgramRunner()
-        loop.call_soon(daemon.start, loop)
+        loop.call_soon_threadsafe(daemon.start, loop)
 
         # start main event loop
         loop.run_forever()
@@ -93,7 +95,6 @@ def main():
     finally:
         print("Stopping daemon...")
         loop.close()
-
 
 if __name__ == '__main__':
     main()
