@@ -7,6 +7,19 @@ import threading
 import contextlib
 import asyncio
 import collections
+import os
+import tempfile
+
+@contextlib.contextmanager
+def tempfile_then_atomic_move(filename, dir=None, prefix='.tmp_'):
+    if dir is None:
+        dir = os.path.dirname(filename)
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    temp = tempfile.mktemp(prefix=prefix, dir=dir)
+    yield temp
+    print('atomic {} -> {}'.format(temp, filename))
+    os.rename(temp, filename)
 
 # https://fredrikaverpil.github.io/2017/06/20/async-and-await-with-subprocesses/
 # https://docs.python.org/3/library/asyncio-subprocess.html
@@ -49,64 +62,6 @@ def invert_dict(d):
         r[v].append(k)
     r = {k: sorted(v) for k, v in r.items()}
     return v
-
-def reorder_schema(schema, names):
-    schema_names = [x.name for x in schema]
-    index = dict(zip(schema_names, range(len(schema_names))))
-    new_schema = [schema[index[x]] for x in names]
-    from pyspark.sql.types import StructType
-    return StructType(new_schema)
-
-def df_to_pasteable_spark_schema(df):
-    return schema_tuples_to_pasteable_spark_schema(df_to_schema_tuples(df))
-
-def df_to_spark_schema(df):
-    return schema_tuples_to_spark_schema(df_to_schema_tuples(df))
-
-def schema_tuples_to_pasteable_spark_schema(d, print_string=True):
-    import pyspark.sql.types as t
-    # convoluted but using actual objects as test
-    s = list()
-    for k, v in d:
-        if v.startswith('int'):
-            temp = k, t.IntegerType()
-        elif v.startswith('object') or v.startswith('str'):
-            temp = k, t.StringType()
-        elif v.startswith('float'):
-            temp = k, t.DoubleType()
-        elif v.startswith('date'):
-            temp = k, t.DateType()
-        else:
-            raise Exception('uh oh {} {}'.format(k, v))
-        temp = 't.StructField("{}", t.{}())'.format(temp[0], temp[1])
-        s.append(temp)
-    s = '\n    ' + ',\n    '.join(s)
-    s = "import pyspark.sql.types as t\nschema = t.StructType([{}\n    ])".format(s)
-    if print_string:
-        print(s)
-    else:
-        return s
-
-def schema_tuples_to_spark_schema(d):
-    import pyspark.sql.types as t
-    s = list()
-    for k, v in d:
-        if v.startswith('int'):
-            temp = k, t.IntegerType()
-        elif v.startswith('object') or v.startswith('str'):
-            temp = k, t.StringType()
-        elif v.startswith('float'):
-            temp = k, t.DoubleType()
-        elif v.startswith('date'):
-            temp = k, t.DateType()
-        else:
-            raise Exception('uh oh {} {}'.format(k, v))
-        s.append(t.StructField(*temp))
-    return t.StructType(s)
-
-def dict_to_spark_schema(d):
-    """ use tuples instead. spark schema are ordered so be careful """
-    raise Exception('use schema_tuples_to_spark_schema')
 
 def df_to_schema_tuples(df):
     return list(df.dtypes.map(lambda x: x.name).items())
@@ -154,19 +109,6 @@ def run_tasks_in_parallel(*tasks, max_workers=10, wait=True):
     else:
         return fut
 
-
-@contextlib.contextmanager
-def spark_manager(spark_master=None, name='default name'):
-    if spark_master is None:
-        spark_master = os.environ['SPARK_MASTER']
-    conf = SparkConf().setMaster(spark_master) \
-                      .setAppName(name) \
-                      .set("spark.executor.memory", '1000m')
-    spark_context = SparkContext(conf=conf)
-    try:
-        yield spark_context
-    finally:
-        spark_context.stop()
 
 class TimeLogger():
 

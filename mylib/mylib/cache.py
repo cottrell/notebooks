@@ -2,13 +2,9 @@ import os
 import sys
 import inspect
 import hashlib
-import simplekv
-import decorator
-from tools import run_command_get_output
+from tools import run_command_get_output, tempfile_then_atomic_move
 
-def get_store(basename):
-    from simplekv.fs import FilesystemStore
-    return FilesystemStore(basename)
+# TODO copy stuff from git/libcache.py
 
 def memo_args(args, kwargs):
     return args, frozenset(kwargs.items())

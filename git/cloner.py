@@ -1,12 +1,56 @@
 import sys
+import subprocess
 import os
 import json
-# pip install pygithub
 import libcache
+
+# TODO probably hitting some paging issues
 
 _basedir = os.path.expanduser('~/code')
 
-# seems am throttled
+def clone_following_of_followers(user=libcache._username):
+    followers = libcache.get_followers(user)
+    for x in followers:
+        following = libcache.get_following(x['login'])
+        for y in following:
+            clone_user(y['logiin'])
+
+def clone_followers(user=libcache._username):
+    followers = libcache.get_followers(user)
+    for x in followers:
+        clone_user(x['login'])
+
+def clone_user(user=libcache._username):
+    """ ~/code/<user> """
+    if not os.path.exists(_basedir):
+        os.makedirs(_basedir)
+    if not os.path.exists(os.path.join(_basedir, '.git')):
+        res = run_command_get_output('cd {} && git init'.format(_basedir))
+        if res['status'] != 0:
+            raise Exception(res)
+    userdir = os.path.join(_basedir, user)
+    if not os.path.exists(userdir):
+        os.makedirs(userdir)
+        res = run_command_get_output('cd {} && git init'.format(userdir))
+        if res['status'] != 0:
+            print('some problem: {}'.format(res))
+        res = run_command_get_output('cd {} && git submodule add ./{}'.format(_basedir, user))
+        if res['status'] != 0:
+            print('some problem: {}'.format(res))
+    all_repos = libcache.get_repos(user)
+    repos = [x for x in all_repos if not x['fork'] and x['size'] > 0]
+    print('will skip {} forks for {}'.format(len(all_repos) - len(repos), user))
+    for x in all_repos:
+        if x['fork']:
+            print('\t{}'.format(x['full_name']))
+    print('will clone {} repos for {}'.format(len(repos), user))
+    for x in all_repos:
+        if not x['fork']:
+            print('\t{}'.format(x['full_name']))
+    for x in repos:
+        res = run_command_get_output('cd {} && [[ -e {} ]] || git submodule add {}'.format(userdir, x['name'], x['git_url']))
+        if res['status'] != 0:
+            print('some problem: {}'.format(res))
 
 def get_followers(user=libcache._username, depth=0):
     print('get_following {} depth={}'.format(user, depth))
@@ -14,7 +58,7 @@ def get_followers(user=libcache._username, depth=0):
     d[user] = list(libcache.get_followers(user))
     if depth > 0:
         for x in d[user]:
-            d[x.login] = list(get_followers(user=x.login, depth=depth-1))
+            d[x['login']] = list(get_followers(user=x['login'], depth=depth-1))
     return d
 
 def get_following(user=libcache._username, depth=0):
@@ -23,10 +67,11 @@ def get_following(user=libcache._username, depth=0):
     d[user] = list(libcache.get_following(user))
     if depth > 0:
         for x in d[user]:
-            d[x.login] = list(get_following(user=x.login, depth=depth-1))
+            d[x['login']] = list(get_following(user=x['login'], depth=depth-1))
     return d
 
-def run_command_get_output(cmd, shell=True, splitlines=True):
+def run_command_get_output(cmd, shell=True, splitlines=True, do_raise=True):
+    print('running: {}'.format(cmd))
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell)
     out, err = p.communicate()
     status = p.returncode
@@ -35,7 +80,10 @@ def run_command_get_output(cmd, shell=True, splitlines=True):
     if splitlines:
         out = out.split('\n')
         err = err.split('\n')
-    return dict(out=out, err=err, status=status)
+    res = dict(out=out, err=err, status=status)
+    if res['status'] != 0 and do_raise:
+        raise Exception('some problem: {}'.format(res))
+    return res
 
 if __name__ == '__main__':
     pass
