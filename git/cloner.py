@@ -26,17 +26,11 @@ def clone_user(user=libcache._username):
         os.makedirs(_basedir)
     if not os.path.exists(os.path.join(_basedir, '.git')):
         res = run_command_get_output('cd {} && git init'.format(_basedir))
-        if res['status'] != 0:
-            raise Exception(res)
     userdir = os.path.join(_basedir, user)
     if not os.path.exists(userdir):
         os.makedirs(userdir)
         res = run_command_get_output('cd {} && git init'.format(userdir))
-        if res['status'] != 0:
-            print('some problem: {}'.format(res))
         res = run_command_get_output('cd {} && git submodule add ./{}'.format(_basedir, user))
-        if res['status'] != 0:
-            print('some problem: {}'.format(res))
     all_repos = libcache.get_repos(user)
     repos = [x for x in all_repos if not x['fork'] and x['size'] > 0]
     print('will skip {} forks for {}'.format(len(all_repos) - len(repos), user))
@@ -49,8 +43,9 @@ def clone_user(user=libcache._username):
             print('\t{}'.format(x['full_name']))
     for x in repos:
         res = run_command_get_output('cd {} && [[ -e {} ]] || git submodule add {}'.format(userdir, x['name'], x['git_url']))
-        if res['status'] != 0:
-            print('some problem: {}'.format(res))
+    # for now don't fail
+    res = run_command_get_output('cd {} && git commit -a -m "update" || :'.format(userdir))
+    res = run_command_get_output('cd {} && git commit -a -m "added {}" || : '.format(_basedir, user))
 
 def get_followers(user=libcache._username, depth=0):
     print('get_following {} depth={}'.format(user, depth))
