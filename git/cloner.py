@@ -31,7 +31,7 @@ def clone_user(user=libcache._username):
         os.makedirs(userdir)
         res = run_command_get_output('cd {} && git init'.format(userdir))
     all_repos = libcache.get_repos(user)
-    repos = [x for x in all_repos if not x['fork'] and x['size'] > 56] # guess at how to detect empty
+    repos = [x for x in all_repos if not x['fork'] and x['size'] > 0] # guess at how to detect empty
     print('will skip {} forks for {}'.format(len(all_repos) - len(repos), user))
     for x in all_repos:
         if x['fork']:
@@ -41,7 +41,12 @@ def clone_user(user=libcache._username):
         if not x['fork']:
             print('\t{}'.format(x['full_name']))
     for x in repos:
-        res = run_command_get_output('cd {} && [[ -e {} ]] || git submodule add {}'.format(userdir, x['name'], x['git_url']))
+        res = run_command_get_output('cd {} && [[ -e {} ]] || git submodule add {}'.format(userdir, x['name'], x['git_url']), do_raise=False)
+        if res['status'] != 0:
+            if 'You appear to have cloned an empty repository' in res['stdout']:
+                pass
+            else:
+                raise Exception("some problem: {}".format(res))
     # for now don't fail
     res = run_command_get_output('cd {} && git submodule add ./{} || :'.format(_basedir, user))
     res = run_command_get_output('cd {} && git commit -a -m "update" || :'.format(userdir))
