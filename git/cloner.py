@@ -13,7 +13,7 @@ def clone_following_of_followers(user=libcache._username):
     for x in followers:
         following = libcache.get_following(x['login'])
         for y in following:
-            clone_user(y['logiin'])
+            clone_user(y['login'])
 
 def clone_followers(user=libcache._username):
     followers = libcache.get_followers(user)
@@ -30,7 +30,6 @@ def clone_user(user=libcache._username):
     if not os.path.exists(userdir):
         os.makedirs(userdir)
         res = run_command_get_output('cd {} && git init'.format(userdir))
-        res = run_command_get_output('cd {} && git submodule add ./{}'.format(_basedir, user))
     all_repos = libcache.get_repos(user)
     repos = [x for x in all_repos if not x['fork'] and x['size'] > 0]
     print('will skip {} forks for {}'.format(len(all_repos) - len(repos), user))
@@ -44,6 +43,7 @@ def clone_user(user=libcache._username):
     for x in repos:
         res = run_command_get_output('cd {} && [[ -e {} ]] || git submodule add {}'.format(userdir, x['name'], x['git_url']))
     # for now don't fail
+    res = run_command_get_output('cd {} && git submodule add ./{} || :'.format(_basedir, user))
     res = run_command_get_output('cd {} && git commit -a -m "update" || :'.format(userdir))
     res = run_command_get_output('cd {} && git commit -a -m "added {}" || : '.format(_basedir, user))
 
