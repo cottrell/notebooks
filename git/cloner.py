@@ -31,7 +31,7 @@ def clone_user(user=libcache._username):
         os.makedirs(userdir)
         res = run_command_get_output('cd {} && git init'.format(userdir))
     all_repos = libcache.get_repos(user)
-    repos = [x for x in all_repos if not x['fork'] and x['size'] > 0]
+    repos = [x for x in all_repos if not x['fork'] and x['size'] > 56] # guess at how to detect empty
     print('will skip {} forks for {}'.format(len(all_repos) - len(repos), user))
     for x in all_repos:
         if x['fork']:
