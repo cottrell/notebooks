@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import subprocess
 import os
@@ -43,7 +44,7 @@ def clone_user(user=libcache._username):
     for x in repos:
         res = run_command_get_output('cd {} && [[ -e {} ]] || git submodule add {}'.format(userdir, x['name'], x['git_url']), do_raise=False, splitlines=False)
         if res['status'] != 0:
-            if 'You appear to have cloned an empty repository' in res['out']:
+            if 'You appear to have cloned an empty repository' in res['err']:
                 pass
             else:
                 raise Exception("some problem: {}".format(res))
@@ -86,4 +87,5 @@ def run_command_get_output(cmd, shell=True, splitlines=True, do_raise=True):
     return res
 
 if __name__ == '__main__':
-    pass
+    import argh
+    argh.dispatch_commands([clone_user])
