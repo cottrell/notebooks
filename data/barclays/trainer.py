@@ -49,6 +49,7 @@ def get_dictionary(texts, min_count=2):
     _hash = hashlib.sha1(pickle.dumps(pd.util.hash_pandas_object(wc, index=True).values)).hexdigest() # this is not stable if you don't sort above!
     filename = 'dictionary_{}.dict'.format(_hash)
     texts = [[token if wc[token] >= min_count else 'OTHER' for token in text] for text in texts]
+    texts = list(set([tuple(x) for x in texts]))
     if os.path.exists(filename):
         print('reading {}'.format(filename))
         return texts, corpora.Dictionary.load(filename)
@@ -81,17 +82,31 @@ def setup_data():
 #                     multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
 #                     verbose=0)
 
-flylsh = None
 import flylsh
 
-_hash_length = 16
-def setup_flylsh(hash_length=_hash_length, sampling_ratio=1, embedding_size=int(20 * _hash_length)):
-    global flylsh
-    flylsh = flylsh.flylsh(X.T, hash_length, sampling_ratio, embedding_size)
+_hash_length = 64
+def setup_flylsh(hash_length=_hash_length, sampling_ratio=0.3, embedding_size=None):
+    global lsh
+    if embedding_size is None:
+        embedding_size = X.T.shape[1] * 40 # i.e. 50 into 2000
+    lsh = flylsh.flylsh(X.T, hash_length, sampling_ratio, embedding_size)
+
+def query(n=None, n_neighbours=3):
+    if n is None:
+        n = len(texts_mod)
+    d = list()
+    for i in range(n):
+        print('{} of {}'.format(i, n))
+        temp = lsh.query(i, n_neighbours)
+        temp = [texts_mod[i]] + [texts_mod[x] for x in temp]
+        print(temp)
+        d.append(temp)
+    return d
 
 try:
-    df, texts, texts_mod, dictionary, corpus, X
+    df, texts, texts_mod, dictionary, corpus, X, lsh
 except NameError as e:
+    lsh = None
     df = None
     texts = None
     texts_mod = None
