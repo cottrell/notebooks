@@ -55,8 +55,6 @@ def get_dictionary(texts, min_count=2):
         dictionary = corpora.Dictionary(texts)
         print('writing {}'.format(filename))
         dictionary.save(filename)
-    texts = [[token for token in text if wc[token] > min_count] for text in texts]
-    dictionary = corpora.Dictionary(texts)
     return dictionary
 
 def get_corpus(texts, dictionary):
@@ -100,7 +98,7 @@ except NameError as e:
     dictionary = None
     corpus = None
     X = None # ~ 460 x 4000
-    setup_data()
+    # setup_data()
     # setup_flylsh()
 
 if __name__ == '__main__':

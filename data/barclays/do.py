@@ -31,7 +31,7 @@ def confirm_do_this(msg='are you sure?'):
 def load_files():
     df = list()
     # just update whole set each time
-    files = [glob.glob(x)[-1] for x in ['chequing_20140401_present.csv', 'saver_20140401_present.csv', 'isa_20140401_present.csv']]
+    files = [glob.glob(os.path.join(_mydir, 'data', x))[-1] for x in ['chequing_20140401_present.csv', 'saver_20140401_present.csv', 'isa_20140401_present.csv']]
     print('found files {}'.format(files))
     for f in files:
         try:
@@ -62,8 +62,6 @@ def one_hot_to_tags(df, cols, sep='|'):
     return s
 
 abbrev = json.load(open('abbreviations.json'))['data']
-
-import trainer
 
 def enrich(df):
     # booleans
@@ -106,6 +104,7 @@ def enrich(df):
     df.loc[i, 'msub'] = 'CASH'
 
     # manglings
+    import trainer
     documents, texts = trainer.preproc_docs(df.Memo.unique())
     d = dict(zip(documents, texts))
     df['Memo_'] = df.Memo.map(d)
