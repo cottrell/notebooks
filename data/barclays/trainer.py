@@ -67,18 +67,13 @@ def get_corpus(texts, dictionary):
     # corpora.MmCorpus.serialize(filename, corpus)
     return corpus
 
-texts = None
-dictionary = None
-corpus = None
-X = None
-
 def setup_data():
-    global texts, dictionary, corpus, X
+    global df, texts, dictionary, corpus, X
     df = pd.read_pickle('data.pickle')
     texts = df.Memo_.tolist()
-    dictionary = get_dictionary(texts)
+    dictionary = get_dictionary(texts) # word encodings
     corpus = get_corpus(texts, dictionary)
-    X = matutils.corpus2csc
+    X = matutils.corpus2csc(corpus) # X.shape =  (vocabsize, ndata)
 
 def sample_data_and_collect_responses(texts):
     texts = sorted(list(set(texts)))
@@ -88,6 +83,25 @@ def sample_data_and_collect_responses(texts):
                     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
                     multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
                     verbose=0)
+
+flylsh = None
+import flylsh
+
+def setup_flylsh(hash_length=16, sampling_ratio=1, embedding_size=1000):
+    global flylsh
+    flylsh = flylsh.flylsh(X.T, hash_length, sampling_ratio, embedding_size)
+
+try:
+    df, texts, dictionary, corpus, X
+except NameError as e:
+    df = None
+    texts = None
+    dictionary = None
+    corpus = None
+    X = None # ~ 460 x 4000
+    setup_data()
+    # setup_flylsh()
+
 
 if __name__ == '__main__':
     import do
