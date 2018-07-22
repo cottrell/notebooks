@@ -38,10 +38,10 @@ def preproc_docs(documents):
 def get_word_counts(texts):
     return pd.Series([token for text in texts for token in text]).value_counts()
 
-def get_dictionary(texts, min_count=1):
+def get_dictionary(texts, min_count=2):
     """ make corpora. texts = df.Memo_ """
     texts = list(set(texts))
-    # remove words that appear only min_count times
+    # for words that appear only min_count times, replace them with OTHER
     wc = get_word_counts(texts).sort_index()
     # if need to hash the dict for filename saving
     # or https://stackoverflow.com/questions/16589791/most-efficient-property-to-hash-for-numpy-array
@@ -51,7 +51,7 @@ def get_dictionary(texts, min_count=1):
         print('reading {}'.format(filename))
         return corpora.Dictionary.load(filename)
     else:
-        texts = [[token for token in text if wc[token] > min_count] for text in texts]
+        texts = [[token if wc[token] >= min_count else 'OTHER' for token in text] for text in texts]
         dictionary = corpora.Dictionary(texts)
         print('writing {}'.format(filename))
         dictionary.save(filename)
@@ -87,7 +87,8 @@ def sample_data_and_collect_responses(texts):
 flylsh = None
 import flylsh
 
-def setup_flylsh(hash_length=16, sampling_ratio=1, embedding_size=1000):
+_hash_length = 16
+def setup_flylsh(hash_length=_hash_length, sampling_ratio=1, embedding_size=int(20 * _hash_length)):
     global flylsh
     flylsh = flylsh.flylsh(X.T, hash_length, sampling_ratio, embedding_size)
 
@@ -101,7 +102,6 @@ except NameError as e:
     X = None # ~ 460 x 4000
     setup_data()
     # setup_flylsh()
-
 
 if __name__ == '__main__':
     import do
