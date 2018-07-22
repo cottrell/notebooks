@@ -3,6 +3,7 @@ import scipy.sparse
 import numpy as np
 
 def mean_shift_nonzero_sparse(data):
+    # shift rows
     # probably inplace
     assert scipy.sparse.isspmatrix_csr(data), 'must use csr format'
     # adjust zero elements only ... kind of strange
