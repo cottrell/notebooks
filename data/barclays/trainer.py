@@ -21,6 +21,7 @@ def sub_chainer(subs):
         f = functools.partial(reg.sub, y)
         funcs.append(f)
     return toolz.compose(*funcs)
+
 subs = [
         # ('[0-9]', '9'),
         ('\W*ON\W(\d\d\W[A-Z]{3})\W*', ' ONDATE '),
@@ -47,40 +48,38 @@ def get_dictionary(texts, min_count=2):
     # or https://stackoverflow.com/questions/16589791/most-efficient-property-to-hash-for-numpy-array
     _hash = hashlib.sha1(pickle.dumps(pd.util.hash_pandas_object(wc, index=True).values)).hexdigest() # this is not stable if you don't sort above!
     filename = 'dictionary_{}.dict'.format(_hash)
+    texts = [[token if wc[token] >= min_count else 'OTHER' for token in text] for text in texts]
     if os.path.exists(filename):
         print('reading {}'.format(filename))
-        return corpora.Dictionary.load(filename)
+        return texts, corpora.Dictionary.load(filename)
     else:
-        texts = [[token if wc[token] >= min_count else 'OTHER' for token in text] for text in texts]
         dictionary = corpora.Dictionary(texts)
         print('writing {}'.format(filename))
         dictionary.save(filename)
-    return dictionary
+    return texts, dictionary
 
 def get_corpus(texts, dictionary):
-    """
-    get_corpuse(df.Memo_.unique(), dictionary)
-    """
+    """ get_corpuse(df.Memo_.unique(), dictionary) """
     corpus = [dictionary.doc2bow(text) for text in texts]
     # corpora.MmCorpus.serialize(filename, corpus)
     return corpus
 
 def setup_data():
-    global df, texts, dictionary, corpus, X
+    global df, texts, texts_mod, dictionary, corpus, X
     df = pd.read_pickle('data.pickle')
-    texts = df.Memo_.tolist()
-    dictionary = get_dictionary(texts) # word encodings
-    corpus = get_corpus(texts, dictionary)
+    texts = list(set(df.Memo_.tolist()))
+    texts_mod, dictionary = get_dictionary(texts) # word encodings
+    corpus = get_corpus(texts_mod, dictionary)
     X = matutils.corpus2csc(corpus) # X.shape =  (vocabsize, ndata)
 
-def sample_data_and_collect_responses(texts):
-    texts = sorted(list(set(texts)))
-    dictionary = get_dictionary()
-    corpus = get_corpus(texts, dictionary)
-    model = svm.LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
-                    intercept_scaling=1, loss='squared_hinge', max_iter=1000,
-                    multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
-                    verbose=0)
+# def sample_data_and_collect_responses(texts):
+#     texts = sorted(list(set(texts)))
+#     dictionary = get_dictionary()
+#     corpus = get_corpus(texts_mod, dictionary)
+#     model = svm.LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
+#                     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+#                     multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
+#                     verbose=0)
 
 flylsh = None
 import flylsh
@@ -91,10 +90,11 @@ def setup_flylsh(hash_length=_hash_length, sampling_ratio=1, embedding_size=int(
     flylsh = flylsh.flylsh(X.T, hash_length, sampling_ratio, embedding_size)
 
 try:
-    df, texts, dictionary, corpus, X
+    df, texts, texts_mod, dictionary, corpus, X
 except NameError as e:
     df = None
     texts = None
+    texts_mod = None
     dictionary = None
     corpus = None
     X = None # ~ 460 x 4000
