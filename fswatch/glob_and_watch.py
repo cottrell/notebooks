@@ -29,7 +29,7 @@ class Watch():
     def __iter__(self):
         for x in self.p.stdout:
             x = x.decode().split()
-            assert len(x) == 3, 'bad length {}'.format(x)
+            # assert len(x) == 3, 'bad length {}'.format(x)
             x[2] = x[2].split(',')
             yield x
 
@@ -37,6 +37,7 @@ def glob_and_watch(dirname):
     p_watch = watch(dirname)
     p_glob = glob(dirname)
     for x in itertools.chain(p_glob, p_watch):
+        assert len(x) == 3, 'bad length {}'.format(x)
         yield x
 
 def watch(dirname):
