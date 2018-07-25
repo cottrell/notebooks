@@ -29,7 +29,6 @@ class Watch():
     def __iter__(self):
         for x in self.p.stdout:
             x = x.decode().split()
-            # assert len(x) == 3, 'bad length {}'.format(x)
             x[2] = x[2].split(',')
             yield x
 
