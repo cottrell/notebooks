@@ -1,10 +1,14 @@
+# pip install MySQL-python - no py3
+# pip install cymysql
+# pip install mysqlclient
 import pandas as pd
 import glob
 from sqlalchemy import create_engine
 import os
 _mydir = os.path.realpath(os.path.dirname(__file__))
 db = os.path.join(_mydir, 'db.sqlite3')
-connection_string = 'sqlite:///{}'.format(db)
+# connection_string = 'sqlite:///{}'.format(db)
+connection_string = 'mysql+mysqlclient://localhost:3306/foo'
 print(connection_string)
 engine = create_engine(connection_string, echo=False)
 filename = glob.glob('NON*.csv')
