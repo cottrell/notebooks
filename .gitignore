@@ -1,4 +1,5 @@
 metastore_db/
+*.log
 *.doc
 *.carrays/
 .DS_Store
