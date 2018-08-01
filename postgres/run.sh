@@ -1,5 +1,6 @@
 #!/bin/sh
 export DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# 5432
 
 dbdir=/var/tmp/postgres_test_db
 logfile=$DIR/pg.log
