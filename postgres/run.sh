@@ -8,13 +8,16 @@ mkdir -p $dbdir
 
 case $1 in
     init)
-        pg_ctl -D /var/tmp/postgres_test_db -l $logfile initdb
+        pg_ctl -D $dbdir -l $logfile initdb
         ;;
     start)
-        pg_ctl -D /var/tmp/postgres_test_db -l $logfile start
+        pg_ctl -D $dbdir -l $logfile start
+        ;;
+    connect)
+        psql postgres
         ;;
     stop)
-        pg_ctl -D /var/tmp/postgres_test_db stop
+        pg_ctl -D $dbdir stop
         ;;
     *)
         echo dunno
