@@ -1,10 +1,11 @@
 # google cloud workflow
 
-1. listing things
+1. listing things (some things like disks are missing from the resource list in the UI)
 
 	gsutil ls
 	gcloud compute instances list
 	gcloud dataproc clusters list
+	gcloud compute disks list
 
 1. Select or create a Cloud Platform project. Either go here: https://console.cloud.google.com/cloud-resource-manager or:
 

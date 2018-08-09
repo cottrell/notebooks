@@ -1,4 +1,4 @@
-export DIR=/Users/davidcottrell/projects/notebooks/gcloud
+export DIR=/Users/davidcottrell/projects/notebooks/cloud/gcp
 export PROJECT=bisrnn
 export REGION=europe-west1
 export ZONE=europe-west1-b
