@@ -2,6 +2,7 @@
 # pip install cymysql
 # pip install mysqlclient
 # pip install psycopg2
+import datetime
 import pandas as pd
 import glob
 from sqlalchemy import create_engine
@@ -29,10 +30,17 @@ print(connection_string)
 engine = create_engine(connection_string, echo=False)
 conn = engine.connect()
 
-filename = glob.glob('NON*.csv')
-assert len(filename) == 1, 'got {}'.format(filename)
-filename = filename[0]
-df = pd.read_csv(filename)
+filenames = glob.glob('NON*.csv')
+df = list()
+for filename in filenames:
+    d = pd.read_csv(filename)
+    x = filename.split(' ')[3][:8]
+    date = datetime.datetime.strptime(x, "%d%m%Y").date()
+    d['date'] = date
+    print(filename, d.shape, x, date)
+    df.append(d)
+df = pd.concat(df, axis=0)
+print(df.shape)
 df.to_sql('data', con=engine, index=False, if_exists='replace')
 # d = engine.execute('select * from data').fetchall()
 d = pd.read_sql('select * from data', engine)
