@@ -1,8 +1,52 @@
-# ...
+# notes
 
+    google cloud sdk puts kubectl in the path. this is bad. Check what you are using first!
+
+    brew info kubectl
+    type kubectl
+
+    export PATH=/usr/local/Cellar/kubernetes-cli/1.11.2/bin:$PATH
+
+    Do some install on Docker app itself.
+
+    Can use minikube or docker for desktop? DO NOT USE MINIKUBE FOR NOW!
+
+    $ kubectl config get-contexts
+    CURRENT   NAME                 CLUSTER                      AUTHINFO             NAMESPACE
+    docker-for-desktop   docker-for-desktop-cluster   docker-for-desktop
+    *         minikube             minikube                     minikube
+
+    kubectl config current-context
+    kubectl config use-context docker-for-desktop
+
+    kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+    kubectl get all --all-namespaces
+    kubectl get pods --namespace=kube-system
+    kubectl port-forward kubernetes-dashboard-7d5dcdb6d9-grxsw 8443:8443 --namespace=kube-system
+
+# example (nginx)
+
+    kubectl run hello-nginx --image=nginx --port=80
+    kubectl get pods
+    kubectl get deployments
+    kubectl expose deployment hello-nginx --type=NodePort
+    kubectl describe service hello-nginx
+
+# example (metabase)
+
+    also see notebooks/metabase/run.sh
+    docker pull metabase/metabase
+    kubectl expose deployment metabase-example --type=NodePort
+
+
+
+
+
+    # OLD IGNORE
     minikube start
     kubectl version
     kubectl cluster-info
+
     kubectl get nodes
     kubectl run kubernetes-bootcamp --image=gcr.io/google-samples/kubernetes-bootcamp:v1 --port=8080
     kubectl get deployments
