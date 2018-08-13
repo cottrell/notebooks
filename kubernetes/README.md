@@ -24,6 +24,18 @@
     kubectl get pods --namespace=kube-system
     kubectl port-forward kubernetes-dashboard-7d5dcdb6d9-grxsw 8443:8443 --namespace=kube-system
 
+    host might be 10.0.0.2 from virtuabox???
+
+# example (run some image with a command)
+
+Without creating Dockerfile
+
+    # kubectl run ubuntu -n default --image ubuntu:latest --command /bin/bash
+    kubectl run u --rm -i --tty --image ubuntu:latest -- bash
+    kubectl run u --rm -i --tty --image centos_postgres -- bash
+
+
+
 # example (nginx)
 
     kubectl run hello-nginx --image=nginx --port=80

@@ -22,6 +22,9 @@ case $1 in
         # localhost:3000
         echo to ssh into machine do something like kubectl exec -it metabase-example-67f87cf78-gzl29 -- /bin/bash
         ;;
+    ssh)
+        kubectl exec -it metabase-example-67f87cf78-gzl29 -- /bin/bash
+        ;;
     *)
         echo "prog docker|kubectl"
         ;;

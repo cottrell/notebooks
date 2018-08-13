@@ -3,6 +3,8 @@ export DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 # 5432
 
 dbdir=/var/tmp/postgres_test_db
+# manually set listen_addresses = '*' in postgressql.conf
+# pg_hba.conf host all all 0.0.0.0/0 md5
 logfile=$DIR/pg.log
 
 mkdir -p $dbdir
