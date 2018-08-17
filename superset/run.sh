@@ -2,7 +2,7 @@
 
 case $1 in
     install)
-        # conda create -n superset
+        conda create -n superset
         source activate superset
         pip install superset
         fabmanager create-admin --app superset
@@ -14,7 +14,7 @@ case $1 in
         superset runserver -d -p 8088
         ;;
     *)
-        echo dunno
+        echo 'run.sh install|run'
         ;;
 esac
 
