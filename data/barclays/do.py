@@ -7,6 +7,8 @@ import subprocess
 import pandas as pd
 import shutil
 import datetime
+from sqlalchemy import create_engine
+import glob
 import matplotlib.gridspec as gridspec
 from pylab import *
 pd.options.display.width = 200
@@ -79,6 +81,7 @@ def enrich(df):
     df['is_interest'] = df.Memo.str.contains('INTEREST PAID GROSS')
     bool_cols = ['is_b2b', 'is_rental', 'is_q', 'is_transfer', 'is_ignorable', 'is_interest']
     other = ~df[bool_cols].any(axis=1)
+    df['other'] = other
     df['is_other_in'] = (df.Amount > 0) & other
     df['is_other_out'] = (df.Amount < 0) & other
     bool_cols = bool_cols + ['is_other_in', 'is_other_out']
@@ -124,9 +127,11 @@ def enrich(df):
 
 try:
     df
+    asdf
 except NameError as e:
     df_orig = load_files()
 df = enrich(df_orig)
+assert df.shape[0] == df_orig.shape[0]
 # for the learn bit
 filename = 'data.pickle'
 print('writing {}'.format(filename))
@@ -219,12 +224,13 @@ doplot_flows()
 #     return a[i].head(n=30).sort_values('Date', ascending=False)
 
 _cols = ['Date', 'Account', 'Amount', 'Subcategory', 'Memo']
+
 # temp = df.iloc[:,:-2][_cols]
 # print("\ntop recent things")
 # print(top_recent_things(temp))
 # print("\ntop things all time")
 # print(top_things(temp).head(n=30))
-# 
+
 # figure(2)
 # clf()
 # gs = gridspec.GridSpec(2, 1, hspace=0.5, wspace=0.5)
@@ -238,4 +244,30 @@ _cols = ['Date', 'Account', 'Amount', 'Subcategory', 'Memo']
 # t.plot(kind='bar', ax=ax, grid=True)
 # savefig(os.path.join(_mydir, 'figure_2.png'))
 
+def create_db(name='test'):
+    connection_string = 'postgresql+psycopg2://localhost/postgres'
+    engine = create_engine(connection_string, echo=True)
+    conn = engine.connect()
+    conn.execute('commit')
+    res = pd.read_sql('SELECT * FROM pg_database', conn)
+    if name in res.values:
+        print('{} exists'.format(name))
+    else:
+        conn.execute('create database {}'.format(name))
+    conn.close()
 
+def get_conn(dbname):
+    connection_string = 'postgresql+psycopg2://localhost/{}'.format(dbname)
+    print(connection_string)
+    engine = create_engine(connection_string, echo=False)
+    return engine
+
+def put_data(df, tablename, dbname='test', if_exists='replace'):
+    dbname = 'test'
+    create_db(name=dbname)
+    engine = get_conn('test')
+    conn = engine.connect()
+    df.to_sql(tablename, con=engine, index=False, if_exists=if_exists)
+
+if __name__ == '__main__':
+    put_data(df, 'flows')
