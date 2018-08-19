@@ -11,6 +11,7 @@ case $1 in
         superset init
         ;;
     run)
+        source activate superset
         superset runserver -d -p 8088
         ;;
     *)

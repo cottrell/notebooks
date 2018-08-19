@@ -36,16 +36,21 @@ check_ni, m_F_ni, F_ni = get_tax_interp(v_tax_ni)
 
 assert F(200000) == 75600
 
-x = linspace(0, 300000)
+x = linspace(1, _max_x, 10000)
 figure(1)
 ion()
 clf()
-subplot(211)
+subplot(311)
 grid()
-plot(x, m_F(x), '.-')
-subplot(212)
+plot(x, m_F(x), '.-', label='tax')
+plot(x, m_F_ni(x), '.-', label='ni')
+legend()
+ylabel('marginal rate')
+subplot(312)
 grid()
-plot(x, F(x), '.-')
+plot(x, F(x), '-', label='tax')
+plot(x, F_ni(x), '-', label='ni')
+ylabel('tax and pension limit')
 
 def get_pension_limit(v):
     x, y = zip(*v)
@@ -53,6 +58,39 @@ def get_pension_limit(v):
     return f
 
 G = get_pension_limit(v_pension)
-plot(x, G(x), '.-')
+plot(x, G(x), '-', label='pension limit')
 
+subplot(313)
+grid()
+# plot(x, x, 'k-', label='gross')
+total_no_contribution = F(x) + F_ni(x)
+total_max_contribution = F(x - G(x)) + F_ni(x - G(x))
+plot(x, total_no_contribution, label='total no contrib')
+plot(x, total_max_contribution, label='total max contrib')
+plot(x, total_no_contribution - total_max_contribution, label='tax delta')
+ylabel('income and tax')
+legend()
 show()
+
+def get_tax_info(gross, pension_contribution):
+    g = G(gross)
+    if pension_contribution == 'max':
+        pension_contribution = g
+    assert pension_contribution <= g, 'pension contrib greater than max {} > {}'.format(pension_contribution, g)
+    taxable = gross - pension_contribution
+    tax = F(taxable)
+    ni = F_ni(taxable)
+    net = gross - tax - ni
+    effective_tax_rate = 1 - net / gross
+    return dict(gross=gross, net=net, pension_contribution=pension_contribution, pension_room=g, ni=ni, tax=tax, effective_tax_rate=effective_tax_rate)
+
+max_scenario_effective_rate = total_max_contribution / x
+zero_scenario_effective_rate = total_no_contribution / x
+figure(2)
+clf()
+grid()
+plot(x, max_scenario_effective_rate, '--', label='max scenario')
+plot(x, zero_scenario_effective_rate, '--', label='zero scenario')
+legend()
+ylabel('effective tax rate')
+xlabel('income')
