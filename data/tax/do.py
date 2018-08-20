@@ -14,7 +14,7 @@ v_tax = df['income_tax']['data']
 v_tax_ni = df['data_employee_ni']['data'] # not sure
 v_pension = df['data_pension_limit']['data']
 
-_max_x = 5e5
+_max_x = 3e5
 
 def get_tax_interp(v):
     """ marginals and boundaries """
@@ -33,44 +33,59 @@ def get_tax_interp(v):
 
 check, m_F, F = get_tax_interp(v_tax)
 check_ni, m_F_ni, F_ni = get_tax_interp(v_tax_ni)
+G = get_pension_limit(v_pension)
 
 assert F(200000) == 75600
 
-x = linspace(1, _max_x, 10000)
-figure(1)
-ion()
-clf()
-subplot(311)
-grid()
-plot(x, m_F(x), '.-', label='tax')
-plot(x, m_F_ni(x), '.-', label='ni')
-legend()
-ylabel('marginal rate')
-subplot(312)
-grid()
-plot(x, F(x), '-', label='tax')
-plot(x, F_ni(x), '-', label='ni')
-ylabel('tax and pension limit')
-
 def get_pension_limit(v):
     x, y = zip(*v)
+    x = np.hstack([x, _max_x])
+    y = np.hstack([y, y[-1]])
     f = si.interp1d(x, y, fill_value=(y[0], y[-1]), kind='linear', bounds_error=False)
     return f
 
-G = get_pension_limit(v_pension)
-plot(x, G(x), '-', label='pension limit')
+def doplot():
+    x = linspace(1, _max_x, 10000)
+    figure(1)
+    ion()
+    clf()
+    subplot(311)
+    grid()
+    plot(x, m_F(x), '-', label='tax')
+    plot(x, m_F_ni(x), '-', label='ni')
+    legend()
+    ylabel('marginal rate')
+    subplot(312)
+    grid()
+    plot(x, F(x), '-', label='tax')
+    plot(x, F_ni(x), '-', label='ni')
+    ylabel('tax and pension limit')
 
-subplot(313)
-grid()
-# plot(x, x, 'k-', label='gross')
-total_no_contribution = F(x) + F_ni(x)
-total_max_contribution = F(x - G(x)) + F_ni(x - G(x))
-plot(x, total_no_contribution, label='total no contrib')
-plot(x, total_max_contribution, label='total max contrib')
-plot(x, total_no_contribution - total_max_contribution, label='tax delta')
-ylabel('income and tax')
-legend()
-show()
+    plot(x, G(x), '-', label='pension limit')
+
+    subplot(313)
+    grid()
+    # plot(x, x, 'k-', label='gross')
+    total_no_contribution = F(x) + F_ni(x)
+    total_max_contribution = F(x - G(x)) + F_ni(x - G(x))
+    plot(x, total_no_contribution, label='total no contrib')
+    plot(x, total_max_contribution, label='total max contrib')
+    plot(x, total_no_contribution - total_max_contribution, label='tax delta')
+    ylabel('income and tax')
+    legend()
+    show()
+
+    max_scenario_effective_rate = total_max_contribution / x
+    zero_scenario_effective_rate = total_no_contribution / x
+    figure(2)
+    clf()
+    grid()
+    plot(x, max_scenario_effective_rate, '--', label='max scenario')
+    plot(x, zero_scenario_effective_rate, '--', label='zero scenario')
+    legend()
+    ylabel('effective tax rate')
+    xlabel('income')
+    title('one year only')
 
 def get_tax_info(gross, pension_contribution):
     g = G(gross)
@@ -83,14 +98,3 @@ def get_tax_info(gross, pension_contribution):
     net = gross - tax - ni
     effective_tax_rate = 1 - net / gross
     return dict(gross=gross, net=net, pension_contribution=pension_contribution, pension_room=g, ni=ni, tax=tax, effective_tax_rate=effective_tax_rate)
-
-max_scenario_effective_rate = total_max_contribution / x
-zero_scenario_effective_rate = total_no_contribution / x
-figure(2)
-clf()
-grid()
-plot(x, max_scenario_effective_rate, '--', label='max scenario')
-plot(x, zero_scenario_effective_rate, '--', label='zero scenario')
-legend()
-ylabel('effective tax rate')
-xlabel('income')
