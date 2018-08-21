@@ -31,18 +31,19 @@ def get_tax_interp(v):
         np.hstack([0, check.tax_cumulative.values]), kind='linear', fill_value='extrapolate')
     return check, m, t
 
-check, m_F, F = get_tax_interp(v_tax)
-check_ni, m_F_ni, F_ni = get_tax_interp(v_tax_ni)
-G = get_pension_limit(v_pension)
-
-assert F(200000) == 75600
-
 def get_pension_limit(v):
     x, y = zip(*v)
     x = np.hstack([x, _max_x])
     y = np.hstack([y, y[-1]])
     f = si.interp1d(x, y, fill_value=(y[0], y[-1]), kind='linear', bounds_error=False)
     return f
+
+check, m_F, F = get_tax_interp(v_tax)
+check_ni, m_F_ni, F_ni = get_tax_interp(v_tax_ni)
+G = get_pension_limit(v_pension)
+
+assert F(200000) == 75600
+
 
 def doplot():
     x = linspace(1, _max_x, 10000)
