@@ -20,6 +20,13 @@ def get_tax_pension_income_optimal_terminal_state_constant_income(t, X, Y, actio
     xs = np.repeat([X / t], t)
     return get_tax_pension_income_fixed_x(t, X, Y, xs, actions)
 
+# test
+# t = 2
+# X = 200000
+# Y = 0
+# actions = np.array([1])
+# r = get_tax_pension_income_optimal_terminal_state_constant_income(t, X, Y, actions)
+
 def total_tax_with_optimal_terminal_state(t, X, Y, actions):
     """
     actions should prob be an (n-1) x 2 np array
@@ -212,9 +219,17 @@ def optimal_allocation_with_skopt(t, X, Y, n=10, n_parallel=4, const_income=True
             print(n_left)
             y = Parallel()(delayed(fun)(x) for x in suggested)
             optimizer.tell(suggested, y)
-            print('iteration: {}, {}, {}'.format(i, suggested, y))
+            print('iteration: {}, {}, {}, {}'.format(i, suggested, y, action_to_zeroone(np.array(suggested))))
     print('min is', min(optimizer.yi))
     return optimizer
 
+t = 2
+X = 100000 * t
+Y = 0
 test = functools.partial(optimal_allocation_with_skopt, t, X, Y)
 # see Xi and yi
+
+actions = uniform_to_actions(np.linspace(0, 1, 100))
+from pylab import *
+figure()
+fs = [total_tax_with_optimal_terminal_state_constant_income(t, X, Y, np.array([action])) for action in actions]
