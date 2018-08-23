@@ -107,27 +107,3 @@ def _F_const_full(t, X, Y, alphas):
         assert X >= 0
         assert Y >= 0
     return dict(tax=tax, xs=xs, ys=ys, Ys=Ys, Xs=Xs, alpha_xs=alpha_xs, alpha_ys=alpha_ys)
-
-def get_var(t, X, n=1000):
-    X = X * t
-    d = list()
-    for i in range(n):
-        r = _F_const_full(t, X, Y, nr.rand(t-1, 2))
-        d.append(sum(r['tax']))
-    d = pd.Series(d)
-    s = d.describe()
-    return (s['max'] - s['min']) / t
-
-# def doplot(X):
-#     figure(1)
-#     clf()
-#     df = list()
-#     t = 3
-#     Y = 0
-#     # for X in range(50000, 350000, 50000):
-#     for alpha_y in np.linspace(0, 1, 20):
-#         r = _F_const_full(t, X * t, Y, np.array([alpha_y, 0]))
-#         d = dict(t=t, X=X, Y=Y, alpha_y=alpha_y, tax=sum(r['tax']), tax_=r['tax'], ys=sum(r['ys']), ys_=r['ys'], xs=sum(r['xs']), xs_=r['xs'])
-#         df.append(d)
-#     df = pd.DataFrame(df)
-#     return df
