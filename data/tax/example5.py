@@ -50,7 +50,7 @@ def multiplot(force=True, step=1000):
     # webbrowser.open('file://{}'.format(gif)) # opens in preview ugh
     ion()
 
-def doplot(t=2, A=200000, zlim=None, filename=None, num=1):
+def doplot(t=2, A=210000, zlim=None, filename=None, num=1):
     assert t == 2, 'will not work otherwise'
     X = A * t
     Y = 0
@@ -87,7 +87,7 @@ def doplot(t=2, A=200000, zlim=None, filename=None, num=1):
         savefig(filename)
     return d, ax
 
-def doplot2(t=3, alpha_y=[0.5, 0.5], A=200000, zlim=None, filename=None, num=1):
+def doplot2(t=3, alpha_y=[0.5, 0.5], A=210000, zlim=None, filename=None, num=1):
     # keep alpha_y const, doesn't matter so much
     assert t == 3, 'will not work otherwise'
     X = A * t
@@ -133,7 +133,8 @@ def unravel(actions):
 
 @curry
 def _F_const_full(t, X, Y, alphas):
-    alphas = np.atleast_2d(np.array(alphas))
+    # alphas are unravelled here (2d)
+    alphas = np.maximum(0, np.minimum(1, np.atleast_2d(np.array(alphas))))
     assert alphas.shape[1] == 2
     assert (t - 1) == alphas.shape[0]
     alphas = np.vstack([alphas, [1, 1]])
@@ -145,22 +146,31 @@ def _F_const_full(t, X, Y, alphas):
     Xs = list()
     Ys = list()
     x = X / t
+    if isinstance(Y, int) or isinstance(Y, float):
+        Y_state = [Y] # is unused room
+    else:
+        Y_state = list(Y)
     for i, (alpha_x, alpha_y) in enumerate(alphas):
         Xs.append(X)
-        Ys.append(Y)
         alpha_xs.append(alpha_x)
         alpha_ys.append(alpha_y)
         x = alpha_x * X
         X = X - x
-        Y = Y + G(x)
-        y = alpha_y * min(x, Y) # was a bug (X) before!
-        Y = Y - y
+        assert len(Y_state) <= 3
+        y_max = sum(Y_state) + G(x)
+        assert 0 <= alpha_y <= 1
+        y = alpha_y * min(x, y_max) # was a bug (X) before!
+        # this years remaining room
+        # yes this is how it works, it is dumb, you can not use up the old stuff first and have room left. the only way of accessing prev room is to over-contribute
+        Y_state.append(max(0, G(x) - y))
+        Y_state = Y_state[-3:] # keep only last three years!
+        Ys.append(Y_state)
         xs.append(x)
         ys.append(y)
         tax.append(F(x - y))
         if _bounds_errors:
             assert X >= 0
-            assert Y >= 0
+            assert sum(Y_state) >= 0
         else:
             pass
             # if X < 0:
@@ -169,11 +179,12 @@ def _F_const_full(t, X, Y, alphas):
             #     print('WARNING: Y = {} >= 0'.format(Y))
     # as a check, final state
     Xs.append(X)
-    Ys.append(Y)
+    Ys.append(Y_state)
     tax_pv = tax / np.power(1 + gamma, np.arange(0, len(tax)))
     return dict(tax=tax, tax_pv=tax_pv, xs=xs, ys=ys, Ys=Ys, Xs=Xs, alpha_xs=alpha_xs, alpha_ys=alpha_ys, tax_annualized=sum(tax) / t, tax_pv_annualized=sum(tax_pv) / t)
 
-def test_opt(t=2, A=210000, Y=0):
+def test_opt(t=2, A=210000):
+    Y = 0
     X = A * t
     f = f_opt(t, X, Y)
     with with_bounds_errors_off() as e:
@@ -191,4 +202,15 @@ def test_opt(t=2, A=210000, Y=0):
         print(k, r[k])
     return res
 
-# skopt.gp_minimize(f, [skopt.space.Real(0, 1)] * 2, noise=0, kappa=10, n_calls=100, n_random_starts=10)
+import skopt
+# skopt.gp_minimize(func, dimensions, base_estimator=None, n_calls=100, n_random_starts=10, acq_func='gp_hedge', acq_optimizer='auto', x0=None, y0=None, random_state=None, verbose=False, callback=None, n_points=10000, n_restarts_optimizer=5, xi=0.01, kappa=1.96, noise='gaussian', n_jobs=1)
+def test_opt2(t=3, A=210000):
+    Y = 0
+    X = A * t
+    f = f_opt(t, X, Y)
+    m = 2 * (t - 1)
+    r = skopt.gp_minimize(f, [skopt.space.Real(0, 1)] * m, n_calls=30, x0=[[0] * m, [1] * m], n_random_starts=10)
+    alphas = pd.DataFrame(unravel(np.minimum(1, np.maximum(0, r.x))), columns=['alpha_x', 'alpha_y'])
+    rr = _F_const_full(t, X, Y, alphas.values)
+    r.update(dict(r=rr, alphas=alphas))
+    return r
