@@ -21,18 +21,23 @@ def multiplot(force=True):
     dirname = os.path.join(_mydir, 'plots')
     if not os.path.exists(dirname):
         os.makedirs(dirname)
-    for A in range(10000, 310000, 1000):
-        filename = os.path.join(dirname, 'wireframe_t={}_A={}.png'.format(t, A))
+    ioff()
+    _max = 350000
+    _max_z = _max / 2
+    for A in range(10000, _max, 1000):
+        # ordering hack
+        filename = os.path.join(dirname, 'wireframe_t={}_A={:07}.png'.format(t, A))
         if force or not os.path.exists(filename):
-            doplot(t=t, A=A, filename=filename)
+            doplot(t=t, A=A, filename=filename) # , zlim=[0, _max_z])
     gif = os.path.join(dirname, 'wireframe_t={}.gif'.format(t))
     pngs = os.path.join(dirname, 'wireframe_t={}_A=*.png'.format(t))
     cmd = 'cd {} && convert -loop 0 -delay 10 {} {}'.format(dirname, pngs, gif)
     print('running: {}'.format(cmd))
-    # os.system(cmd)
+    os.system(cmd)
     # webbrowser.open('file://{}'.format(gif)) # opens in preview ugh
+    ion()
 
-def doplot(t=2, A=200000, filename=None, num=1):
+def doplot(t=2, A=200000, zlim=None, filename=None, num=1):
     assert t == 2, 'will not work otherwise'
     X = A * t
     Y = 0
@@ -41,7 +46,7 @@ def doplot(t=2, A=200000, filename=None, num=1):
     n = 20
     for alpha_x in linspace(0, 1, n + 1):
         for alpha_y in linspace(0, 1, n + 1):
-            v = f([alpha_x, alpha_y])
+            v = f([alpha_x, alpha_y]) / t
             d.append([alpha_x, alpha_y, v])
     d = pd.DataFrame(d, columns='alpha_x,alpha_y,tax'.split(','))
     df = d.set_index(['alpha_x', 'alpha_y'])['tax'].unstack('alpha_y')
@@ -52,12 +57,15 @@ def doplot(t=2, A=200000, filename=None, num=1):
     from mpl_toolkits import mplot3d
     import matplotlib.pyplot as plt
     fig = plt.figure(num)
+    fig.clf()
     ax = plt.axes(projection='3d')
     xx, yy, zz = meshgrid_from_df(df)
     ax.plot_wireframe(xx, yy, zz, color='black')
     ax.set_xlabel(df.index.names[0])
     ax.set_ylabel(df.columns.names[0])
     ax.set_title('t = {}, A = {}'.format(t, A))
+    if zlim is not None:
+        ax.set_zlim(*zlim)
     if filename is not None:
         print('saving {}'.format(filename))
         savefig(filename)
