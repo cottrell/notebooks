@@ -2,9 +2,10 @@ import numpy as np
 # notes mostly
 
 def meshgrid_from_df(df, **kwargs):
+    # this is useful because meshgrid is confusing ... is like 'real space' not i,j space ... things are flipped. 
     df = df.sort_index(axis=1).sort_index(axis=0)
     x, y = np.meshgrid(df.index.values, df.columns.values, **kwargs)
-    z = df.values
+    z = df.values.T
     return x, y, z
 
 def doplot_3d_from_df(df, zlabel=None, fig=None, num=1, kind='wireframe', meshgrid_kwargs={}, **plot_options):

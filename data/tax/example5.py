@@ -16,7 +16,7 @@ F = lambda x: F_(x) + F_ni(x)
 # x and y
 _mydir = os.path.realpath(os.path.dirname(__file__))
 
-def multiplot(force=True):
+def multiplot(force=True, step=1000):
     t = 2
     dirname = os.path.join(_mydir, 'plots')
     if not os.path.exists(dirname):
@@ -24,7 +24,7 @@ def multiplot(force=True):
     ioff()
     _max = 350000
     _max_z = _max / 2
-    for A in range(10000, _max, 1000):
+    for A in range(10000, _max, step):
         # ordering hack
         filename = os.path.join(dirname, 'wireframe_t={}_A={:07}.png'.format(t, A))
         if force or not os.path.exists(filename):
@@ -50,6 +50,7 @@ def doplot(t=2, A=200000, zlim=None, filename=None, num=1):
             d.append([alpha_x, alpha_y, v])
     d = pd.DataFrame(d, columns='alpha_x,alpha_y,tax'.split(','))
     df = d.set_index(['alpha_x', 'alpha_y'])['tax'].unstack('alpha_y')
+    # df = df.sort_index(axis=0, ascending=True).sort_index(axis=1, ascending=False)
     # figure(num)
     # clf()
     # sns.heatmap(df)
@@ -59,10 +60,12 @@ def doplot(t=2, A=200000, zlim=None, filename=None, num=1):
     fig = plt.figure(num)
     fig.clf()
     ax = plt.axes(projection='3d')
-    xx, yy, zz = meshgrid_from_df(df)
-    ax.plot_wireframe(xx, yy, zz, color='black')
-    ax.set_xlabel(df.index.names[0])
-    ax.set_ylabel(df.columns.names[0])
+    ax.view_init(None, 300)
+    xx, yy, zz = plotting.meshgrid_from_df(df)
+    ax.plot_wireframe(yy, xx, zz, alpha=0.75)
+    ax.set_ylabel(df.index.names[0])
+    ax.set_xlabel(df.columns.names[0])
+    ax.set_zlabel('annualized tax')
     ax.set_title('t = {}, A = {}'.format(t, A))
     if zlim is not None:
         ax.set_zlim(*zlim)
@@ -79,6 +82,7 @@ def f_opt(t, X, Y, alphas_ravelled):
 def unravel(actions):
     return actions.reshape((int(actions.shape[0] / 2), 2))
 
+@curry
 def _F_const_full(t, X, Y, alphas):
     alphas = np.atleast_2d(np.array(alphas))
     assert alphas.shape[1] == 2
@@ -98,12 +102,16 @@ def _F_const_full(t, X, Y, alphas):
         alpha_xs.append(alpha_x)
         alpha_ys.append(alpha_y)
         x = alpha_x * X
-        y = alpha_y * min(X, (Y + G(x)))
+        X = X - x
+        Y = Y + G(x)
+        y = alpha_y * min(x, Y) # was a bug (X) before!
+        Y = Y - y
         xs.append(x)
         ys.append(y)
         tax.append(F(x - y))
-        X = X - x
-        Y = Y + G(x) - y
         assert X >= 0
         assert Y >= 0
-    return dict(tax=tax, xs=xs, ys=ys, Ys=Ys, Xs=Xs, alpha_xs=alpha_xs, alpha_ys=alpha_ys)
+    # as a check, final state
+    Xs.append(X)
+    Ys.append(Y)
+    return dict(tax=tax, xs=xs, ys=ys, Ys=Ys, Xs=Xs, alpha_xs=alpha_xs, alpha_ys=alpha_ys, tax_per_year=sum(tax) / t)
