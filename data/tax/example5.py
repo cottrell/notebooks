@@ -87,6 +87,27 @@ def doplot(t=2, A=210000, zlim=None, filename=None, num=1):
         savefig(filename)
     return d, ax
 
+def multiplot2(force=True, step=1000):
+    t = 3
+    dirname = os.path.join(_mydir, 'plots')
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+    ioff()
+    _max = 350000
+    _max_z = _max / 2
+    for A in range(10000, _max, step):
+        # ordering hack
+        filename = os.path.join(dirname, 'plot2_t={}_A={:07}.png'.format(t, A))
+        if force or not os.path.exists(filename):
+            doplot2(t=t, A=A, filename=filename) # , zlim=[0, _max_z])
+    gif = os.path.join(dirname, 'plot2_t={}.gif'.format(t))
+    pngs = os.path.join(dirname, 'plot2_t={}_A=*.png'.format(t))
+    cmd = 'cd {} && convert -loop 0 -delay 10 {} {}'.format(dirname, pngs, gif)
+    print('running: {}'.format(cmd))
+    os.system(cmd)
+    # webbrowser.open('file://{}'.format(gif)) # opens in preview ugh
+    ion()
+
 def doplot2(t=3, alpha_y=[0.5, 0.5], A=210000, zlim=None, filename=None, num=1):
     # keep alpha_y const, doesn't matter so much
     assert t == 3, 'will not work otherwise'
