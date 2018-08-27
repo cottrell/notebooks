@@ -3,6 +3,20 @@
 		"country": "uk",
 		"year": "2018-2019",
 		"columns": ["income bucket (left)", "marginal rate"],
+		"tax_on_dividends": {
+			"notes": "you pay tax avoid the dividend allowance. Above this allowance the tax you pay depends on which Income Tax band you’re in. Add your income from dividends to your other taxable income when working this out. You may pay tax at more than one rate. ... So the bands (levels) are the same as income but the rates are different.",
+			"questions": "does dividend income affect your basic personal amount? If so the bands below need correction.",
+			"dividend_allowance": 2000,
+			"tax_rate_on_dividends_over_you_allowance": [
+				[0, 0],
+				[11850, 0.075],
+				[46350, 0.325],
+				[150000, 38.1]
+			]
+		},
+		"tax_on_savings_interest": {
+			"notes": "https://www.gov.uk/apply-tax-free-interest-on-savings. Complicated rules for basically no relief. It is just income. There are two tax-free bits. You get (additional) tax-free room for interest of max(0, min(5000, 16850 - income)), basically this will be zero. You get 1000, 500 or zero for the basic rate, higher rate or additional rate bands. Interest past this is treated as additional income."
+		},
 		"income_tax": {
 			"type": "constant_cadlag",
 			"data": [
