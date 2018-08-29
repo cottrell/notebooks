@@ -11,7 +11,7 @@ def format_filename(s):
     return filename
 
 _mydir = os.path.realpath(os.path.dirname(__file__))
-_default_dir = os.path.join(_mydir, os.path.basename(__file__).rsplit('.', 1)[0])
+_default_dir = os.path.join('.', os.path.basename(__file__).rsplit('.', 1)[0])
 
 def mangle_df(df):
     for k in df:
@@ -25,8 +25,7 @@ def _run(filename, outputdir=None):
     if len(xl.sheet_names) == 0:
         print("no sheets in {}".format(filename))
         return
-    elif len(xl.sheet_names) > 1:
-        outputdir = os.path.join(outputdir, os.path.basename(filename).rsplit('.', 1)[0])
+    outputdir = os.path.join(outputdir, format_filename(os.path.basename(filename).rsplit('.', 1)[0]))
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
     for s in xl.sheet_names:
