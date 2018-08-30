@@ -1,13 +1,36 @@
 #!/bin/sh
-
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# manually get the max N %% 20
 case $1 in
     datasets)
-        rm /tmp/kaggle_*.csv
+        bbb=datasets
+        base=kaggle_"$bbb"_
+        rm /tmp/"$base"*.csv || :
         for i in $(seq 1 13); do
-            kaggle datasets list --page $i --csv > /tmp/kaggle_$i.csv &
+            kaggle $bbb list --page $i --csv > /tmp/"$base"$i.csv &
         done
         wait
-        cat /tmp/kaggle_*.csv
+        (
+        head -1 /tmp/"$base"1.csv
+        for x in /tmp/"$base"*.csv; do
+            sed -e 1,1d $x
+        done
+        ) > $DIR/kaggle_datasets.csv
+        ;;
+    competitions)
+        bbb=competitions
+        base=kaggle_"$bbb"_
+        rm /tmp/"$base"*.csv || :
+        for i in $(seq 1 13); do
+            kaggle $bbb list --page $i --csv > /tmp/"$base"$i.csv &
+        done
+        wait
+        (
+        head -1 /tmp/"$base"1.csv
+        for x in /tmp/"$base"*.csv; do
+            sed -e 1,1d $x
+        done
+        ) > $DIR/kaggle_competitions.csv
         ;;
     *)
         echo dunno
