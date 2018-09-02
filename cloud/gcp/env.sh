@@ -8,6 +8,6 @@ ZONE=$(gcloud config list --format "value(compute.zone)")
 BUCKET=misc-data-ml
 CLUSTERNAME=spark-cluster
 
-for x in $(grep '^[A-Z]*=' $DIR/env.sh | cut -d'=' -f1); do echo export $x=${!x}; done > $DIR/env_$PROJECT.sh
+for x in $(grep '^[A-Z]*=' $DIR/env.sh | grep -v '^DIR' | cut -d'=' -f1); do echo export $x=${!x}; done > $DIR/env_$PROJECT.sh
 
 echo see $DIR/env_$PROJECT.sh

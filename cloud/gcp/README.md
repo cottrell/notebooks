@@ -1,5 +1,9 @@
 # google cloud workflow
 
+For ml stuff use images as of 2018
+
+    https://blog.kovalevskyi.com/deep-learning-images-for-google-cloud-engine-the-definitive-guide-bc74f5fb02bc
+
 1. listing things (some things like disks are missing from the resource list in the UI)
 
 	gsutil ls
@@ -12,7 +16,7 @@
 	gcloud projects list
 	gcloud projects create <some name>
 
-    	gcloud config list
+    gcloud config list
 	gcloud config set/get --project ...
 
     	gcloud config set compute/region europe-west1
