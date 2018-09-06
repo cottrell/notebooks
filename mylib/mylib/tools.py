@@ -1,4 +1,5 @@
 import logging
+import functools
 import concurrent.futures
 import subprocess
 import time
@@ -98,10 +99,31 @@ def run_in_foreground(*tasks, loop=None):
         loop.run_forever()
         tasks.exception()
 
-def run_tasks_in_parallel(*tasks, max_workers=10, wait=True):
+def _wrapped_errors(task):
+    @functools.wraps(task)
+    def inner():
+        exception = None
+        result = None
+        try:
+            result = task()
+        except Exception as e:
+            exception = e
+        return dict(exception=exception, result=result)
+    return inner
+
+def test_wrapped_errors():
+    def f():
+        asdf
+        return 'nothing'
+    f = _wrapped_errors(f)
+    return f()
+
+def run_tasks_in_parallel(*tasks, max_workers=10, wait=True, raise_exceptions=False):
     # http://masnun.rocks/2016/10/06/async-python-the-different-forms-of-concurrency/
     # https://www.reddit.com/r/learnpython/comments/72a8ek/why_bother_using_asyncio_when/
     executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
+    if not raise_exceptions:
+        tasks = map(_wrapped_errors, tasks)
     fut = [executor.submit(task) for task in tasks]
     # executor.shutdown(wait=wait) # apparently just returning .result triggers the wait. probably the context manager.
     if wait:

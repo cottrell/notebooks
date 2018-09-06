@@ -22,8 +22,22 @@ import multiprocessing.pool
 from pandas.core.internals import SingleBlockManager
 import decorator
 import functools
+import gzip
 from .tools import TimeLogger, AttrDict
 
+def _open(filename, **kwargs):
+    if filename.endswith('.gz'):
+        return gzip.open(filename, **kwargs)
+    else:
+        return open(filename, **kwargs)
+
+def get_capped_line_count(filename, n=2):
+    i = 0
+    for x in _open(filename):
+        i += 1
+        if i >= n:
+            break
+    return i
 def _check_move_and_remove_and_make(path):
     if os.path.exists(path):
         _move_and_remove_nonblocking(path)

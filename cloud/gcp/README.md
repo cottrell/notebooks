@@ -76,3 +76,56 @@ See what models you have: `gcloud ml-engine models list`
 	enable a bunch of APIs as above
 	pip install google-cloud-dataflow
 
+# GPU
+
+GCP ml-engine is a bit of a pain and I think still mainly focussed on tf. Avoid buying in too much for now.
+
+ZONE europe-west1-b has v100: https://cloud.google.com/compute/docs/gpus/
+
+You need to pick image names from this list: https://cloud.google.com/deep-learning-vm/docs/images
+
+Or see google groups for bleeding edge availability: https://groups.google.com/forum/#!topic/google-dl-platform/Qsu2CVO0kV8
+
+Probably just take a chance and pick the latest for now:
+
+    tf-latest-cu92
+    tf-latest-cpu
+    pytorch-latest-cu92
+    pytorch-latest-cpu
+
+I do not know of a CLI command to get the list yet (`gcloud compute images list` does not show these for example).
+
+Machines types:
+
+    gcloud compute machine-types list --filter zone:europe-west1-b
+        NAME             ZONE            CPUS  MEMORY_GB  DEPRECATED
+    f1-micro         europe-west1-b  1     0.60
+    g1-small         europe-west1-b  1     1.70
+    n1-highcpu-16    europe-west1-b  16    14.40
+    n1-highcpu-2     europe-west1-b  2     1.80
+    n1-highcpu-32    europe-west1-b  32    28.80
+    n1-highcpu-4     europe-west1-b  4     3.60
+    n1-highcpu-64    europe-west1-b  64    57.60
+    n1-highcpu-8     europe-west1-b  8     7.20
+    n1-highcpu-96    europe-west1-b  96    86.40
+    n1-highmem-16    europe-west1-b  16    104.00
+    n1-highmem-2     europe-west1-b  2     13.00
+    n1-highmem-32    europe-west1-b  32    208.00
+    n1-highmem-4     europe-west1-b  4     26.00
+    n1-highmem-64    europe-west1-b  64    416.00
+    n1-highmem-8     europe-west1-b  8     52.00
+    n1-highmem-96    europe-west1-b  96    624.00
+    n1-megamem-96    europe-west1-b  96    1433.60
+    n1-standard-1    europe-west1-b  1     3.75
+    n1-standard-16   europe-west1-b  16    60.00
+    n1-standard-2    europe-west1-b  2     7.50
+    n1-standard-32   europe-west1-b  32    120.00
+    n1-standard-4    europe-west1-b  4     15.00
+    n1-standard-64   europe-west1-b  64    240.00
+    n1-standard-8    europe-west1-b  8     30.00
+    n1-standard-96   europe-west1-b  96    360.00
+    n1-ultramem-160  europe-west1-b  160   3844.00
+    n1-ultramem-40   europe-west1-b  40    961.00
+    n1-ultramem-80   europe-west1-b  80    1922.00
+
+See here for some info on picking zones, sizes, params etc: https://blog.kovalevskyi.com/deep-learning-images-for-google-cloud-engine-the-definitive-guide-bc74f5fb02bc

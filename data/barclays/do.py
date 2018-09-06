@@ -15,7 +15,22 @@ pd.options.display.width = 200
 
 _mydir = os.path.dirname(os.path.realpath(__file__))
 
+
+def generalized_mean_like(k):
+    if k == 0:
+        def _inner(v):
+            p = v / v.sum()
+            return (p * np.log(p)).sum()
+    else:
+        def _inner(v):
+            # entropy or something
+            # sum(p_i p_i ** k) ** (1 / k)
+            p = v / v.sum()
+            return (p ** (1 + k)).sum() ** ( 1 / k )
+    return _inner
+
 def fix_file(filename):
+    filename = os.path.realpath(filename) # otherwise you will create a backup with the name of the symlink
     rows = [x.strip().split(',', 5) for x in open(filename, encoding='latin-1')]
     bak = '{}.{}'.format(filename, datetime.datetime.today().isoformat())
     print('backed up to {}'.format(bak))
@@ -33,7 +48,8 @@ def confirm_do_this(msg='are you sure?'):
 def load_files():
     df = list()
     # just update whole set each time
-    files = [glob.glob(os.path.join(_mydir, 'data', x))[-1] for x in ['chequing_20140401_present.csv', 'saver_20140401_present.csv', 'isa_20140401_present.csv']]
+    # files = [glob.glob(os.path.join(_mydir, 'data', x))[-1] for x in ['chequing_20140401_present.csv', 'saver_20140401_present.csv', 'isa_20140401_present.csv']]
+    files = [os.path.join(_mydir, 'data', x) for x in ['chequing_present.csv', 'saver_present.csv', 'isa_present.csv']]
     print('found files {}'.format(files))
     for f in files:
         try:

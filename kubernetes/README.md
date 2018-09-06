@@ -48,7 +48,7 @@ Without creating Dockerfile
 
     also see notebooks/metabase/run.sh
     docker pull metabase/metabase
-    kubectl expose deployment metabase-example --type=NodePort
+    kubectl expose deployment metabase-example --type=NodePort (no you probably want LoadBalancer)
 
 
 
