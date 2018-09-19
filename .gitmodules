@@ -19,3 +19,6 @@
 [submodule "jupyter-notes/plugins/ipynb"]
 	path = jupyter-notes/plugins/ipynb
 	url = git://github.com/danielfrg/pelican-ipynb.git
+[submodule "jupyter-notes/h/themes/ananke"]
+	path = jupyter-notes/h/themes/ananke
+	url = https://github.com/budparr/gohugo-theme-ananke.git
