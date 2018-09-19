@@ -22,5 +22,5 @@ def vanilla(S_0, strike, time_to_expiry, implied_vol, riskfree_rate, kind='put')
 
 v = vanilla(100., 110., 2., 0.2, 0.03)
 
-def q(S_0=100, strike=110, time_to_expiry=1, implied_vol=.2, riskfree_rate=0.00):
-    return vanilla(S_0, strike, time_to_expiry, implied_vol, riskfree_rate)
+def q(S_0=100, strike=110, time_to_expiry=1, implied_vol=.2, riskfree_rate=0.00, kind='put'):
+    return vanilla(S_0, strike, time_to_expiry, implied_vol, riskfree_rate, kind=kind)
