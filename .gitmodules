@@ -13,3 +13,9 @@
 [submodule "uk_land_registry"]
 	path = uk_land_registry
 	url = https://github.com/cottrell/uk_land_registry.git
+[submodule "jupyter-notes/pelican-ipynb"]
+	path = jupyter-notes/pelican-ipynb
+	url = git://github.com/danielfrg/pelican-ipynb.git
+[submodule "jupyter-notes/plugins/ipynb"]
+	path = jupyter-notes/plugins/ipynb
+	url = git://github.com/danielfrg/pelican-ipynb.git
