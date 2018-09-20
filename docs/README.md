@@ -6,5 +6,5 @@ nothing exists
 
 Expect to fail, no idea how to test gh locally.
 
-$$ \int_x f(x) \text{d} x $$
+$ \int_x f(x) \text{d} x $
 
