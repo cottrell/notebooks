@@ -16,7 +16,9 @@ case $1 in
         # whatever
         post=$2
         [[ "$post" ]] || post=newpost
-        hugo new posts/$post.md
+        filename=content/posts/$post.md
+        [[ -e $filename ]] || hugo new posts/$post.md
+        vi $filename
         ;;
     serve)
         hugo server --buildDrafts -w
