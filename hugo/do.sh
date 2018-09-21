@@ -7,7 +7,7 @@ case $1 in
         # git init # assume you are in git repo already
         # git submodule add https://github.com/budparr/gohugo-theme-ananke.git themes/ananke
         # echo 'theme = "ananke"' >> config.toml
-        git submodule add https://github.com/alanorth/hugo-theme-bootstrap4-blog.git themes/
+        git submodule add https://github.com/alanorth/hugo-theme-bootstrap4-blog.git themes/hugo-theme-bootstrap4-blog
         echo 'theme = "hugo-theme-bootstrap4-blog"' >> config.toml
         # look at head-custom.html
         # see .gitignore
