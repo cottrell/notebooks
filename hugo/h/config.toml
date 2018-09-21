@@ -1,5 +1,0 @@
-baseURL = "http://cottrell.github.io/"
-languageCode = "en-us"
-title = "Notes"
-theme = "hugo-theme-bootstrap4-blog"
-summaryLength = 0
