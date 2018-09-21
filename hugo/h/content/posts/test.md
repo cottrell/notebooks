@@ -1,7 +1,7 @@
 ---
 title: "Mathjax example"
 date: 2018-09-20T19:08:42+01:00
-draft: true
+draft: false
 ---
 
 Nothing here, just some mathjax.
