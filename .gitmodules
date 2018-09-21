@@ -25,3 +25,6 @@
 [submodule "hugo/themes/ananke"]
 	path = hugo/themes/ananke
 	url = https://github.com/budparr/gohugo-theme-ananke.git
+[submodule "hugo/hugoblog"]
+	path = hugo/hugoblog
+	url = git@gitlab.com:david-cottrell/hugoblog.git
