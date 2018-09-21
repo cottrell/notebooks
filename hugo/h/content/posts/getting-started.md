@@ -1,5 +1,5 @@
 ---
-title: "Getting started with Hugo (again)"
+title: "Setting up Hugo"
 date: 2018-09-20T20:14:41+01:00
 draft: false
 ---
