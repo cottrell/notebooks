@@ -25,9 +25,3 @@
 [submodule "hugo/themes/ananke"]
 	path = hugo/themes/ananke
 	url = https://github.com/budparr/gohugo-theme-ananke.git
-[submodule "hugo/h/themes/ananke"]
-	path = hugo/h/themes/ananke
-	url = https://github.com/budparr/gohugo-theme-ananke.git
-[submodule "hugo/h/hugo-theme-bootstrap4-blog"]
-	path = hugo/h/themes/hugo-theme-bootstrap4-blog
-	url = https://github.com/alanorth/hugo-theme-bootstrap4-blog.git
