@@ -4,7 +4,7 @@ date: 2018-09-20T20:00:12+01:00
 draft: false
 ---
 
-Another post to see Chart.js inclusion working.
+Another post to see Chartjs inclusion working.
 
 <div>
 <canvas id="bar-chart-grouped" width="800" height="450"></canvas>

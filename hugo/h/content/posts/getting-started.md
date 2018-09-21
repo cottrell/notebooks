@@ -4,12 +4,16 @@ date: 2018-09-20T20:14:41+01:00
 draft: false
 ---
 
+Install hugo and then do the following.
+
 {{< highlight sh >}}
 mkdir newsite && cd newsite
 hugo new site .
 git init # assume you are in git repo already
 git submodule add https://github.com/alanorth/hugo-theme-bootstrap4-blog.git themes/
 echo 'theme = "hugo-theme-bootstrap4-blog"' >> config.toml
+# html and special config is not rendering well in the summaries
+echo 'summaryLength = 0' >> config.toml
 git commit
 
 cat >layouts/partials/head-custom.html<<EOL
@@ -32,3 +36,5 @@ $RECYCLE.BIN/
 .DS_Store
 EOL
 {{< / highlight >}}
+
+Post summaries are rendered badly still.
