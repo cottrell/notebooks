@@ -1,5 +1,10 @@
 # install
 
+    pip install iisignature
+
+    OR
+
+
     git clone https://github.com/bottler/iisignature.git
     # hub clone bottler/iisignature
     cd iisignature
