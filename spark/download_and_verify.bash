@@ -12,7 +12,7 @@ function maybe_get {
     fi
 }
 
-version=2.3.1
+version=2.3.2
 
 maybe_get  http://www.apache.org/dist/spark/spark-$version/spark-"$version"-bin-hadoop2.7.tgz
 maybe_get https://www.apache.org/dist/spark/KEYS
