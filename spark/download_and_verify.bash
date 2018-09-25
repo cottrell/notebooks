@@ -12,20 +12,22 @@ function maybe_get {
     fi
 }
 
-version=2.3.0
+version=2.3.1
 
 maybe_get  http://www.apache.org/dist/spark/spark-$version/spark-"$version"-bin-hadoop2.7.tgz
 maybe_get https://www.apache.org/dist/spark/KEYS
 maybe_get  http://www.apache.org/dist/spark/spark-"$version"/spark-"$version"-bin-hadoop2.7.tgz.asc
-maybe_get  http://www.apache.org/dist/spark/spark-"$version"/spark-"$version"-bin-hadoop2.7.tgz.md5
+# maybe_get  http://www.apache.org/dist/spark/spark-"$version"/spark-"$version"-bin-hadoop2.7.tgz.md5
 maybe_get  http://www.apache.org/dist/spark/spark-"$version"/spark-"$version"-bin-hadoop2.7.tgz.sha512
 
-md5_file=$(md5 spark-"$version"-bin-hadoop2.7.tgz | cut -d= -f2 | sed -e 's/ //' | tr '[:upper:]' '[:lower:]')
-md5_orig=$(cat spark-"$version"-bin-hadoop2.7.tgz.md5 | cut -d: -f2 | sed -e 's/ //g' | tr '[:upper:]' '[:lower:]')
-if [[ "$md5_file" = "$md5_orig" ]]; then
-    echo "md5 pass"
+# md5_file=$(md5 spark-"$version"-bin-hadoop2.7.tgz | cut -d= -f2 | sed -e 's/ //' | tr '[:upper:]' '[:lower:]')
+# md5_orig=$(cat spark-"$version"-bin-hadoop2.7.tgz.md5 | cut -d: -f2 | sed -e 's/ //g' | tr '[:upper:]' '[:lower:]')
+sha_file=$(shasum -a 512 spark-"$version"-bin-hadoop2.7.tgz | cut -d' ' -f1 )
+sha_orig=$(cat spark-"$version"-bin-hadoop2.7.tgz.sha512 | cut -d: -f2 | sed -e 's/ //g' | tr '[:upper:]' '[:lower:]' | paste -s -d'\0' -)
+if [[ "$sha_file" = "$sha_orig" ]]; then
+    echo "sha pass"
 else
-    echo "md5 fail <$md5_file> vs <$md5_orig>"
+    echo "sha fail <$sha_file> vs <$sha_orig>"
 fi
 
 gpg --import KEYS
@@ -37,6 +39,6 @@ else
     echo untarring to ~/dev
     tar -xzf ./spark-$version-bin-hadoop2.7.tgz -C ~/dev
 fi
-echo clean up: rm -rf KEYS spark-$version-bin-hadoop2.7.tgz spark-$version-bin-hadoop2.7.tgz.asc spark-$version-bin-hadoop2.7.tgz.md5 spark-$version-bin-hadoop2.7.tgz.sha512
+echo clean up: rm -rf KEYS spark-$version-bin-hadoop2.7.tgz spark-$version-bin-hadoop2.7.tgz.asc spark-$version-bin-hadoop2.7.tgz.sha512 spark-$version-bin-hadoop2.7.tgz.sha512
 echo PATH='$PATH':$HOME/dev/spark-"$version"-bin-hadoop2.7/bin
 echo alias "pyspark_ipython='PYSPARK_DRIVER_PYTHON=ipython pyspark'"
