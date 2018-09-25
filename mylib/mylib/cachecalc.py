@@ -1,5 +1,4 @@
-from .io import *
-from .io import _mkdir
+from .io_dict_of_things_and_carrays import *
 def cachecalc(basepath=None):
     """ basic bundler and serializer of dict outputs. Tries to use **kwargs using default_namer (*args is banned). """
 
@@ -19,7 +18,7 @@ def cachecalc(basepath=None):
             _basepath = 'things'
         _basepath = os.path.join(_basepath, '{}:{}'.format(reg.sub('', os.path.basename(inspect.getmodule(fun).__file__)), fun.__name__)) # basically use pwd
         if not os.path.exists(os.path.dirname(_basepath)):
-            _mkdir(os.path.dirname(_basepath))
+            os.makedirs(os.path.dirname(_basepath))
         def _inner(fun, *args, **kwargs):
             """ this one is returned """
             _path = _basepath
