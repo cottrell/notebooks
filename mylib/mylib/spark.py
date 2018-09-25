@@ -1,3 +1,12 @@
+import contextlib
+
+def get_spark_context_and_session():
+    from pyspark.sql import SparkSession
+    import pyspark.context
+    spark = SparkSession.builder.getOrCreate()
+    sc = pyspark.context.SparkContext.getOrCreate()
+    return sc, spark
+
 @contextlib.contextmanager
 def spark_manager(spark_master=None, name='default name'):
     if spark_master is None:

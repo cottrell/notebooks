@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+import argh
 import pandas as pd
 import time
 import glob
@@ -7,6 +9,7 @@ import mylib.io
 _mydir = os.path.dirname(os.path.realpath(__file__))
 
 def run(nrows=None, force=False):
+    """ parse the data, save a parquet """
     # not a lot of data here ... do it in memory, forget about parallelism
     data = list()
     outfile = os.path.join(_mydir, 'nrows={}.parquet'.format(nrows if nrows is not None else 'all'))
@@ -38,3 +41,15 @@ def run(nrows=None, force=False):
         df.to_parquet(outfile)
     print('reading {}'.format(outfile))
     return pd.read_parquet(outfile)
+
+def spark_part():
+    """ read the origin and parition it """
+    # for fun
+    import mylib.spark
+    sc, spark = mylib.spark.get_spark_context_and_session()
+    filename = os.path.join(_mydir, 'nrows=all.parquet')
+    outdir = os.path.join(_mydir, 'nrows=all')
+    spark.read.parquet(filename).write.partitionBy('product').parquet(outdir)
+
+if __name__ == '__main__':
+    argh.dispatch_commands([run, spark_part])
