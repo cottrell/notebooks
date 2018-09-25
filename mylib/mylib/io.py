@@ -8,6 +8,8 @@ import pandas as pd
 import numpy
 import numpy as np
 import gzip
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 def get_capped_line_count(filename, n=2):
     i = 0
@@ -22,3 +24,21 @@ def _open(filename, **kwargs):
         return gzip.open(filename, **kwargs)
     else:
         return open(filename, **kwargs)
+
+parquet_options = {'compression': 'snappy'}
+def append_to_parquet_table(dataframe, filepath=None, writer=None):
+    """
+    Example recipe:
+
+        writer = None
+        for chunk in chunks:
+            writer = append_to_parquet_table(chunk, filepath=filename, writer=writer)
+
+    See: https://stackoverflow.com/questions/47113813/using-pyarrow-how-do-you-append-to-parquet-file
+    """
+    assert (filepath is not None) or (writer is not None), 'filepath and writer can not both be None'
+    table = pa.Table.from_pandas(dataframe)
+    if writer is None:
+        writer = pq.ParquetWriter(filepath, table.schema)
+    writer.write_table(table=table)
+    return writer
