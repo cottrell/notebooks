@@ -1,10 +1,37 @@
 import contextlib
 
-def get_spark_context_and_session():
+# use this as convenience, not suitable in general
+_default_settings_for_local = [
+    ("spark.sql.shuffle.partitions", "2")
+    ]
+
+def get_spark_conf(settings=None):
+    from pyspark.conf import SparkConf
+    conf = SparkConf()
+    if settings is None:
+        conf.setAll(_default_settings_for_local)
+    else:
+        conf.setAll(settings)
+    return conf
+
+def get_spark_context(conf):
+    from pyspark import SparkContext
+    # WARNING: not sure if this will not set conf if exist in all versions of spark
+    sc = SparkContext.getOrCreate(conf=conf)
+    return sc
+
+def spark_context_is_stopped(sc):
+    return sc._jsc.sc().isStopped()
+
+def get_spark_session(conf):
     from pyspark.sql import SparkSession
-    import pyspark.context
-    spark = SparkSession.builder.getOrCreate()
-    sc = pyspark.context.SparkContext.getOrCreate()
+    # WARNING: not sure if this will not set conf if exist in all versions of spark
+    return SparkSession.builder.config(conf=conf).getOrCreate()
+
+def get_spark_context_and_session(settings=None):
+    conf = get_spark_conf(settings=settings)
+    sc = get_spark_context(conf)
+    spark = get_spark_session(conf)
     return sc, spark
 
 @contextlib.contextmanager
