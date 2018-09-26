@@ -41,4 +41,7 @@ def append_to_parquet_table(dataframe, filepath=None, writer=None):
     if writer is None:
         writer = pq.ParquetWriter(filepath, table.schema)
     writer.write_table(table=table)
+    # TODO: figure out how to preserve_index false on the append mode case
+    # table = pa.Table.from_pandas(df, preserve_index=False)
+    # pq.write_to_dataset(table, root_path=outfile, partition_cols=['product'], preserve_index=False)
     return writer

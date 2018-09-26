@@ -14,7 +14,7 @@ case $1 in
         pyspark \
             --conf spark.sql.execution.arrow.enabled=true \
             --conf spark.driver.memory='16g' \
-            --conf spark.sql.shuffle.partitions=4
+            --conf spark.sql.shuffle.partitions=1
         ;;
     *)
         ;;
