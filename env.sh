@@ -6,6 +6,8 @@ PATH=$PATH:$SPARK_HOME/bin
 PYTHONPATH=$PYTHONPATH:$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.6-src.zip
 PYTHONPATH=$ENVDIR:$PYTHONPATH
 
+# NOTES: for local you want executor memory to be near max likely
+
 case $1 in
     pyspark_ipython)
         export PYSPARK_DRIVER_PYTHON=ipython
@@ -14,7 +16,17 @@ case $1 in
         pyspark \
             --conf spark.sql.execution.arrow.enabled=true \
             --conf spark.driver.memory='16g' \
+            --conf spark.executor.memory='8g' \
             --conf spark.sql.shuffle.partitions=1
+        ;;
+    spark-submit)
+        # TODO test
+        shift
+        spark-submit \
+            --conf spark.sql.execution.arrow.enabled=true \
+            --conf spark.driver.memory='16g' \
+            --conf spark.executor.memory='8g' \
+            --conf spark.sql.shuffle.partitions=1 $*
         ;;
     *)
         ;;
