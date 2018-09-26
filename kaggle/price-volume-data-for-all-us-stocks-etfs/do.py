@@ -106,33 +106,6 @@ def run_enriched(nrows=None):
     mapped = db.from_sequence(zip(filenames, output_filenames)).starmap(read_transform_write)
     mappend.compute()
 
-
-
-
-
-
-
-
-
-
-
-
-
-# def enrich_pandas(df):
-#     # enrich_with_rolling first
-#     # use shift, faster than math + joining
-#     for i in _rolling_days:
-#         for k in ['Close']:
-#     # # note, if you are subsampling by product name you don't need them in here, leave to be safe
-#     # for i in _rolling_days:
-#     #     # better way without copy?
-#     #     date_i = 'date_{}d'.format(i)
-#     #     df[date_i] = df.Date + datetime.timedelta(days=i)
-#     #     cols = [x for x in df.columns if 'Close' in x] + ['Volume']
-#     #     df = df.drop(date_i, axis=1).merge(df[[date_i] + cols], how='left', left_on=['Date'], right_on=[date_i], left_index=False, right_index=False, suffixes=('', '_{}d'.format(i)))
-#     #     df = df.drop(date_i, axis=1)
-#     return df
-
 # def enrich(df):
 #     import pyspark.sql.functions as F
 #     todrop = ['market', 'OpenInt']
@@ -146,7 +119,7 @@ def run_enriched(nrows=None):
 #         d = df[['product', 'name', 'Date', 'Close']].withColumn('Date', F.date_add(F.col('Date'), i)).withColumnRenamed('Close', 'close_{}d'.format(i))
 #         df = df.join(d, on=['product', 'name', 'Date'], how='left')
 #     return df
-# 
+
 # def spark_part(outdir=None, nrows=None):
 #     """ read the origin and parition it """
 #     # for fun, not fast
@@ -162,6 +135,5 @@ def run_enriched(nrows=None):
 #     print('writing {}'.format(outdir))
 #     df.write.partitionBy('product').parquet(outdir)
 
-
 if __name__ == '__main__':
-    argh.dispatch_commands([run_raw])
+    argh.dispatch_commands([run_raw, run_enriched])
