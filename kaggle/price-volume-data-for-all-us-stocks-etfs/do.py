@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import bcolz
+import numpy as np
 import datetime
 import argh
 import pandas as pd
@@ -111,6 +113,35 @@ def run_enriched(nrows=None, force=False):
         pq.write_to_dataset(table, root_path=outfile, preserve_index=False)
     mapped = db.from_sequence(zip(filenames, output_filenames)).starmap(read_transform_write)
     mapped.compute()
+
+_min_date = datetime.datetime(2006, 1, 1)
+_max_date = datetime.datetime(2017, 11, 10)
+_validation_cutoff = datetime.datetime(2016, 1, 1)
+
+def get_xy_data_plain(df_in, n_steps_back=10):
+    # FOR ONE NAME ONLY AT A TIME! this is just to look at autogressive performance
+    # LSTM format not, unrolled for plain regression or signatured for iis
+    # ycols = [x for x in df.columns if 'future_' in x]
+    # ycols = ['future_close_max_loss_30d', 'future_close_max_gain_30d', 'future_close_max_loss_60d', 'future_close_max_gain_60d'] 
+    ycols = ['future_close_max_loss_60d']
+    # xcols = ['open', 'high', 'low', 'close', 'volume', 'weekday', 'day', 'month', 'year', 'close_rolling_min_30d', 'close_rolling_max_30d', 'close_rolling_min_60d', 'close_rolling_max_60d']
+    xcols = ['t', 'close', 'volume', 'close_rolling_min_30d', 'close_rolling_max_30d', 'close_rolling_min_60d', 'close_rolling_max_60d']
+    df = df_in.dropna(subset=ycols, how='any')
+    df[xcols[1:]] = np.log(df[xcols[1:]])
+    df['t'] = (df.date - df.date.min()).dt.days
+    df[xcols] = df[xcols].diff() # use the increments? dunno
+    df = df.dropna(subset=ycols + xcols)
+    yy = df[ycols]
+    xx = df[xcols]
+    # NOTE: YOU SHOULD NOTE USE t UNLESS YOU ARE USING THE dt IN THE SIGNATURE OR UNROLLED VERION OR SOMETHING LIKE THAT
+    X = list()
+    y = list()
+    for i in range(n_steps_back, df.shape[0]):
+        X.append(xx.iloc[i-n_steps_back:i].values.flatten())
+        y.append(yy.iloc[i])
+    X = np.array(X)
+    y = np.array(y)
+    return X, y
 
 # def enrich(df):
 #     import pyspark.sql.functions as F
