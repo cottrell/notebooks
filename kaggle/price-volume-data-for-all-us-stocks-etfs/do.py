@@ -126,10 +126,10 @@ def get_xy_data_plain(df_in, n_steps_back=10):
     ycols = ['future_close_max_loss_60d']
     # xcols = ['open', 'high', 'low', 'close', 'volume', 'weekday', 'day', 'month', 'year', 'close_rolling_min_30d', 'close_rolling_max_30d', 'close_rolling_min_60d', 'close_rolling_max_60d']
     xcols = ['t', 'close', 'volume', 'close_rolling_min_30d', 'close_rolling_max_30d', 'close_rolling_min_60d', 'close_rolling_max_60d']
-    df = df_in.dropna(subset=ycols, how='any')
-    df[xcols[1:]] = np.log(df[xcols[1:]])
-    df['t'] = (df.date - df.date.min()).dt.days
-    df[xcols] = df[xcols].diff() # use the increments? dunno
+    df = df_in.dropna(subset=ycols, how='any').copy() # need copy otherwise get warnings
+    df.loc[:,xcols[1:]] = np.log(df[xcols[1:]])
+    df.loc[:,'t'] = (df.date - df.date.min()).dt.days
+    df.loc[:,xcols] = df[xcols].diff() # use the increments? dunno
     df = df.dropna(subset=ycols + xcols)
     yy = df[ycols]
     xx = df[xcols]
@@ -142,35 +142,6 @@ def get_xy_data_plain(df_in, n_steps_back=10):
     X = np.array(X)
     y = np.array(y)
     return X, y
-
-# def enrich(df):
-#     import pyspark.sql.functions as F
-#     todrop = ['market', 'OpenInt']
-#     df = df.drop(*todrop)
-#     df = df.withColumn('Date', F.col('Date').cast('date'))
-#     df = df.orderBy(['product', 'name', 'Date'])
-#     # df = df.repartition('product', 'name')
-#     # return df
-#     # TODO repartition somehow and figure out why slow
-#     for i in [30, 60, 90]:
-#         d = df[['product', 'name', 'Date', 'Close']].withColumn('Date', F.date_add(F.col('Date'), i)).withColumnRenamed('Close', 'close_{}d'.format(i))
-#         df = df.join(d, on=['product', 'name', 'Date'], how='left')
-#     return df
-
-# def spark_part(outdir=None, nrows=None):
-#     """ read the origin and parition it """
-#     # for fun, not fast
-#     import mylib.spark
-#     sc, spark = mylib.spark.get_spark_context_and_session()
-#     filename = os.path.join(_mydir, 'nrows={}'.format(nrows if nrows is not None else 'all'))
-#     if outdir is None:
-#         outdir = os.path.join(_mydir, 'enriched/nrows=all')
-#     if os.path.exists(outdir):
-#         os.system('dl {}'.format(outdir))
-#     df = spark.read.parquet(filename)
-#     df = enrich(df)
-#     print('writing {}'.format(outdir))
-#     df.write.partitionBy('product').parquet(outdir)
 
 if __name__ == '__main__':
     argh.dispatch_commands([run_raw, run_enriched])
