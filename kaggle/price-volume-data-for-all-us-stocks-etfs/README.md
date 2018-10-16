@@ -10,3 +10,9 @@ Interesting note about partition parquet
     # partitioned by produce only
     ~/projects/notebooks/kaggle/price-volume-data-for-all-us-stocks-etfs $ du -sh old
     372M	old
+
+
+vgk
+spy
+tan
+fan
