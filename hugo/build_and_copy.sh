@@ -4,4 +4,4 @@ cd $DIR/hugoblog
 hugo
 mkdir -p ../../docs
 cp -vR public/* ../../docs
-echo 'REMIND: git stuff'
+echo 'REMINDER: git stuff'
