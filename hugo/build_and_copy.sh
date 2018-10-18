@@ -1,7 +1,7 @@
 #!/bin/sh -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $DIR/h
+cd $DIR/hugoblog
 hugo
-mkdir -p ../../docs/hugo
-cp -vR public/* ../../docs/hugo
+mkdir -p ../../docs
+cp -vR public/* ../../docs
 echo 'REMIND: git stuff'
