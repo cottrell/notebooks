@@ -2,39 +2,39 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Notes</title>
-    <link>/</link>
+    <link>https://cottrell.github.io/notebooks/</link>
     <description>Recent content on Notes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 20 Sep 2018 20:14:41 +0100</lastBuildDate>
     
-	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://cottrell.github.io/notebooks/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Setting up Hugo</title>
-      <link>/posts/getting-started/</link>
+      <link>https://cottrell.github.io/notebooks/posts/getting-started/</link>
       <pubDate>Thu, 20 Sep 2018 20:14:41 +0100</pubDate>
       
-      <guid>/posts/getting-started/</guid>
+      <guid>https://cottrell.github.io/notebooks/posts/getting-started/</guid>
       <description>Install Hugo and then do the following.</description>
     </item>
     
     <item>
       <title>Chart.js example</title>
-      <link>/posts/test2/</link>
+      <link>https://cottrell.github.io/notebooks/posts/test2/</link>
       <pubDate>Thu, 20 Sep 2018 20:00:12 +0100</pubDate>
       
-      <guid>/posts/test2/</guid>
+      <guid>https://cottrell.github.io/notebooks/posts/test2/</guid>
       <description>Another post to see Chartjs inclusion working.</description>
     </item>
     
     <item>
       <title>Mathjax example</title>
-      <link>/posts/test/</link>
+      <link>https://cottrell.github.io/notebooks/posts/test/</link>
       <pubDate>Thu, 20 Sep 2018 19:08:42 +0100</pubDate>
       
-      <guid>/posts/test/</guid>
+      <guid>https://cottrell.github.io/notebooks/posts/test/</guid>
       <description>See here</description>
     </item>
     
