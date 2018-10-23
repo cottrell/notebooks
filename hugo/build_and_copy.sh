@@ -5,6 +5,7 @@ hugo
 mkdir -p ../../docs
 cp -vR public/* ../../docs
 cmd="cd $DIR/.. && ls && git add ./docs && git commit -m 'update docs' && git push"
+echo
 read -p "RUN command $cmd ? " -n 1 -r </dev/tty
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo
