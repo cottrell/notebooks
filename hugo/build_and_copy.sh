@@ -1,6 +1,7 @@
 #!/bin/sh -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/hugoblog
+dl public/
 hugo
 mkdir -p ../../docs
 cp -vR public/* ../../docs
