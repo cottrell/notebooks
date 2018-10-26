@@ -16,8 +16,8 @@ case $1 in
         # whatever
         post=$2
         [[ "$post" ]] || post=newpost
-        filename=content/posts/$post.md
-        [[ -e $filename ]] || hugo new posts/$post.md
+        filename=content/notes/$post.md
+        [[ -e $filename ]] || hugo new notes/$post.md
         vi $filename
         ;;
     serve)
