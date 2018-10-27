@@ -1,5 +1,7 @@
 # chart
 
+https://alligator.io/vuejs/vue-chart-js/
+
 > A Vue.js project
 
 ## Build Setup
