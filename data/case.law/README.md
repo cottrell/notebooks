@@ -1,3 +1,5 @@
+# Pull the bulk data
+
     xidel --extract "//a/@href" http://example.com/ https://case.law/bulk/download/ > hrefs.txt
     cat hrefs.txt | grep http | grep download > todo
     for x in $(cat todo); do
