@@ -7,7 +7,7 @@ Vue.component('allocation-input', {
 					this.internal_allocations.push(0.5)
 				}
 				return this.internal_allocations.slice(0, this.periods)
-			} 
+			}
 		}
 	},
 	data: function() {
