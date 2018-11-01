@@ -1,0 +1,1 @@
+hugoblog/post.sh
