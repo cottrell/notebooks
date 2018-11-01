@@ -3,39 +3,39 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/notes/getting-started/</loc>
+    <loc>https://cottrell.github.io/notebooks/notes/getting-started/</loc>
     <lastmod>2018-10-26T19:42:45+01:00</lastmod>
   </url>
   
   <url>
-    <loc>/notes/test2/</loc>
+    <loc>https://cottrell.github.io/notebooks/notes/test2/</loc>
     <lastmod>2018-10-26T19:42:45+01:00</lastmod>
   </url>
   
   <url>
-    <loc>/notes/test/</loc>
+    <loc>https://cottrell.github.io/notebooks/notes/test/</loc>
     <lastmod>2018-10-26T19:42:45+01:00</lastmod>
   </url>
   
   <url>
-    <loc>/categories/</loc>
+    <loc>https://cottrell.github.io/notebooks/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/</loc>
-    <lastmod>2018-10-26T19:42:45+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/notes/</loc>
+    <loc>https://cottrell.github.io/notebooks/</loc>
     <lastmod>2018-10-26T19:42:45+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/</loc>
+    <loc>https://cottrell.github.io/notebooks/notes/</loc>
+    <lastmod>2018-10-26T19:42:45+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://cottrell.github.io/notebooks/tags/</loc>
     <priority>0</priority>
   </url>
   
