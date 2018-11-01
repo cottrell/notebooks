@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 # run this FROM the hugo dir!
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 case $1 in
@@ -16,6 +16,7 @@ case $1 in
         # whatever
         post=$2
         [[ "$post" ]] || post=newpost
+        cd $DIR/hugoblog
         filename=content/notes/$post.md
         [[ -e $filename ]] || hugo new notes/$post.md
         vi $filename
