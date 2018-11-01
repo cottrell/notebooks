@@ -38,13 +38,14 @@
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<meta property="og:title" content="Categories" />
-<meta property="og:description" content="description todo" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="/categories/" />
+<meta property="og:title" content="Chart.js example" />
+<meta property="og:description" content="Another post to see Chartjs inclusion working." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/notes/test2/" /><meta property="article:published_time" content="2018-09-20T20:00:12&#43;01:00"/>
+<meta property="article:modified_time" content="2018-10-26T19:42:45&#43;01:00"/>
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Categories"/>
-<meta name="twitter:description" content="description todo"/>
+<meta name="twitter:title" content="Chart.js example"/>
+<meta name="twitter:description" content="Another post to see Chartjs inclusion working."/>
 <meta name="google-site-verification" content="gPu55Wsj3mBFBdjmPgOWrNzRhJl7uILLVVVvZzZHrzU" />
 <meta name="generator" content="Hugo 0.48" />
 
@@ -53,29 +54,28 @@
 <script type="application/ld+json">
 {
   "@context": "http://schema.org",
-  "@type": "Blog",
-  "headline": "Notes",
-  "url" : "/categories/",
+  "@type": "BlogPosting",
+  "headline": "Chart.js example",
+  "url": "/notes/test2/",
+  "wordCount": "52",
+  "datePublished": "2018-09-20T20:00:12&#43;01:00",
+  "dateModified": "2018-10-26T19:42:45&#43;01:00",
   "author": {
     "@type": "Person",
     "name": "cottrell"
-  },
-  "keywords": "",
-  "description": "description todo"
+  }
 }
 </script>
 
 
-    <link rel="canonical" href="/categories/">
 
-    <title>Notes</title>
+    <link rel="canonical" href="/notes/test2/">
+
+    <title>Chart.js example | Notes</title>
 
     <!-- combined, minified CSS -->
     <link href="css/style.css" rel="stylesheet" integrity="sha384-6&#43;EGfPoOzk/n2DVJSlglKT8TV1TgIMvVcKI73IZgBswLasPBn94KommV6ilJqCXE" crossorigin="anonymous">
 
-    
-    <!-- RSS 2.0 feed -->
-    <link href="/categories/index.xml" rel="alternate" type="application/rss+xml" title="Notes" />
     
 
     
@@ -117,73 +117,74 @@
           
 
 
-
-
-
-
-
-
-<article class="blog-post">
-  <header>
-    <h2 class="blog-post-title"><a href="/notes/getting-started/">Setting up Hugo</a></h2>
-    <p class="blog-post-meta">
-    <time datetime="2018-09-20T20:14:41&#43;01:00">
-        2018-09-20 &mdash; 2018-10-26 (Friday)
-    </time>
-    
-        by cottrell</p>
-    
-  </header>
-  Install Hugo and then do the following.
-  <a href='/notes/getting-started/'>Read more →</a>
-</article> 
-
-
-
-
-
-
-
 <article class="blog-post">
   <header>
     <h2 class="blog-post-title"><a href="/notes/test2/">Chart.js example</a></h2>
-    <p class="blog-post-meta">
-    <time datetime="2018-09-20T20:00:12&#43;01:00">
-        2018-09-20 &mdash; 2018-10-26 (Friday)
-    </time>
+    <p class="blog-post-meta"><time datetime="2018-09-20T20:00:12&#43;01:00">2018-09-20 (Thursday)</time>
     
-        by cottrell</p>
+        by cottrell
     
+    </p>
   </header>
-  Another post to see Chartjs inclusion working.
-  <a href='/notes/test2/'>Read more →</a>
+
+  
+
+  <p>Another post to see Chartjs inclusion working.</p>
+
+<div>
+<canvas id="bar-chart-grouped" width="800" height="450"></canvas>
+<script>
+new Chart(document.getElementById("bar-chart-grouped"), {
+    type: 'bar',
+    data: {
+      labels: ["1900", "1950", "1999", "2050"],
+      datasets: [
+        {
+          label: "Africa",
+          backgroundColor: "#3e95cd",
+          data: [133,221,783,2478]
+        }, {
+          label: "Europe",
+          backgroundColor: "#8e5ea2",
+          data: [408,547,675,734]
+        }
+      ]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Population growth (millions)'
+      }
+    }
+});
+</script>
+</div>
+
+
+  
+
+  
+  <hr>
+  <footer>
+
+  
+    <section>
+    <h4>Share</h4>
+    <nav class="nav sharing-icons">
+      <a class="nav-item" href="https://www.facebook.com/sharer/sharer.php?u=%2fnotes%2ftest2%2f" title="Share on Facebook"><span class="fa fa-facebook fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://plus.google.com/share?url=%2fnotes%2ftest2%2f" title="Share on Google+"><span class="fa fa-google-plus fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%2fnotes%2ftest2%2f" title="Share on LinkedIn"><span class="fa fa-linkedin fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://twitter.com/home?status=%2fnotes%2ftest2%2f" title="Tweet this"><span class="fa fa-twitter fa-2x"></span></a>
+    </nav>
+  </section>
+
+  
+
+  
+  </footer>
+  
+
 </article> 
-
-
-
-
-
-
-
-<article class="blog-post">
-  <header>
-    <h2 class="blog-post-title"><a href="/notes/test/">Mathjax example</a></h2>
-    <p class="blog-post-meta">
-    <time datetime="2018-09-20T19:08:42&#43;01:00">
-        2018-09-20 &mdash; 2018-10-26 (Friday)
-    </time>
-    
-        by cottrell</p>
-    
-  </header>
-  Also see mathjax-v3
-  <a href='/notes/test/'>Read more →</a>
-</article> 
-
-
-
-
-
 
 
 
