@@ -2,7 +2,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/hugoblog
 dl public/
-hugo
+hugo --baseURL https://cottrell.github.io/notebooks/
 mkdir -p ../../docs
 cp -vR public/* ../../docs
 cmd="cd $DIR/.. && ls && git add ./docs && git commit -m 'update docs' && git push"
