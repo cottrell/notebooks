@@ -17,3 +17,7 @@ fi
 bash ./$filename -u
 
 ~/anaconda3/bin/conda create -n 37 pandas
+source ~/anaconda3/bin/activate 37
+conda install -c conda-forge xgboost
+conda install pytorch torchvision -c pytorch
+

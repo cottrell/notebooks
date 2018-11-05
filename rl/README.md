@@ -2,11 +2,11 @@
 
     brew install ffmpeg
 
-    conda create -n rl
+    conda create -y -n rl
     source activate rl
-    conda install pandas numpy scipy ipython
+    conda install -y pandas numpy scipy ipython
     cd ~/dev && git clone https://github.com/openai/gym.git && cd gym && python setup.py develop
-    conda install pytorch torchvision -c pytorch
+    conda install -y pytorch torchvision -c pytorch
     pip install atari-py ptan opencv-python tensorboardX tensorflow tensorboard
     pip install --upgrade pip
     ../roboschool/install.sh
