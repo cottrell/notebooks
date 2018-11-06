@@ -1,5 +1,8 @@
 #!/bin/sh -e
 
+# consider using miniconda
+# https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+
 if [[ $(uname) -eq Linux ]]; then
     filename=Anaconda3-5.3.0-MacOSX-x86_64.sh
 else
@@ -14,10 +17,20 @@ else
     wget https://repo.anaconda.com/archive/$filename
 fi
 
-bash ./$filename -u
+[ -e ~/anaconda3 ] || bash ./$filename -u
 
-~/anaconda3/bin/conda create -n 37 pandas
-source ~/anaconda3/bin/activate 37
-conda install -c conda-forge xgboost
-conda install pytorch torchvision -c pytorch
-
+# continually rerunning this this will not necessarily lead to stable deployment state, just for human setup
+# if you try 37 will just get downgraded by some packages as of 2018-11
+if [ ! $(conda info --envs | grep 36) ]; then
+    echo ~/anaconda3/bin/conda create -n 36 python=3.6 pandas
+    ~/anaconda3/bin/conda create -y -n 36 python=3.6 pandas
+else
+    echo 36 exists
+fi
+source ~/anaconda3/bin/activate 36
+echo installing packages
+conda install -y pip pandas scipy Cython scikit-learn tensorflow keras tensorboard setuptools ujson
+conda install -y -c conda-forge xgboost nodejs
+conda install -y pytorch torchvision -c pytorch
+pip install --upgrade pip
+pip install GPy lightgbm catboost

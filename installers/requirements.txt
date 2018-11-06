@@ -1,0 +1,8 @@
+pandas
+Cython
+scikit-learn
+tensorflow
+keras
+tensorboard
+setuptools
+ujson
