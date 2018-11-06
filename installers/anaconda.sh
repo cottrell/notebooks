@@ -29,7 +29,7 @@ else
 fi
 source ~/anaconda3/bin/activate 36
 echo installing packages
-conda install -y pip pandas scipy Cython scikit-learn tensorflow keras tensorboard setuptools ujson
+conda install -y pip pandas ipython scipy Cython scikit-learn tensorflow keras tensorboard setuptools ujson
 conda install -y -c conda-forge xgboost nodejs
 # if you have problems with node, clear the ~/.npm dir
 # nodejs # maybe do not install node like this

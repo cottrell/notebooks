@@ -1,5 +1,9 @@
 # .
 
+https://markshust.com/2018/01/30/performance-tuning-docker-mac
+
+    # USE docker run -v delegated
+
 	cd <somewhere>
 	docker build . -t name_here
 
