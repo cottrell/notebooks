@@ -2,6 +2,8 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/hugoblog
 dl public/
+# TODO need to exclude drafts
+./build_search_index.sh
 hugo --baseURL https://cottrell.github.io/notebooks/
 mkdir -p ../../docs
 cp -vR public/* ../../docs

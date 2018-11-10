@@ -3,8 +3,7 @@
     npm install -g @vue/cli
     npm install -g @vue/cli-service-global
 
-	# vue init simple app
-    vue create hello-world
+    vue create hello-world # creates hello-world dir
 
     vue ui
 

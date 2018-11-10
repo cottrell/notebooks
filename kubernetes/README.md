@@ -34,8 +34,6 @@ Without creating Dockerfile
     kubectl run u --rm -i --tty --image ubuntu:latest -- bash
     kubectl run u --rm -i --tty --image centos_postgres -- bash
 
-
-
 # example (nginx)
 
     kubectl run hello-nginx --image=nginx --port=80
