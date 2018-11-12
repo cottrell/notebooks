@@ -23,7 +23,9 @@ def wok():
 def attributedict_from_locals(text_or_list_of_text):
     return dict_from_locals(text_or_list_of_text, attributedict=True, depth=1)
 
-def dict_from_locals(text_or_list_of_text, attributedict=False, depth=-1):
+def dict_from_locals(text_or_list_of_text, data=None, attributedict=False, depth=-1):
+    if data is None:
+        data = dict()
     if attributedict:
         from attributedict.collections import AttributeDict
         d = AttributeDict()
@@ -35,7 +37,10 @@ def dict_from_locals(text_or_list_of_text, attributedict=False, depth=-1):
         text_or_list_of_text = text_or_list_of_text.split(',')
     for k in text_or_list_of_text:
         k = k.strip()
-        d[k] = _locals[k]
+        if k in data:
+            d[k] = data[k]
+        else:
+            d[k] = _locals[k]
     return d
 
 def _test_dict_from_locals():
