@@ -62,7 +62,7 @@ def invert_dict(d):
             r[v] = list()
         r[v].append(k)
     r = {k: sorted(v) for k, v in r.items()}
-    return v
+    return r
 
 def df_to_schema_tuples(df):
     return list(df.dtypes.map(lambda x: x.name).items())
