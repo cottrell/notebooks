@@ -1,1 +1,3 @@
-TODO: make this develop installable so I don't have to do site packages all the time.
+# Tools
+
+Probably some strict requirements like pandas. TODO
