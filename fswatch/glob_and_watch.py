@@ -12,6 +12,7 @@ logging.getLogger().setLevel(logging.INFO)
 _date_format = '%Y-%m-%dT%H:%M:%S'
 
 def glob(dirname):
+    """ use this to test your glob pattern """
     # find is probably faster, whatever
     for x in _glob.iglob(os.path.join(dirname, '**/*'), recursive=True):
         yield [datetime.datetime.now().strftime(_date_format), os.path.abspath(x), 'glob']
@@ -34,6 +35,9 @@ class Watch():
 
 def glob_and_watch(dirname):
     """
+    A full listing of the directory and all subsequent changes.
+    Starts the watch first, then globs.
+
     $ ./glob_and_watch glob-and-watch ./tmp
         ['2018-07-25T22:57:36', '/path/to/somewhere/tmp/asdf', 'glob']
         ['2018-07-25T22:57:36', '/path/to/somewhere/tmp/jadfs', 'glob']
@@ -53,6 +57,9 @@ def glob_and_watch(dirname):
         yield x
 
 def watch(dirname):
+    """
+    watches a directory for events
+    """
     for x in Watch(dirname):
         yield x
 
