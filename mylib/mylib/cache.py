@@ -69,6 +69,10 @@ class SimpleNode():
         filename = self._get_dated_file(self.dirname)
         print('writing {}'.format(filename))
         pickle.dump(obj, open(filename, 'wb'))
+    def __call__(self, *args, **kwargs):
+        self.force_run(*args, **kwargs)
+        return self.get_latest()
+
 
 if __name__ == '__main__':
     # just trying to make sure the memo does not depend on the run path
