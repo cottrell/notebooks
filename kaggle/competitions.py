@@ -79,9 +79,9 @@ def train_autosklearn(l=None):
            seed=1, shared_mode=False,
            smac_scenario_args=None, time_left_for_this_task=3600,
            tmp_folder=None)
-    model.fit(l.X_train.values, l.y_train.values.squeeze())
-    # y_hat = automl.predict(l.X_test)
-    # print("Accuracy score", sklearn.metrics.accuracy_score(l.y_test, y_hat))
+    model.fit(l.X_train.values.copy(), l.y_train.values.squeeze().copy())
+    model.refit(l.X_train.values.copy(), l.y_train.values.squeeze().copy())
+    print(model.show_models())
     return attributedict_from_locals('model')
 
 def plot_predict(model):
