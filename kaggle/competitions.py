@@ -2,8 +2,6 @@ import pandas as pd
 import glob
 import os
 import pickle
-# >>> from sklearn.externals import joblib
-# >>> joblib.dump(clf, 'filename.joblib')
 import datetime
 import re
 from pylab import *
@@ -16,6 +14,7 @@ from autosklearn.regression import AutoSklearnRegressor
 import sklearn.model_selection
 import sklearn.datasets
 from sklearn.svm import LinearSVR, SVR
+from tpot import TPOTRegressor
 import sklearn.metrics
 from mylib import attributedict_from_locals
 from mylib.cache import SimpleNode
@@ -55,6 +54,23 @@ def train_svm(l=None):
     #     intercept_scaling=1.0, loss='epsilon_insensitive', max_iter=1000,
     #     random_state=None, tol=0.0001, verbose=0)
     model.fit(l.X_train.values, l.y_train.values.squeeze())
+    return attributedict_from_locals('model')
+
+@SimpleNode
+def train_tpot(l=None):
+    # can also do directly from the command line
+    if l is None:
+        l = get_data()
+    model = TPOTRegressor(config_dict=None, crossover_rate=0.1, cv=5,
+        disable_update_check=False, early_stop=None, generations=100,
+        max_eval_time_mins=5, max_time_mins=None, memory=None,
+        mutation_rate=0.9, n_jobs=1, offspring_size=None,
+        periodic_checkpoint_folder=None, population_size=100,
+        random_state=None, scoring=None, subsample=1.0, use_dask=False,
+        verbosity=0, warm_start=False)
+    model.fit(l.X_train.copy(), l.y_train.copy())
+    # to be safe:
+    model.export('tpot_exported_pipeline.py')
     return attributedict_from_locals('model')
 
 @SimpleNode
