@@ -61,7 +61,7 @@ class SimpleNode():
     def _get_dated_file(self, ext='.pickle'):
         return os.path.join(self.dirname, datetime.datetime.today().isoformat() + '.pickle')
     def _get_latest_pickle(self):
-        files = glob.glob(os.path.join(self.dirname, '*.pickle'))
+        files = sorted(glob.glob(os.path.join(self.dirname, '*.pickle')))
         if len(files) == 0:
             raise Exception("no files in {}".format(self.dirname))
         return files[-1]

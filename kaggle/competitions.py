@@ -66,9 +66,6 @@ def train_autosklearn(l=None):
     # print("Accuracy score", sklearn.metrics.accuracy_score(l.y_test, y_hat))
     return attributedict_from_locals('model')
 
-
-
-
 def do_plots(df=None):
     if df is None:
         l = get_data()
@@ -95,6 +92,7 @@ if __name__ == '__main__':
     l = get_data()
 else:
     l = get_data()
+    globals().update(l)
     df_orig = l['df']
     df = df_orig[df_orig.r > 0]
     # do_plots(df=df)
