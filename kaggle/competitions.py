@@ -36,7 +36,7 @@ def get_data():
     df['days_remaining'] = (df.deadline - datetime.datetime.today()).dt.days
     df['logr'] = np.log10(df.r)
     ycols = ['teamCount']
-    xcols = ['r', 'days_remaining']
+    xcols = ['logr', 'days_remaining']
     df_ = df[df.r > 0]
     y = df_[ycols]
     X = df_[xcols].astype(float) # just in case this matters
@@ -66,11 +66,42 @@ def train_autosklearn(l=None):
     # print("Accuracy score", sklearn.metrics.accuracy_score(l.y_test, y_hat))
     return attributedict_from_locals('model')
 
+def plot_predict():
+    d = get_data()
+    m = train_autosklearn.get_latest()
+    yh_train = m.model.predict(d.X_train).squeeze()
+    yh_test = m.model.predict(d.X_test).squeeze()
+    d.y_train = d.y_train.squeeze()
+    d.y_test = d.y_test.squeeze()
+
+    n = 50
+    mm = 40
+    df = d.df; df = df[df.r > 0]
+    logr = linspace(-1, df.logr.max(), mm)
+    days_remaining = linspace(df.days_remaining.min(), df.days_remaining.max(), n)
+    X, Y = meshgrid(logr, days_remaining)
+    xy = np.vstack([X.ravel(), Y.ravel()]).T
+    Z = m.model.predict(xy).reshape(X.shape)
+    fig = plt.figure(4)
+    ax = fig.add_subplot(111, projection='3d')
+    surf = ax.plot_surface(X, Y, Z, linewidth=1, alpha=0.5)
+    ax.set_xlabel('log(r)')
+    ax.set_ylabel('days remaining')
+    ax.set_zlabel('team count')
+    plt.show()
+
+    figure(1)
+    clf()
+    plot(d.y_train, yh_train - d.y_train, 'bo', alpha=0.5, label='train')
+    plot(d.y_test, yh_test - d.y_test, 'ro', alpha=0.5, label='test')
+    legend()
+    return locals()
+
 def do_plots(df=None):
     if df is None:
         l = get_data()
         df = l['df']
-    figure(1)
+    figure(2)
     clf()
     ax = subplot(121)
     grid()
@@ -80,19 +111,19 @@ def do_plots(df=None):
     sns.scatterplot(x='days_remaining', y='teamCount', hue='is_active', data=df, alpha=0.5, ax=ax)
     grid()
 
-    fig = plt.figure(2)
+    fig = figure(3)
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(df.logr, df.days_remaining, df.teamCount) # , c=c, marker=m)
     ax.set_xlabel('log(r)')
     ax.set_ylabel('days remaining')
     ax.set_zlabel('team count')
-    plt.show()
+    show()
 
 if __name__ == '__main__':
     l = get_data()
 else:
     l = get_data()
-    globals().update(l)
+    # globals().update(l)
     df_orig = l['df']
     df = df_orig[df_orig.r > 0]
     # do_plots(df=df)
