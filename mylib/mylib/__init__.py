@@ -27,8 +27,8 @@ def dict_from_locals(text_or_list_of_text, data=None, attributedict=False, depth
     if data is None:
         data = dict()
     if attributedict:
-        from attributedict.collections import AttributeDict
-        d = AttributeDict()
+        from .tools import AttrDict
+        d = AttrDict()
     else:
         d = dict()
     frame = sys._getframe(depth)
