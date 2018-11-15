@@ -1,4 +1,6 @@
 import pandas as pd
+import glob
+import os
 import pickle
 # >>> from sklearn.externals import joblib
 # >>> joblib.dump(clf, 'filename.joblib')
@@ -40,17 +42,37 @@ def get_data():
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, random_state=1)
     return attributedict_from_locals('df,X_train,X_test,y_train,y_test')
 
-def get_dated_file(dirname, ext='.pickle'):
-    if not os.path.exists(dirname):
-        os.makedirs(dirname)
-    return os.path.join(dirname, datetime.datetime.today().isoformat() + '.pickle')
+from mylib.cache import SimpleNode
+# def get_dated_file(dirname, ext='.pickle'):
+#     if not os.path.exists(dirname):
+#         os.makedirs(dirname)
+#     return os.path.join(dirname, datetime.datetime.today().isoformat() + '.pickle')
+# 
+# def get_latest_pickle(dirname):
+#     files = glob.glob(os.path.join(dirname, '*.pickle'))
+#     if len(files) == 0:
+#         raise Exception("no files in {}".format(dirname))
+#     return files[-1]
+# 
+# def pickle_dated_file(obj, dirname):
+#     filename = get_dated_file(dirname)
+#     print('writing {}'.format(filename))
+#     pickle.dump(obj, open(filename, 'wb'))
+# 
+# class SimpleNode():
+#     def __init__(self, fun):
+#         self.fun = fun
+#         self.dirname = os.path.join(os.path.basename(os.path.abspath(fun.__code__.co_filename)).replace('.py', ''), fun.__qualname__))
+#         if not os.path.exists(self.dirname):
+#             os.makedirs(self.dirname)
+#     def force_run(self, *args, **kwargs):
+#         obj = self.fun(*args, **kwargs)
+#         pickle_dated_file(obj, self.dirname)
+#     def get_latest(self):
+#         return pickle.load(open(get_latest_pickle(self.dirname), 'rb'))
 
-def pickle_dated_file(dirname):
-    filename = get_dated_file(dirname)
-    print('writing {}'.format(filename))
-    pickle.dumps(obj, filename)
-
-def train_and_pickle(l=None):
+@SimpleNode
+def train_autosklearn(l=None):
     if l is None:
         l = get_data()
     ensemble_size = 1 # 50 ... 1 for vanilla
@@ -67,11 +89,14 @@ def train_and_pickle(l=None):
            resampling_strategy_arguments=None, seed=1, shared_mode=False,
            smac_scenario_args=None, time_left_for_this_task=3600,
            tmp_folder=None)
-    model.fit(l.X_train.values, l.y_train.values.squeeze())
-    pickle_dated_file(model, os.path.join(_mydir, 'competition_autosklearn'))
-    # y_hat = automl.predict(l.X_test)
-    # print("Accuracy score", sklearn.metrics.accuracy_score(l.y_test, y_hat))
+    # # model.fit(l.X_train.values, l.y_train.values.squeeze())
+    # pickle_dated_file(dict(model=model), os.path.join(_mydir, 'competition_autosklearn'))
+    # # y_hat = automl.predict(l.X_test)
+    # # print("Accuracy score", sklearn.metrics.accuracy_score(l.y_test, y_hat))
     return attributedict_from_locals('model')
+
+
+
 
 def do_plots(df=None):
     if df is None:

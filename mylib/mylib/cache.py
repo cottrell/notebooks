@@ -1,8 +1,11 @@
 import os
+import glob
+import datetime
+import pickle
 import sys
 import inspect
 import hashlib
-from tools import run_command_get_output, tempfile_then_atomic_move
+from .tools import run_command_get_output, tempfile_then_atomic_move
 
 # TODO copy stuff from git/libcache.py
 
@@ -37,6 +40,35 @@ def __test():
     b = memo_func(tc._test_function)
     print(a)
     print(b)
+
+# see data/kaggle/
+
+class SimpleNode():
+    """
+    I have written something like this so many times it is not funny. Put something here and keep it simple to reuse.
+    """
+    def __init__(self, fun):
+        self.fun = fun
+        filename = os.path.abspath(fun.__code__.co_filename)
+        self.dirname = os.path.join(os.path.basename(filename).replace('.py', ''), fun.__qualname__)
+        if not os.path.exists(self.dirname):
+            os.makedirs(self.dirname)
+    def force_run(self, *args, **kwargs):
+        obj = self.fun(*args, **kwargs)
+        self._pickle_dated_file(obj)
+    def get_latest(self):
+        return pickle.load(open(self._get_latest_pickle(), 'rb'))
+    def _get_dated_file(self, ext='.pickle'):
+        return os.path.join(self.dirname, datetime.datetime.today().isoformat() + '.pickle')
+    def _get_latest_pickle(self):
+        files = glob.glob(os.path.join(self.dirname, '*.pickle'))
+        if len(files) == 0:
+            raise Exception("no files in {}".format(self.dirname))
+        return files[-1]
+    def _pickle_dated_file(self, obj):
+        filename = self._get_dated_file(self.dirname)
+        print('writing {}'.format(filename))
+        pickle.dump(obj, open(filename, 'wb'))
 
 if __name__ == '__main__':
     # just trying to make sure the memo does not depend on the run path
