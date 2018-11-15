@@ -15,6 +15,7 @@ import numpy as np
 from autosklearn.regression import AutoSklearnRegressor
 import sklearn.model_selection
 import sklearn.datasets
+from sklearn.svm import LinearSVR, SVR
 import sklearn.metrics
 from mylib import attributedict_from_locals
 from mylib.cache import SimpleNode
@@ -44,6 +45,19 @@ def get_data():
     return attributedict_from_locals('df,X_train,X_test,y_train,y_test')
 
 @SimpleNode
+def train_svm(l=None):
+    # basic no tuning
+    if l is None:
+        l = get_data()
+    model = SVR(C=1.0, cache_size=200, coef0=0.0, degree=3, epsilon=0.1, gamma='auto',
+        kernel='rbf', max_iter=-1, shrinking=True, tol=0.001, verbose=False)
+    # model = LinearSVR(C=1.0, dual=True, epsilon=0.0, fit_intercept=True,
+    #     intercept_scaling=1.0, loss='epsilon_insensitive', max_iter=1000,
+    #     random_state=None, tol=0.0001, verbose=0)
+    model.fit(l.X_train.values, l.y_train.values.squeeze())
+    return attributedict_from_locals('model')
+
+@SimpleNode
 def train_autosklearn(l=None):
     if l is None:
         l = get_data()
@@ -57,8 +71,12 @@ def train_autosklearn(l=None):
            include_estimators=None, include_preprocessors=None,
            initial_configurations_via_metalearning=initial_configurations_via_metalearning, logging_config=None,
            ml_memory_limit=3072, output_folder=None,
-           per_run_time_limit=360, resampling_strategy='holdout',
-           resampling_strategy_arguments=None, seed=1, shared_mode=False,
+           per_run_time_limit=360,
+           resampling_strategy='cv',
+           resampling_strategy_arguments={'folds': 5},
+           # resampling_strategy='holdout',
+           # resampling_strategy_arguments=None,
+           seed=1, shared_mode=False,
            smac_scenario_args=None, time_left_for_this_task=3600,
            tmp_folder=None)
     model.fit(l.X_train.values, l.y_train.values.squeeze())
@@ -66,11 +84,11 @@ def train_autosklearn(l=None):
     # print("Accuracy score", sklearn.metrics.accuracy_score(l.y_test, y_hat))
     return attributedict_from_locals('model')
 
-def plot_predict():
+def plot_predict(model):
+    # model = train_autosklearn.get_latest().model
     d = get_data()
-    m = train_autosklearn.get_latest()
-    yh_train = m.model.predict(d.X_train).squeeze()
-    yh_test = m.model.predict(d.X_test).squeeze()
+    yh_train = model.predict(d.X_train).squeeze()
+    yh_test = model.predict(d.X_test).squeeze()
     d.y_train = d.y_train.squeeze()
     d.y_test = d.y_test.squeeze()
 
@@ -81,7 +99,7 @@ def plot_predict():
     days_remaining = linspace(df.days_remaining.min(), df.days_remaining.max(), n)
     X, Y = meshgrid(logr, days_remaining)
     xy = np.vstack([X.ravel(), Y.ravel()]).T
-    Z = m.model.predict(xy).reshape(X.shape)
+    Z = model.predict(xy).reshape(X.shape)
     fig = plt.figure(4)
     ax = fig.add_subplot(111, projection='3d')
     surf = ax.plot_surface(X, Y, Z, linewidth=1, alpha=0.5)
@@ -118,6 +136,15 @@ def do_plots(df=None):
     ax.set_ylabel('days remaining')
     ax.set_zlabel('team count')
     show()
+
+    figure(5)
+    clf()
+    subplot(121)
+    plot(l['X_train'].logr, l['y_train'].teamCount, 'bo', alpha=0.5)
+    plot(l['X_test'].logr, l['y_test'].teamCount, 'ro', alpha=0.5)
+    subplot(122)
+    plot(l['X_train'].days_remaining, l['y_train'].teamCount, 'bo', alpha=0.5)
+    plot(l['X_test'].days_remaining, l['y_test'].teamCount, 'ro', alpha=0.5)
 
 if __name__ == '__main__':
     l = get_data()
