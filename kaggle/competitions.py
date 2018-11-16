@@ -38,10 +38,12 @@ def get_data():
     ycols = ['teamCount']
     xcols = ['logr', 'days_remaining']
     df_ = df[df.r > 0]
+    # ugh better to label a column as train test
     y = df_[ycols]
     X = df_[xcols].astype(float) # just in case this matters
+    data = df_[xcols + ycols].rename(columns={ycols[0]: 'target'})
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, random_state=1)
-    return attributedict_from_locals('df,X_train,X_test,y_train,y_test')
+    return attributedict_from_locals('df,data,X_train,X_test,y_train,y_test')
 
 @SimpleNode
 def train_svm(l=None):
