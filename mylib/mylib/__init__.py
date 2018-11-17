@@ -20,7 +20,7 @@ def wok():
     print("wak vars from {}".format(name))
     sys._getframe(-1).f_back.f_locals.update(_locals)
 
-def attributedict_from_locals(text_or_list_of_text):
+def attributedict_from_locals(text_or_list_of_text=None):
     return dict_from_locals(text_or_list_of_text, attributedict=True, depth=1)
 
 def dict_from_locals(text_or_list_of_text, data=None, attributedict=False, depth=-1):
@@ -35,6 +35,8 @@ def dict_from_locals(text_or_list_of_text, data=None, attributedict=False, depth
     _locals = frame.f_back.f_locals
     if isinstance(text_or_list_of_text, str):
         text_or_list_of_text = text_or_list_of_text.split(',')
+    elif text_or_list_of_text is None:
+        text_or_list_of_text = _locals.keys()
     for k in text_or_list_of_text:
         k = k.strip()
         if k in data:

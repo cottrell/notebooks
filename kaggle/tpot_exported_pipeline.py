@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline, make_union
 from sklearn.preprocessing import MaxAbsScaler, PolynomialFeatures
 from tpot.builtins import StackingEstimator, ZeroCount
+from sklearn.compose import TransformedTargetRegressor
+from sklearn.preprocessing import QuantileTransformer
 
 # NOTE: Make sure that the class is labeled 'target' in the data file
 import competitions
@@ -28,6 +30,8 @@ exported_pipeline = make_pipeline(
     LassoLarsCV(normalize=False)
 )
 
+# exported_pipeline = TransformedTargetRegressor(regressor=exported_pipeline, transformer=QuantileTransformer(output_distribution='normal'))
+
 exported_pipeline.fit(training_features, training_target)
 results = exported_pipeline.predict(testing_features)
 train_results = exported_pipeline.predict(training_features)
@@ -40,5 +44,3 @@ from pylab import *
 # show()
 
 competitions.plot_predict(exported_pipeline)
-
-

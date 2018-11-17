@@ -16,6 +16,10 @@ import sklearn.datasets
 from sklearn.svm import LinearSVR, SVR
 from tpot import TPOTRegressor
 import sklearn.metrics
+from sklearn.compose import TransformedTargetRegressor
+from sklearn.preprocessing import QuantileTransformer
+from sklearn.gaussian_process import GaussianProcessRegressor
+
 from mylib import attributedict_from_locals
 from mylib.cache import SimpleNode
 
@@ -46,12 +50,25 @@ def get_data():
     return attributedict_from_locals('df,data,X_train,X_test,y_train,y_test')
 
 @SimpleNode
+def train_gpr(l=None):
+    # basic no tuning
+    if l is None:
+        l = get_data()
+    model = GaussianProcessRegressor(alpha=1e1, copy_X_train=True, kernel=None,
+             n_restarts_optimizer=0, normalize_y=False,
+             optimizer='fmin_l_bfgs_b', random_state=None)
+    # model = TransformedTargetRegressor(regressor=model, transformer=QuantileTransformer(output_distribution='normal'))
+    model.fit(l.X_train.values, l.y_train.values.squeeze())
+    return attributedict_from_locals('model')
+
+@SimpleNode
 def train_svm(l=None):
     # basic no tuning
     if l is None:
         l = get_data()
     model = SVR(C=1.0, cache_size=200, coef0=0.0, degree=3, epsilon=0.1, gamma='auto',
         kernel='rbf', max_iter=-1, shrinking=True, tol=0.001, verbose=False)
+    model = TransformedTargetRegressor(regressor=model, transformer=QuantileTransformer(output_distribution='normal'))
     # model = LinearSVR(C=1.0, dual=True, epsilon=0.0, fit_intercept=True,
     #     intercept_scaling=1.0, loss='epsilon_insensitive', max_iter=1000,
     #     random_state=None, tol=0.0001, verbose=0)
@@ -118,6 +135,7 @@ def plot_predict(model):
     X, Y = meshgrid(logr, days_remaining)
     xy = np.vstack([X.ravel(), Y.ravel()]).T
     Z = model.predict(xy).reshape(X.shape)
+
     fig = plt.figure(4)
     ax = fig.add_subplot(111, projection='3d')
     surf = ax.plot_surface(X, Y, Z, linewidth=1, alpha=0.5)
@@ -131,7 +149,7 @@ def plot_predict(model):
     plot(d.y_train, yh_train - d.y_train, 'bo', alpha=0.5, label='train')
     plot(d.y_test, yh_test - d.y_test, 'ro', alpha=0.5, label='test')
     legend()
-    return locals()
+    return attributedict_from_locals() # locals()
 
 def do_plots(df=None):
     if df is None:
@@ -172,3 +190,5 @@ else:
     df_orig = l['df']
     df = df_orig[df_orig.r > 0]
     # do_plots(df=df)
+    # l = train_svm()
+    # plot_predict(l.model)
