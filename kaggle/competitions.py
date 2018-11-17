@@ -18,7 +18,7 @@ from tpot import TPOTRegressor
 import sklearn.metrics
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.preprocessing import QuantileTransformer
-from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process import GaussianProcessRegressor, kernels
 
 from mylib import attributedict_from_locals
 from mylib.cache import SimpleNode
@@ -54,7 +54,7 @@ def train_gpr(l=None):
     # basic no tuning
     if l is None:
         l = get_data()
-    model = GaussianProcessRegressor(alpha=1e1, copy_X_train=True, kernel=None,
+    model = GaussianProcessRegressor(alpha=1.8, copy_X_train=True, kernel=kernels.RBF(4.85 * np.array([4, 3000])),
              n_restarts_optimizer=0, normalize_y=False,
              optimizer='fmin_l_bfgs_b', random_state=None)
     # model = TransformedTargetRegressor(regressor=model, transformer=QuantileTransformer(output_distribution='normal'))
@@ -127,6 +127,14 @@ def plot_predict(model):
     d.y_train = d.y_train.squeeze()
     d.y_test = d.y_test.squeeze()
 
+    figure(1)
+    clf()
+    show()
+    plot(d.y_train, d.y_train, 'k-', alpha=0.5, label=None)
+    plot(d.y_train, yh_train, 'bo', alpha=0.5, label='train')
+    plot(d.y_test, yh_test, 'ro', alpha=0.5, label='test')
+    legend()
+
     n = 50
     mm = 40
     df = d.df; df = df[df.r > 0]
@@ -136,7 +144,7 @@ def plot_predict(model):
     xy = np.vstack([X.ravel(), Y.ravel()]).T
     Z = model.predict(xy).reshape(X.shape)
 
-    fig = plt.figure(4)
+    fig = plt.figure(2)
     ax = fig.add_subplot(111, projection='3d')
     surf = ax.plot_surface(X, Y, Z, linewidth=1, alpha=0.5)
     ax.set_xlabel('log(r)')
@@ -144,11 +152,6 @@ def plot_predict(model):
     ax.set_zlabel('team count')
     plt.show()
 
-    figure(1)
-    clf()
-    plot(d.y_train, yh_train - d.y_train, 'bo', alpha=0.5, label='train')
-    plot(d.y_test, yh_test - d.y_test, 'ro', alpha=0.5, label='test')
-    legend()
     return attributedict_from_locals() # locals()
 
 def do_plots(df=None):
