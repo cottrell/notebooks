@@ -82,7 +82,7 @@ def train_tpot(l=None):
         l = get_data()
     model = TPOTRegressor(config_dict=None, crossover_rate=0.1, cv=5,
         disable_update_check=False, early_stop=None, generations=100,
-        max_eval_time_mins=5, max_time_mins=None, memory=None,
+        max_eval_time_mins=5, max_time_mins=None, memory=os.path.join(_mydir, 'tpot_cache'),
         mutation_rate=0.9, n_jobs=1, offspring_size=None,
         periodic_checkpoint_folder=None, population_size=100,
         random_state=None, scoring=None, subsample=1.0, use_dask=False,
