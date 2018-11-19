@@ -1,4 +1,5 @@
 from __future__ import print_function
+import base64
 import datetime
 import argh
 from googleapiclient.discovery import build
@@ -63,6 +64,13 @@ def search_A(after=datetime.date.today()):
     query += ' after:{} before:{}'.format(after, before)
     # print(query)
     return search(query, format='full')
+
+def dump_one(x):
+    # do this for each of the things returned by search_A, get a text blob or something. dunno what after that. it will be garbage
+    parts = list()
+    for part in x['payload']['parts']:
+        parts.append(base64.urlsafe_b64decode(part['body']['data']).decode())
+    return ''.join(parts)
 
 def n_days_back(n):
     date = datetime.date.today()
