@@ -26,7 +26,7 @@ from mylib.cache import SimpleNode # just use joblib.Memory.cache
 import joblib
 _mydir = os.path.dirname(__file__)
 cachedir = os.path.join(_mydir, 'joblib_cache')
-memory = Memory(cachedir, verbose=1)
+memory = joblib.Memory(cachedir, verbose=1)
 
 _mydir = os.path.dirname(__file__)
 ion()
@@ -53,6 +53,14 @@ def get_data():
     data = df_[xcols + ycols].rename(columns={ycols[0]: 'target'})
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, random_state=1)
     return attributedict_from_locals('df,data,X_train,X_test,y_train,y_test')
+
+@SimpleNode
+def train_autokeras(l=None):
+    if l is None:
+        l = get_data()
+    model = ak.ImageRegressor(path=os.path.join(_mydir, 'autokeras'))
+    model.fit(l.X_train.values, l.y_train.values.squeeze())
+    return attributedict_from_locals('model')
 
 @SimpleNode
 def train_gpr(l=None):
