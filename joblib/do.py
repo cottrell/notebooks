@@ -15,3 +15,5 @@ def f(x):
     print("more")
     print("here!")
     return x
+
+# see do.f.call(1) and do.f.clear() for forcing/reseting etc

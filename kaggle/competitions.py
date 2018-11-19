@@ -19,9 +19,14 @@ import sklearn.metrics
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.preprocessing import QuantileTransformer
 from sklearn.gaussian_process import GaussianProcessRegressor, kernels
+import autokeras as ak
 
 from mylib import attributedict_from_locals
-from mylib.cache import SimpleNode
+from mylib.cache import SimpleNode # just use joblib.Memory.cache
+import joblib
+_mydir = os.path.dirname(__file__)
+cachedir = os.path.join(_mydir, 'joblib_cache')
+memory = Memory(cachedir, verbose=1)
 
 _mydir = os.path.dirname(__file__)
 ion()
@@ -84,9 +89,9 @@ def train_tpot(l=None):
         disable_update_check=False, early_stop=None, generations=100,
         max_eval_time_mins=5, max_time_mins=None, memory=os.path.join(_mydir, 'tpot_cache'),
         mutation_rate=0.9, n_jobs=1, offspring_size=None,
-        periodic_checkpoint_folder=None, population_size=100,
+        periodic_checkpoint_folder='tpot_periodic_checkpoint', population_size=100,
         random_state=None, scoring=None, subsample=1.0, use_dask=False,
-        verbosity=0, warm_start=False)
+        verbosity=1, warm_start=False)
     model.fit(l.X_train.copy(), l.y_train.copy())
     # to be safe:
     model.export('tpot_exported_pipeline.py')
