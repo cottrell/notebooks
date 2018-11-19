@@ -61,7 +61,7 @@ def search_A(after=datetime.date.today()):
     before = after + datetime.timedelta(days=1)
     query = 'from: ' + ' OR '.join(_from_list)
     query += ' after:{} before:{}'.format(after, before)
-    print(query)
+    # print(query)
     return search(query, format='full')
 
 def n_days_back(n):
@@ -69,7 +69,10 @@ def n_days_back(n):
     res = list()
     for i in range(n):
         date -= datetime.timedelta(days=1)
-        res.append(search_A(after=date))
+        try:
+            res.append(search_A(after=date))
+        except Exception as e:
+            print('could not search_A for {} ... not sure if this means search result is empty'.format(date))
     return res
 
 # users().messages().list(userId='me', q='after:2018-11-19 before:2018-11-20').execute()
@@ -94,4 +97,4 @@ def main():
             print(label['name'])
 
 if __name__ == '__main__':
-    main()
+    argh.dispatch_command(search_A)
