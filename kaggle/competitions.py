@@ -58,8 +58,12 @@ def get_data():
 def train_autokeras(l=None):
     if l is None:
         l = get_data()
-    model = ak.ImageRegressor(path=os.path.join(_mydir, 'autokeras'))
-    model.fit(l.X_train.values, l.y_train.values.squeeze())
+    dirname = os.path.join(_mydir, 'autokeras')
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+    model = ak.ImageRegressor(path=dirname)
+    # TODO fix this shape ...
+    model.fit(np.atleast_3d(l.X_train.values), l.y_train.values.squeeze())
     return attributedict_from_locals('model')
 
 @SimpleNode
