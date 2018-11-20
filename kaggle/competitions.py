@@ -43,10 +43,10 @@ def get_data():
     df['year'] = df.deadline.dt.year
     df['month'] = df.deadline.dt.month
     df['days_remaining'] = (df.deadline - datetime.datetime.today()).dt.days
-    df['logr'] = np.log10(df.r)
+    df_ = df[df.r > 0].copy()
     ycols = ['teamCount']
     xcols = ['logr', 'days_remaining']
-    df_ = df[df.r > 0]
+    df_['logr'] = np.log10(df_.r)
     # ugh better to label a column as train test
     y = df_[ycols]
     X = df_[xcols].astype(float) # just in case this matters
@@ -64,6 +64,47 @@ def train_autokeras(l=None):
     model = ak.ImageRegressor(path=dirname)
     # TODO fix this shape ...
     model.fit(np.atleast_3d(l.X_train.values), l.y_train.values.squeeze())
+    return attributedict_from_locals('model')
+
+class MyGP(GaussianProcessRegressor, sklearn.base.RegressorMixin):
+    def __init__(self, alpha=1, mu_x=1, mu_y=1):
+        mu = np.array([mu_x, mu_y])
+        super().__init__(alpha=alpha, copy_X_train=True, kernel=kernels.RBF(mu),
+            n_restarts_optimizer=0, normalize_y=False,
+            optimizer='fmin_l_bfgs_b', random_state=None)
+        # model = GaussianProcessRegressor(alpha=alpha, copy_X_train=True, kernel=kernels.RBF(mu),
+        #          n_restarts_optimizer=0, normalize_y=False,
+        #          optimizer='fmin_l_bfgs_b', random_state=None)
+        # self.__dict__.update(model.__dict__) # dunno
+        # self = model
+
+# @SimpleNode
+def train_gpr_tpot(l=None):
+    # with auto tuning
+    if l is None:
+        l = get_data()
+    config_dict = {
+            # 'sklearn.gaussian_process.GaussianProcessRegressor': {
+            #     'alpha': [1e1, 1, 1e-1]
+            #     },
+            'competitions.MyGP': {
+                'alpha': [1e1, 1, 1e-1],
+                # 'mu_x': np.logspace(-2, 4, 10),
+                # 'mu_y': np.logspace(-2, 4, 10),
+                }
+            }
+    model = TPOTRegressor(config_dict=config_dict, crossover_rate=0.1, cv=5,
+        disable_update_check=False, early_stop=None, generations=10,
+        max_eval_time_mins=5, max_time_mins=None,
+        # memory=os.path.join(_mydir, 'tpot_cache'),
+        mutation_rate=0.9, n_jobs=-1, offspring_size=None,
+        # periodic_checkpoint_folder='periodic_checkpoint_gpr_tpot',
+        population_size=100,
+        random_state=None, scoring=None, subsample=1.0, use_dask=False,
+        verbosity=3, warm_start=False)
+    model.fit(l.X_train.copy(), l.y_train.copy().squeeze())
+    return model
+    model.export('tpot_gpr.py')
     return attributedict_from_locals('model')
 
 @SimpleNode
@@ -92,6 +133,10 @@ def train_svm(l=None):
     model.fit(l.X_train.values, l.y_train.values.squeeze())
     return attributedict_from_locals('model')
 
+_tpot_cache = os.path.join(_mydir, 'tpot_cache')
+if not os.path.exists(_tpot_cache):
+    os.makedirs(_tpot_cache)
+
 @SimpleNode
 def train_tpot(l=None):
     # can also do directly from the command line
@@ -99,8 +144,8 @@ def train_tpot(l=None):
         l = get_data()
     model = TPOTRegressor(config_dict=None, crossover_rate=0.1, cv=5,
         disable_update_check=False, early_stop=None, generations=100,
-        max_eval_time_mins=5, max_time_mins=None, memory=os.path.join(_mydir, 'tpot_cache'),
-        mutation_rate=0.9, n_jobs=1, offspring_size=None,
+        max_eval_time_mins=5, max_time_mins=None, memory=_tpot_cache,
+        mutation_rate=0.9, n_jobs=-1, offspring_size=None,
         periodic_checkpoint_folder='tpot_periodic_checkpoint', population_size=100,
         random_state=None, scoring=None, subsample=1.0, use_dask=False,
         verbosity=1, warm_start=False)
