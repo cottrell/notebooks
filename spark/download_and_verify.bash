@@ -42,6 +42,8 @@ else
     tar -xzf ./spark-$version-bin-hadoop2.7.tgz -C ~/dev
 fi
 echo To clean up: rm -rf KEYS spark-$version-bin-hadoop2.7.tgz spark-$version-bin-hadoop2.7.tgz.asc spark-$version-bin-hadoop2.7.tgz.sha512 spark-$version-bin-hadoop2.7.tgz.sha512
-echo "update your paths manually!"
-echo PATH='$PATH':$HOME/dev/spark-"$version"-bin-hadoop2.7/bin
+echo "add this manually to .bash_aliases"
 echo alias "pyspark_ipython='PYSPARK_DRIVER_PYTHON=ipython pyspark'"
+echo "update your paths manually!"
+echo SPARK_HOME=~/dev/spark-2.4.0-bin-hadoop2.7
+echo PATH='$PATH:$SPARK_HOME/bin'
