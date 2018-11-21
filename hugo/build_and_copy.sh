@@ -10,7 +10,7 @@ cp -vR public/* ../../docs
 
 # fragile stuff
 rm ../../docs/js/lunr/PagesIndex_dev.json
-mv ../../docs/js/lunr/PagesIndex{_prod,}.json
+# mv ../../docs/js/lunr/PagesIndex{_prod,}.json
 
 cmd="cd $DIR/.. && ls && git add ./docs && git commit -m 'update docs' && git push"
 echo

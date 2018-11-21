@@ -23,7 +23,7 @@ from tpot import TPOTRegressor
 import sklearn.metrics
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.preprocessing import QuantileTransformer, MinMaxScaler
-from sklearn.pipeline import FeatureUnion
+from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.gaussian_process import GaussianProcessRegressor, kernels
 import autokeras as ak
 
@@ -57,7 +57,7 @@ def get_data():
 
     # ##########################
     # # this is cheating the cv! learn to put these in tpot ...
-    # X = QuantileTransformer().fit_transform(X)
+    X = QuantileTransformer().fit_transform(X)
     # # X = MinMaxScaler().fit_transform(X)
     # X = pd.DataFrame(X, columns=xcols)
     # ##########################
@@ -212,7 +212,10 @@ def plot_predict(model):
     fig = plt.figure(2)
     ax = fig.add_subplot(111, projection='3d')
     surf = ax.plot_surface(X, Y, Z, linewidth=1, alpha=0.5)
+    ax.scatter(d.X_train.r, d.X_train.days_remaining, d.y_train.values, 'bo', alpha=0.5, label='train')
+    ax.scatter(d.X_test.r, d.X_test.days_remaining, d.y_test.values, 'ro', alpha=0.5, label='train')
     ax.set_xlabel('r')
+    # ax.set_xscale('log')
     ax.set_ylabel('days remaining')
     ax.set_zlabel('team count')
     plt.show()
