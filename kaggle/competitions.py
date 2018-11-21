@@ -24,6 +24,7 @@ import sklearn.metrics
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.preprocessing import QuantileTransformer, MinMaxScaler
 from sklearn.pipeline import FeatureUnion, Pipeline
+import sklearn.compose as compose
 from sklearn.gaussian_process import GaussianProcessRegressor, kernels
 import autokeras as ak
 
@@ -35,6 +36,29 @@ _mydir = os.path.dirname(__file__)
 cachedir = os.path.join(_mydir, 'joblib_cache')
 memory = joblib.Memory(cachedir, verbose=1)
 ion()
+
+# @SimpleNode
+def train_gpr(l=None):
+    # basic no tuning. sklearn gp is not great for this.
+    if l is None:
+        l = get_data()
+    model = GaussianProcessRegressor(
+        alpha=1.8,
+        copy_X_train=True,
+        # kernel=kernels.RBF(4.85 * np.array([4, 3000])),
+        # kernel=kernels.RBF([1, 1]),
+        n_restarts_optimizer=10,
+        normalize_y=True,
+        optimizer='fmin_l_bfgs_b',
+        random_state=None
+        )
+    model = TransformedTargetRegressor(regressor=model, transformer=QuantileTransformer(output_distribution='normal'))
+    steps = [('copulize_x', QuantileTransformer(output_distribution='uniform')),
+             ('gpr', model)]
+    model = Pipeline(steps)
+    model.fit(l.X_train.values, l.y_train.values.squeeze())
+    return attributedict_from_locals('model')
+
 
 def get_data():
     df = pd.read_csv('kaggle_competitions.csv', parse_dates=['deadline'])
@@ -49,6 +73,7 @@ def get_data():
     df['month'] = df.deadline.dt.month
     df['days_remaining'] = (df.deadline - datetime.datetime.today()).dt.days
     df_ = df[df.r > 0].copy()
+    df_['r'] = np.log10(df_['r'])
     ycols = ['teamCount']
     xcols = ['r', 'days_remaining']
     # ugh better to label a column as train test
@@ -57,13 +82,13 @@ def get_data():
 
     # ##########################
     # # this is cheating the cv! learn to put these in tpot ...
-    X = QuantileTransformer().fit_transform(X)
-    # # X = MinMaxScaler().fit_transform(X)
+    # X = QuantileTransformer().fit_transform(X)
+    # X = MinMaxScaler().fit_transform(X)
     # X = pd.DataFrame(X, columns=xcols)
     # ##########################
 
     data = df_[xcols + ycols].rename(columns={ycols[0]: 'target'})
-    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, random_state=1)
+    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, random_state=None)
     return attributedict_from_locals('df,data,X_train,X_test,y_train,y_test')
 
 @SimpleNode
@@ -107,19 +132,6 @@ def train_gpr_tpot(l=None):
         verbosity=3, warm_start=False)
     model.fit(l.X_train.copy(), l.y_train.copy().squeeze())
     model.export('tpot_gpr.py')
-    return attributedict_from_locals('model')
-
-@SimpleNode
-def train_gpr(l=None):
-    # basic no tuning
-    if l is None:
-        l = get_data()
-    model = GaussianProcessRegressor(alpha=1.8, copy_X_train=True,
-            # kernel=kernels.RBF(4.85 * np.array([4, 3000])),
-             n_restarts_optimizer=0, normalize_y=False,
-             optimizer='fmin_l_bfgs_b', random_state=None)
-    # model = TransformedTargetRegressor(regressor=model, transformer=QuantileTransformer(output_distribution='normal'))
-    model.fit(l.X_train.values, l.y_train.values.squeeze())
     return attributedict_from_locals('model')
 
 @SimpleNode
