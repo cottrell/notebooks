@@ -1957,17 +1957,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ "0f2f":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_index_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_lib_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaxWidget_vue_vue_type_style_index_0_id_24645c6a_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("b976");
-/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_index_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_lib_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaxWidget_vue_vue_type_style_index_0_id_24645c6a_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_index_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_lib_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaxWidget_vue_vue_type_style_index_0_id_24645c6a_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
-/* unused harmony reexport * */
- /* unused harmony default export */ var _unused_webpack_default_export = (_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_index_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_lib_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaxWidget_vue_vue_type_style_index_0_id_24645c6a_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
-
-/***/ }),
-
 /***/ "0f38":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3168,6 +3157,20 @@ module.exports = {
 
 /***/ }),
 
+/***/ "230e":
+/***/ (function(module, exports, __webpack_require__) {
+
+var isObject = __webpack_require__("d3f4");
+var document = __webpack_require__("7726").document;
+// typeof document.createElement is 'object' in old IE
+var is = isObject(document) && isObject(document.createElement);
+module.exports = function (it) {
+  return is ? document.createElement(it) : {};
+};
+
+
+/***/ }),
+
 /***/ "2554":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3984,6 +3987,44 @@ module.exports = function(Chart) {
     return me;
 
 })));
+
+
+/***/ }),
+
+/***/ "2aba":
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__("7726");
+var hide = __webpack_require__("32e9");
+var has = __webpack_require__("69a8");
+var SRC = __webpack_require__("ca5a")('src');
+var TO_STRING = 'toString';
+var $toString = Function[TO_STRING];
+var TPL = ('' + $toString).split(TO_STRING);
+
+__webpack_require__("8378").inspectSource = function (it) {
+  return $toString.call(it);
+};
+
+(module.exports = function (O, key, val, safe) {
+  var isFunction = typeof val == 'function';
+  if (isFunction) has(val, 'name') || hide(val, 'name', key);
+  if (O[key] === val) return;
+  if (isFunction) has(val, SRC) || hide(val, SRC, O[key] ? '' + O[key] : TPL.join(String(key)));
+  if (O === global) {
+    O[key] = val;
+  } else if (!safe) {
+    delete O[key];
+    hide(O, key, val);
+  } else if (O[key]) {
+    O[key] = val;
+  } else {
+    hide(O, key, val);
+  }
+// add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
+})(Function.prototype, TO_STRING, function toString() {
+  return typeof this == 'function' && this[SRC] || $toString.call(this);
+});
 
 
 /***/ }),
@@ -4951,6 +4992,38 @@ for (var key in cssKeywords) {
     return uz;
 
 })));
+
+
+/***/ }),
+
+/***/ "2f21":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var fails = __webpack_require__("79e5");
+
+module.exports = function (method, arg) {
+  return !!method && fails(function () {
+    // eslint-disable-next-line no-useless-call
+    arg ? method.call(null, function () { /* empty */ }, 1) : method.call(null);
+  });
+};
+
+
+/***/ }),
+
+/***/ "32e9":
+/***/ (function(module, exports, __webpack_require__) {
+
+var dP = __webpack_require__("86cc");
+var createDesc = __webpack_require__("4630");
+module.exports = __webpack_require__("9e1e") ? function (object, key, value) {
+  return dP.f(object, key, createDesc(1, value));
+} : function (object, key, value) {
+  object[key] = value;
+  return object;
+};
 
 
 /***/ }),
@@ -7192,6 +7265,21 @@ module.exports.options = __webpack_require__("02cd");
 
 /***/ }),
 
+/***/ "4630":
+/***/ (function(module, exports) {
+
+module.exports = function (bitmap, value) {
+  return {
+    enumerable: !(bitmap & 1),
+    configurable: !(bitmap & 2),
+    writable: !(bitmap & 4),
+    value: value
+  };
+};
+
+
+/***/ }),
+
 /***/ "4678":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8088,6 +8176,18 @@ module.exports = function(Chart) {
 		return new Chart(context, config);
 	};
 
+};
+
+
+/***/ }),
+
+/***/ "4bf8":
+/***/ (function(module, exports, __webpack_require__) {
+
+// 7.1.13 ToObject(argument)
+var defined = __webpack_require__("be13");
+module.exports = function (it) {
+  return Object(defined(it));
 };
 
 
@@ -9066,6 +9166,37 @@ module.exports = Element.extend({
 
 /***/ }),
 
+/***/ "55dd":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $export = __webpack_require__("5ca1");
+var aFunction = __webpack_require__("d8e8");
+var toObject = __webpack_require__("4bf8");
+var fails = __webpack_require__("79e5");
+var $sort = [].sort;
+var test = [1, 2, 3];
+
+$export($export.P + $export.F * (fails(function () {
+  // IE8-
+  test.sort(undefined);
+}) || !fails(function () {
+  // V8 bug
+  test.sort(null);
+  // Old WebKit
+}) || !__webpack_require__("2f21")($sort)), 'Array', {
+  // 22.1.3.25 Array.prototype.sort(comparefn)
+  sort: function sort(comparefn) {
+    return comparefn === undefined
+      ? $sort.call(toObject(this))
+      : $sort.call(toObject(this), aFunction(comparefn));
+  }
+});
+
+
+/***/ }),
+
 /***/ "5603":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9995,6 +10126,56 @@ Chart.layoutService = Chart.layouts;
     return zhCn;
 
 })));
+
+
+/***/ }),
+
+/***/ "5ca1":
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__("7726");
+var core = __webpack_require__("8378");
+var hide = __webpack_require__("32e9");
+var redefine = __webpack_require__("2aba");
+var ctx = __webpack_require__("9b43");
+var PROTOTYPE = 'prototype';
+
+var $export = function (type, name, source) {
+  var IS_FORCED = type & $export.F;
+  var IS_GLOBAL = type & $export.G;
+  var IS_STATIC = type & $export.S;
+  var IS_PROTO = type & $export.P;
+  var IS_BIND = type & $export.B;
+  var target = IS_GLOBAL ? global : IS_STATIC ? global[name] || (global[name] = {}) : (global[name] || {})[PROTOTYPE];
+  var exports = IS_GLOBAL ? core : core[name] || (core[name] = {});
+  var expProto = exports[PROTOTYPE] || (exports[PROTOTYPE] = {});
+  var key, own, out, exp;
+  if (IS_GLOBAL) source = name;
+  for (key in source) {
+    // contains in native
+    own = !IS_FORCED && target && target[key] !== undefined;
+    // export native or passed
+    out = (own ? target : source)[key];
+    // bind timers to global for call from export context
+    exp = IS_BIND && own ? ctx(out, global) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+    // extend global
+    if (target) redefine(target, key, out, type & $export.U);
+    // export
+    if (exports[key] != out) hide(exports, key, exp);
+    if (IS_PROTO && expProto[key] != out) expProto[key] = out;
+  }
+};
+global.core = core;
+// type bitmap
+$export.F = 1;   // forced
+$export.G = 2;   // global
+$export.S = 4;   // static
+$export.P = 8;   // proto
+$export.B = 16;  // bind
+$export.W = 32;  // wrap
+$export.U = 64;  // safe
+$export.R = 128; // real proto method for `library`
+module.exports = $export;
 
 
 /***/ }),
@@ -12495,6 +12676,36 @@ module.exports = function(Chart) {
 
 /***/ }),
 
+/***/ "69a8":
+/***/ (function(module, exports) {
+
+var hasOwnProperty = {}.hasOwnProperty;
+module.exports = function (it, key) {
+  return hasOwnProperty.call(it, key);
+};
+
+
+/***/ }),
+
+/***/ "6a99":
+/***/ (function(module, exports, __webpack_require__) {
+
+// 7.1.1 ToPrimitive(input [, PreferredType])
+var isObject = __webpack_require__("d3f4");
+// instead of the ES6 spec version, we didn't implement @@toPrimitive case
+// and the second argument - flag - preferred type is a string
+module.exports = function (it, S) {
+  if (!isObject(it)) return it;
+  var fn, val;
+  if (S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;
+  if (typeof (fn = it.valueOf) == 'function' && !isObject(val = fn.call(it))) return val;
+  if (!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;
+  throw TypeError("Can't convert object to primitive value");
+};
+
+
+/***/ }),
+
 /***/ "6ce3":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -14327,6 +14538,33 @@ module.exports = {
 
 /***/ }),
 
+/***/ "7726":
+/***/ (function(module, exports) {
+
+// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+var global = module.exports = typeof window != 'undefined' && window.Math == Math
+  ? window : typeof self != 'undefined' && self.Math == Math ? self
+  // eslint-disable-next-line no-new-func
+  : Function('return this')();
+if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
+
+
+/***/ }),
+
+/***/ "79e5":
+/***/ (function(module, exports) {
+
+module.exports = function (exec) {
+  try {
+    return !!exec();
+  } catch (e) {
+    return true;
+  }
+};
+
+
+/***/ }),
+
 /***/ "7be6":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -14917,7 +15155,7 @@ module.exports = {
 /***/ "7d01":
 /***/ (function(module) {
 
-module.exports = [{"country":"uk","year":"2018-2019","columns":["income bucket (left)","marginal rate"],"data_tax_on_dividends":{"notes":"you pay tax avoid the dividend allowance. Above this allowance the tax you pay depends on which Income Tax band you’re in. Add your income from dividends to your other taxable income when working this out. You may pay tax at more than one rate. ... So the bands (levels) are the same as income but the rates are different.","questions":"does dividend income affect your basic personal amount? If so the bands below need correction.","data_dividend_allowance":2000,"data_tax_rate_on_div_over_allowance":[[0,0],[11850,0.075],[46350,0.325],[150000,38.1]]},"data_tax_on_savings_interest":{"notes":"https://www.gov.uk/apply-tax-free-interest-on-savings. Complicated rules for basically no relief. It is just income. There are two tax-free bits. You get (additional) tax-free room for interest of max(0, min(5000, 16850 - income)), basically this will be zero. You get 1000, 500 or zero for the basic rate, higher rate or additional rate bands. Interest past this is treated as additional income."},"data_income_tax":{"type":"constant_cadlag","data":[[0,0],[11850,0.2],[46350,0.4],[100000,0.6],[123700,0.4],[150000,0.45]]},"data_pension_limit":{"type":"linear","data":[[0,40000],[150000,40000],[210000,10000]]},"data_employer_ni":{"type":"constant_cadlag","notes":"wrong/approximate","data":[[0,0],[8112,0.138]]},"data_employee_ni":{"type":"constant_cadlag","notes":"approximate, needs update","data":[[0,0],[8424,0.12],[46384,0.02]]}},{"country":"uk","notes":"www.gov.uk says: 'Your Personal Allowance goes down by £1 for every £2 that your adjusted net income is above £100,000. This means your allowance is zero if your income is £122,000 or above.'. This means there is an additional band of 0.60 between 100-122k. Additionally, NI employer contributions are absolutely ridiculous. Additionally, 'For every £2 your adjusted income goes over £150,000, your annual allowance for that year drops by £1. The drop is limited so that the minimum tapered annual allowance you can have is £10,000.' But this only applies if threshold income is less than 110. Need three things for this calc a) net income b) threshold income and c) adjusted income. The real calculation shoudl involve what effectively tax rate is given you max out your pension contrib. So at 210k you have only 10k contribution room.","year":"2017-2018","columns":["income bucket (left)","marginal rate"],"data_income_tax":{"type":"constant_cadlag","data":[[0,0],[11500,0.2],[45000,0.4],[100000,0.6],[123000,0.4],[150000,0.45]]},"data_pension_limit":{"type":"linear","data":[[0,40000],[150000,40000],[210000,10000]]},"data_employer_ni":{"type":"constant_cadlag","data":[[0,0],[8112,0.138]]},"data_employee_ni":{"type":"constant_cadlag","data":[[0,0],[8064,0.12],[42996,0.02]]}},{"country":"uk","notes":"www.gov.uk says: 'Your Personal Allowance goes down by £1 for every £2 that your adjusted net income is above £100,000. This means your allowance is zero if your income is £122,000 or above.'. This means there is an additional band of 0.60 between 100-122k. Additionally, NI employer contributions are absolutely ridiculous.","year":2016,"columns":["income bucket (left)","marginal rate"],"data":[[0,0],[11000,0.2],[43000,0.4],[100000,0.6],[122000,0.4],[150000,0.45]],"data_employer_ni":[[0,0],[8112,0.138]],"data_employee_ni":[[0,0],[8064,0.12],[42996,0.02]]},{"country":"canada","year":2016,"columns":["income bucket (left)","marginal rate"],"data":[[0,0],[11327,0.15],[56609,0.21],[101890,0.26],[151715,0.29],[211327,0.33]],"province/state":{"ontario":{"columns":["income bucket (left)","marginal rate"],"data":[[0,0],[11327,0.0505],[52863,0.0915],[94402,0.1116],[161327,0.1216],[231327,0.1316]]}}}];
+module.exports = [{"country":"uk","year":"2018-2019","columns":["income bucket (left)","marginal rate"],"data_tax_on_dividends":{"notes":"you pay tax avoid the dividend allowance. Above this allowance the tax you pay depends on which Income Tax band you’re in. Add your income from dividends to your other taxable income when working this out. You may pay tax at more than one rate. ... So the bands (levels) are the same as income but the rates are different.","questions":"does dividend income affect your basic personal amount? If so the bands below need correction.","data_dividend_allowance":2000,"data_tax_rate_on_div_over_allowance":[[0,0],[11850,0.075],[46350,0.325],[150000,38.1]]},"data_tax_on_savings_interest":{"notes":"https://www.gov.uk/apply-tax-free-interest-on-savings. Complicated rules for basically no relief. It is just income. There are two tax-free bits. You get (additional) tax-free room for interest of max(0, min(5000, 16850 - income)), basically this will be zero. You get 1000, 500 or zero for the basic rate, higher rate or additional rate bands. Interest past this is treated as additional income."},"data_income_tax":{"type":"constant_cadlag","data":[[0,0],[11850,0.2],[46350,0.4],[100000,0.6],[123700,0.4],[150000,0.45]]},"data_pension_limit":{"type":"linear","data":[[0,40000],[150000,40000],[210000,10000]]},"data_employer_ni":{"type":"constant_cadlag","notes":"wrong/approximate","data":[[0,0],[8112,0.138]]},"data_employee_ni":{"type":"constant_cadlag","notes":"approximate, needs update","data":[[0,0],[8424,0.12],[46384,0.02]]}},{"country":"uk","notes":"www.gov.uk says: 'Your Personal Allowance goes down by £1 for every £2 that your adjusted net income is above £100,000. This means your allowance is zero if your income is £122,000 or above.'. This means there is an additional band of 0.60 between 100-122k. Additionally, NI employer contributions are absolutely ridiculous. Additionally, 'For every £2 your adjusted income goes over £150,000, your annual allowance for that year drops by £1. The drop is limited so that the minimum tapered annual allowance you can have is £10,000.' But this only applies if threshold income is less than 110. Need three things for this calc a) net income b) threshold income and c) adjusted income. The real calculation shoudl involve what effectively tax rate is given you max out your pension contrib. So at 210k you have only 10k contribution room.","year":"2017-2018","columns":["income bucket (left)","marginal rate"],"data_income_tax":{"type":"constant_cadlag","data":[[0,0],[11500,0.2],[45000,0.4],[100000,0.6],[123000,0.4],[150000,0.45]]},"data_pension_limit":{"type":"linear","data":[[0,40000],[150000,40000],[210000,10000]]},"data_employer_ni":{"type":"constant_cadlag","data":[[0,0],[8112,0.138]]},"data_employee_ni":{"type":"constant_cadlag","data":[[0,0],[8064,0.12],[42996,0.02]]}},{"country":"uk","notes":"www.gov.uk says: 'Your Personal Allowance goes down by £1 for every £2 that your adjusted net income is above £100,000. This means your allowance is zero if your income is £122,000 or above.'. This means there is an additional band of 0.60 between 100-122k. Additionally, NI employer contributions are absolutely ridiculous.","year":"2016-2017","columns":["income bucket (left)","marginal rate"],"data_income_tax":{"type":"constant_cadlag","data":[[0,0],[11000,0.2],[43000,0.4],[100000,0.6],[122000,0.4],[150000,0.45]]},"data_pension_limit":{"notes":"I think is same as next year. The big change was 2016","type":"linear","data":[[0,40000],[150000,40000],[210000,10000]]},"data_employer_ni":[[0,0],[8112,0.138]],"data_employee_ni":[[0,0],[8064,0.12],[42996,0.02]]},{"country":"canada","year":2016,"columns":["income bucket (left)","marginal rate"],"data":[[0,0],[11327,0.15],[56609,0.21],[101890,0.26],[151715,0.29],[211327,0.33]],"province/state":{"ontario":{"columns":["income bucket (left)","marginal rate"],"data":[[0,0],[11327,0.0505],[52863,0.0915],[94402,0.1116],[161327,0.1216],[231327,0.1316]]}}}];
 
 /***/ }),
 
@@ -15383,6 +15621,15 @@ module.exports = [{"country":"uk","year":"2018-2019","columns":["income bucket (
 
 /***/ }),
 
+/***/ "8378":
+/***/ (function(module, exports) {
+
+var core = module.exports = { version: '2.5.7' };
+if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
+
+
+/***/ }),
+
 /***/ "83cb":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -15654,6 +15901,29 @@ module.exports = {
     return my;
 
 })));
+
+
+/***/ }),
+
+/***/ "86cc":
+/***/ (function(module, exports, __webpack_require__) {
+
+var anObject = __webpack_require__("cb7c");
+var IE8_DOM_DEFINE = __webpack_require__("c69a");
+var toPrimitive = __webpack_require__("6a99");
+var dP = Object.defineProperty;
+
+exports.f = __webpack_require__("9e1e") ? Object.defineProperty : function defineProperty(O, P, Attributes) {
+  anObject(O);
+  P = toPrimitive(P, true);
+  anObject(Attributes);
+  if (IE8_DOM_DEFINE) try {
+    return dP(O, P, Attributes);
+  } catch (e) { /* empty */ }
+  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');
+  if ('value' in Attributes) O[P] = Attributes.value;
+  return O;
+};
 
 
 /***/ }),
@@ -18037,6 +18307,33 @@ module.exports = {
 
 /***/ }),
 
+/***/ "9b43":
+/***/ (function(module, exports, __webpack_require__) {
+
+// optional / simple context binding
+var aFunction = __webpack_require__("d8e8");
+module.exports = function (fn, that, length) {
+  aFunction(fn);
+  if (that === undefined) return fn;
+  switch (length) {
+    case 1: return function (a) {
+      return fn.call(that, a);
+    };
+    case 2: return function (a, b) {
+      return fn.call(that, a, b);
+    };
+    case 3: return function (a, b, c) {
+      return fn.call(that, a, b, c);
+    };
+  }
+  return function (/* ...args */) {
+    return fn.apply(that, arguments);
+  };
+};
+
+
+/***/ }),
+
 /***/ "9c35":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18675,6 +18972,17 @@ module.exports = function() {
 			helpers.color(colorValue).saturate(0.5).darken(0.1).rgbString();
 	};
 };
+
+
+/***/ }),
+
+/***/ "9e1e":
+/***/ (function(module, exports, __webpack_require__) {
+
+// Thank's IE8 for his funny defineProperty
+module.exports = !__webpack_require__("79e5")(function () {
+  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
+});
 
 
 /***/ }),
@@ -21330,13 +21638,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ "b976":
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-
 /***/ "b97c":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -21772,6 +22073,18 @@ helpers.easingEffects = effects;
     return deCh;
 
 })));
+
+
+/***/ }),
+
+/***/ "be13":
+/***/ (function(module, exports) {
+
+// 7.2.1 RequireObjectCoercible(argument)
+module.exports = function (it) {
+  if (it == undefined) throw TypeError("Can't call method on  " + it);
+  return it;
+};
 
 
 /***/ }),
@@ -26692,6 +27005,16 @@ module.exports.Rectangle = __webpack_require__("d945");
 
 /***/ }),
 
+/***/ "c69a":
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = !__webpack_require__("9e1e") && !__webpack_require__("79e5")(function () {
+  return Object.defineProperty(__webpack_require__("230e")('div'), 'a', { get: function () { return 7; } }).a != 7;
+});
+
+
+/***/ }),
+
 /***/ "c7aa":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27903,6 +28226,30 @@ module.exports = function() {
 
 /***/ }),
 
+/***/ "ca5a":
+/***/ (function(module, exports) {
+
+var id = 0;
+var px = Math.random();
+module.exports = function (key) {
+  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+};
+
+
+/***/ }),
+
+/***/ "cb7c":
+/***/ (function(module, exports, __webpack_require__) {
+
+var isObject = __webpack_require__("d3f4");
+module.exports = function (it) {
+  if (!isObject(it)) throw TypeError(it + ' is not an object!');
+  return it;
+};
+
+
+/***/ }),
+
 /***/ "cf1e":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28239,6 +28586,13 @@ module.exports = function() {
 
 /***/ }),
 
+/***/ "d07c":
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+
 /***/ "d26a":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28423,6 +28777,16 @@ module.exports = function() {
     return ptBr;
 
 })));
+
+
+/***/ }),
+
+/***/ "d3f4":
+/***/ (function(module, exports) {
+
+module.exports = function (it) {
+  return typeof it === 'object' ? it !== null : typeof it === 'function';
+};
 
 
 /***/ }),
@@ -28621,6 +28985,17 @@ module.exports = function() {
     return ca;
 
 })));
+
+
+/***/ }),
+
+/***/ "d8e8":
+/***/ (function(module, exports) {
+
+module.exports = function (it) {
+  if (typeof it != 'function') throw TypeError(it + ' is not a function!');
+  return it;
+};
 
 
 /***/ }),
@@ -29144,6 +29519,17 @@ module.exports = Element.extend({
 
 })));
 
+
+/***/ }),
+
+/***/ "dd8d":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_index_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_lib_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaxWidget_vue_vue_type_style_index_0_id_a112ca6c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("d07c");
+/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_index_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_lib_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaxWidget_vue_vue_type_style_index_0_id_a112ca6c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_index_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_lib_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaxWidget_vue_vue_type_style_index_0_id_a112ca6c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* unused harmony reexport * */
+ /* unused harmony default export */ var _unused_webpack_default_export = (_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_index_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_lib_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaxWidget_vue_vue_type_style_index_0_id_a112ca6c_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
 
 /***/ }),
 
@@ -32572,27 +32958,94 @@ var staticRenderFns = []
 
 // CONCATENATED MODULE: ./src/App.vue?vue&type=template&id=ef93d4ba&
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"cb29a978-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/TaxWidget.vue?vue&type=template&id=24645c6a&scoped=true&
-var TaxWidgetvue_type_template_id_24645c6a_scoped_true_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _vm._m(0)}
-var TaxWidgetvue_type_template_id_24645c6a_scoped_true_staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"tax-widget"},[_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-12"},[_c('div',{staticClass:"alert alert-danger"},[_vm._v(" Trigger Warning: upsetting tax information ")])])]),_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-12"},[_c('canvas',{attrs:{"id":"tax-chart"}})])]),_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-6"})]),_c('div',{staticClass:"col-6"},[_vm._v("\n        chart\n    ")])])}]
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"cb29a978-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/TaxWidget.vue?vue&type=template&id=a112ca6c&scoped=true&
+var TaxWidgetvue_type_template_id_a112ca6c_scoped_true_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"tax-widget container tax-container"},[_c('div',{staticClass:"row"},[_c('div',{staticClass:"col text-left"},[_c('h4',[_vm._v("\n            UK Tax and Pension Allowance (excluding NI) for\n            "),_c('select',{directives:[{name:"model",rawName:"v-model",value:(_vm.year),expression:"year"}],staticStyle:{"border":"none"},on:{"change":function($event){var $$selectedVal = Array.prototype.filter.call($event.target.options,function(o){return o.selected}).map(function(o){var val = "_value" in o ? o._value : o.value;return val}); _vm.year=$event.target.multiple ? $$selectedVal : $$selectedVal[0]}}},_vm._l((_vm.years),function(y){return _c('option',{key:y},[_vm._v(_vm._s(y))])}))])])]),_c('div',{staticClass:"row"},[_c('div',{staticClass:"col text-left"},[_c('p',{staticStyle:{"font-size":"0.8em"}},[_vm._v(" show patterns: "),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.show_patterns),expression:"show_patterns"}],attrs:{"type":"checkbox","id":"checkbox"},domProps:{"checked":Array.isArray(_vm.show_patterns)?_vm._i(_vm.show_patterns,null)>-1:(_vm.show_patterns)},on:{"change":function($event){var $$a=_vm.show_patterns,$$el=$event.target,$$c=$$el.checked?(true):(false);if(Array.isArray($$a)){var $$v=null,$$i=_vm._i($$a,$$v);if($$el.checked){$$i<0&&(_vm.show_patterns=$$a.concat([$$v]))}else{$$i>-1&&(_vm.show_patterns=$$a.slice(0,$$i).concat($$a.slice($$i+1)))}}else{_vm.show_patterns=$$c}}}})])])]),_vm._m(0),_c('hr'),_vm._m(1),_vm._m(2),_c('div',{staticClass:"form-row"},[_c('div',{staticClass:"form-group col-4"},[_c('label',{attrs:{"for":"periodsinput"}},[_vm._v("# Periods")]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.periods),expression:"periods",modifiers:{"number":true}}],staticClass:"form-control",attrs:{"min":"1","id":"periodsinput","type":"number"},domProps:{"value":(_vm.periods)},on:{"input":function($event){if($event.target.composing){ return; }_vm.periods=_vm._n($event.target.value)},"blur":function($event){_vm.$forceUpdate()}}})]),_c('div',{staticClass:"form-group col-4"},[_c('label',{attrs:{"for":"numberinput"}},[_vm._v("Average Gross Annual")]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.Xmean),expression:"Xmean",modifiers:{"number":true}}],staticClass:"form-control",attrs:{"min":"0","id":"numberinput","type":"number","step":"10000"},domProps:{"value":(_vm.Xmean)},on:{"input":function($event){if($event.target.composing){ return; }_vm.Xmean=_vm._n($event.target.value)},"blur":function($event){_vm.$forceUpdate()}}})]),_c('div',{staticClass:"form-group col-4"},[_c('label',{attrs:{"for":"R0input"}},[_vm._v("Initial Pension Room")]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.R0),expression:"R0",modifiers:{"number":true}}],staticClass:"form-control",attrs:{"min":"0","id":"R0input","type":"number","step":"10000"},domProps:{"value":(_vm.R0)},on:{"input":function($event){if($event.target.composing){ return; }_vm.R0=_vm._n($event.target.value)},"blur":function($event){_vm.$forceUpdate()}}})])]),_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-4"},[_c('div',{staticClass:"row"},[_c('div',{staticClass:"col"},[_c('h4',[_vm._v("Gross Income")]),_c('button',{on:{"click":function($event){_vm.reset_gross()}}},[_vm._v("reset")]),_vm._l((_vm.periods),function(n,year){return _c('div',{key:year,staticClass:"input-group row"},[_c('div',{staticClass:"input-group-text"},[_vm._v(_vm._s(_vm._f("toKMB")(_vm.period_calc.X[year])))]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.internal_alpha[year]),expression:"internal_alpha[year]",modifiers:{"number":true}}],staticClass:"myform",attrs:{"id":'alpha-'+year,"type":"range","min":"0","max":"1","step":"0.01"},domProps:{"value":(_vm.internal_alpha[year])},on:{"__r":function($event){_vm.$set(_vm.internal_alpha, year, _vm._n($event.target.value))},"blur":function($event){_vm.$forceUpdate()}}}),_c('div',{staticClass:"input-group-text"},[_vm._v(_vm._s(_vm._f("toPercent")(_vm.alpha[year])))])])})],2)]),_c('div',{staticClass:"row"},[_c('div',{staticClass:"col"},[_c('h4',[_vm._v("Pension Contribution")]),_c('button',{on:{"click":function($event){_vm.reset_pension()}}},[_vm._v("reset")]),_vm._l((_vm.periods),function(n,year){return _c('div',{key:year,staticClass:"input-group row"},[_c('div',{staticClass:"input-group-text"},[_vm._v(_vm._s(_vm._f("toKMB")(_vm.period_calc.C[year])))]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.internal_beta[year]),expression:"internal_beta[year]",modifiers:{"number":true}}],staticClass:"myform",attrs:{"id":'beta-'+year,"type":"range","min":"0","max":"1","step":"0.01"},domProps:{"value":(_vm.internal_beta[year])},on:{"__r":function($event){_vm.$set(_vm.internal_beta, year, _vm._n($event.target.value))},"blur":function($event){_vm.$forceUpdate()}}}),_c('div',{staticClass:"input-group-text"},[_vm._v(_vm._s(_vm._f("toPercent")(_vm.beta[year])))])])})],2)])]),_c('div',{staticClass:"col-8 text-left"},[_c('h4',[_vm._v(" Total Tax: "+_vm._s(_vm._f("toKMB")(_vm._f("sum")(this.period_calc.T))))]),_c('h4',[_vm._v("Gross Income: "+_vm._s(_vm._f("toKMB")(_vm._f("sum")(this.period_calc.X))))]),_c('h4',[_vm._v("Total Contribution: "+_vm._s(_vm._f("toKMB")(_vm._f("sum")(this.period_calc.C))))]),_c('canvas',{staticStyle:{"margin":"0","padding":"0"},attrs:{"id":"tax-chart2"}}),_c('div',{staticClass:"col text-left"},[_c('p',{staticStyle:{"font-size":"0.8em"}},[_vm._v(" show patterns: "),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.show_patterns),expression:"show_patterns"}],attrs:{"type":"checkbox","id":"checkbox"},domProps:{"checked":Array.isArray(_vm.show_patterns)?_vm._i(_vm.show_patterns,null)>-1:(_vm.show_patterns)},on:{"change":function($event){var $$a=_vm.show_patterns,$$el=$event.target,$$c=$$el.checked?(true):(false);if(Array.isArray($$a)){var $$v=null,$$i=_vm._i($$a,$$v);if($$el.checked){$$i<0&&(_vm.show_patterns=$$a.concat([$$v]))}else{$$i>-1&&(_vm.show_patterns=$$a.slice(0,$$i).concat($$a.slice($$i+1)))}}else{_vm.show_patterns=$$c}}}})])])])])])}
+var TaxWidgetvue_type_template_id_a112ca6c_scoped_true_staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"row"},[_c('canvas',{staticStyle:{"margin":"0","padding":"0"},attrs:{"id":"tax-chart"}})])},function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"row"},[_c('div',{staticClass:"col text-left"},[_c('p',[_vm._v("Notice the 80 percent marginal rate when we consider the tax policy under a situtation when we maximum pensionn contributions. You can verify the numbers by manually punching in the endpoints "),_c('a',{attrs:{"href":"https://www.uktaxcalculators.co.uk/"}},[_vm._v("here")]),_vm._v(".")])])])},function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"row"},[_c('div',{staticClass:"col text-left"},[_c('h4',[_vm._v("Multi-year income allocations")]),_c('p',[_vm._v(" What does tax and income look like under different allocations over a multi-year period?  ")]),_c('p',[_vm._v(" What is the optimal allocation? ")])])])}]
 
 
-// CONCATENATED MODULE: ./src/components/TaxWidget.vue?vue&type=template&id=24645c6a&scoped=true&
+// CONCATENATED MODULE: ./src/components/TaxWidget.vue?vue&type=template&id=a112ca6c&scoped=true&
 
 // EXTERNAL MODULE: ./node_modules/vue-json-pretty/vue-json-pretty.js
 var vue_json_pretty = __webpack_require__("d538");
 var vue_json_pretty_default = /*#__PURE__*/__webpack_require__.n(vue_json_pretty);
 
-// EXTERNAL MODULE: ./node_modules/chart.js/src/chart.js
-var chart = __webpack_require__("5b20");
-var chart_default = /*#__PURE__*/__webpack_require__.n(chart);
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es6.array.sort.js
+var es6_array_sort = __webpack_require__("55dd");
 
 // EXTERNAL MODULE: ./node_modules/patternomaly/dist/patternomaly.js
 var patternomaly = __webpack_require__("a7f4");
 var patternomaly_default = /*#__PURE__*/__webpack_require__.n(patternomaly);
 
+// EXTERNAL MODULE: ./node_modules/chart.js/src/chart.js
+var chart = __webpack_require__("5b20");
+var chart_default = /*#__PURE__*/__webpack_require__.n(chart);
+
 // CONCATENATED MODULE: ./src/components/tax.js
-// assert = require('assert')
+
+// utils logic etc
+
+
+
+function createOrUpdateChart(chartId, chartData, myChart) {
+  var ctx = document.getElementById(chartId);
+
+  if (ctx === undefined) {
+    throw 'ctx undef';
+  }
+
+  if (myChart == undefined) {
+    myChart = new chart_default.a(ctx, {
+      type: chartData.type,
+      data: chartData.data,
+      options: chartData.options
+    });
+  } else {
+    console.log('only update chart!'); // assume only data changes for now
+
+    myChart.data = chartData.data; // _.debounce(myChart.update, 1)
+
+    myChart.update(0); // duration zero to have minimal jitter
+  }
+
+  return myChart; // don't strictly need but eslint complains unused if not returned
+}
+
+function tax_calc(t, Xmean, R0, alpha, beta, F, G) {
+  // t; Xmean; R0; alpha; beta; F; G;
+  if (alpha.length != t) throw 'bad length';
+  if (beta.length != t) throw 'bad length';
+  var state = {
+    X: [],
+    // gross incomes
+    R: [R0],
+    // pension Room remaining at the start of each tax year, will be one longer than the rest
+    C: [],
+    // pension Constributions in each year (for convenience)
+    T: [] // taxes
+
+  };
+  var X_total = Xmean * t;
+  var x, c_max, c;
+
+  for (var i = 0; i < t; i++) {
+    x = alpha[i] * X_total;
+    X_total = X_total - x;
+    state.X.push(x); // the max you can contribute given income (can not contribute more than income)
+
+    c_max = Math.min(x, state.R.slice(-3).reduce(function (x, y) {
+      return x + y;
+    }) + G(x));
+    c = beta[i] * c_max;
+    state.C.push(c); // you can only use old room by over-contributing
+    // so you only have room remaining if you don't over-contribute this year i.e. if c < G(x)
+
+    state.R.push(Math.max(0, G(x) - c));
+    state.T.push(F(x - c));
+  }
+
+  return state;
+}
+
 function assert(condition, message) {
   if (!condition) {
     message = message || "Assertion failed";
@@ -32607,7 +33060,59 @@ function assert(condition, message) {
 
 var x_max = 10000000; // some big number to make the interp work
 
+var split_xy = function split_xy(data) {
+  return {
+    x: data.map(function (xx) {
+      return xx[0];
+    }),
+    y: data.map(function (xx) {
+      return xx[1];
+    })
+  };
+};
+
+function get_tax_funcs(taxinfo_selected) {
+  var xy = split_xy(taxinfo_selected['data_income_tax']['data']); // ignore the type for now, it is fixed
+
+  var F = get_tax_interp(xy.x, xy.y); // returns function and marginal
+
+  var G_xy = split_xy(taxinfo_selected['data_pension_limit']['data']);
+  var G = get_pension_limit(G_xy.x, G_xy.y); // taxes under max pension contrib, need to blend the x's and create a new y ... more complicated
+  // var xx = merge_array(xy.x, G_xy.x)
+
+  var xx = xy.x.map(function (x) {
+    return x + G.G(x);
+  }); // shift all the normal points to the right because that is where things change
+  // xx = merge_array(xx, xy.x) // dunno add lots of points
+
+  xx = merge_array(xx, G_xy.x); // probably enough points
+
+  xx.push(250000); // ugh hard code bad here now
+
+  xx.push(x_max); // some big number for the interp
+
+  var yy = xx.map(function (x) {
+    return F.F(Math.max(0, x - G.G(x)));
+  });
+  var FG = get_tax_interp2(xx, yy);
+  var obj = {
+    m_F: F.m_F,
+    F: F.F,
+    x: xy.x,
+    y: xy.y,
+    G: G.G,
+    G_x: G_xy.x,
+    G_y: G_xy.y,
+    m_FG: FG.m_F,
+    FG: FG.F,
+    FG_x: xx,
+    FG_y: yy
+  };
+  return obj;
+}
+
 function get_pension_limit(x, y) {
+  // basically just pw linear
   // the amount of pension room you have in a given year
   assert(x[0] == 0, "x[0] should be zero got " + x[0]);
   x = x.slice();
@@ -32624,6 +33129,36 @@ function get_pension_limit(x, y) {
 
   return {
     G: G
+  };
+}
+
+function get_tax_interp2(x, y) {
+  // this one tax x, y as total tax and computes the marginal from that
+  // nothing to do to compute F, just compute m_F ?
+  assert(y[0] == 0, "y[0] should be zero got " + y[0]);
+  assert(x[0] == 0, "x[0] should be zero got " + x[0]);
+  x = x.slice(); // copy, TODO check on this
+
+  y = y.slice();
+  var marginals = [0]; // cumulative of tax paid up to x
+
+  for (var i = 0; i <= x.length - 2; i++) {
+    marginals.push((y[i + 1] - y[i]) / (x[i + 1] - x[i]));
+  }
+
+  var m_F = function m_F(xx) {
+    return PiecewiseConstant(x, marginals)(xx);
+  };
+
+  var F = function F(xx) {
+    return PiecewiseLinear(x, y)(xx);
+  };
+
+  return {
+    m_F: m_F,
+    F: F,
+    x: x,
+    y: y
   };
 }
 
@@ -32655,7 +33190,9 @@ function get_tax_interp(x, y) {
 
   return {
     m_F: m_F,
-    F: F
+    F: F,
+    x: x,
+    y: y
   };
 } // // testing/dev
 // var a = [0, 11, 46, 100, 123, 145]
@@ -32711,14 +33248,65 @@ function linspace(startValue, stopValue, cardinality) {
   return arr;
 }
 
+function merge_array(array1, array2) {
+  var result_array = [];
+  var arr = array1.concat(array2);
+  var len = arr.length;
+  var assoc = {};
 
+  while (len--) {
+    var item = arr[len];
 
-function chart_data_builder(x, y, m_y, G_x, G_y, xlabel) {
-  // special for the tax (tax and marginal)
-  var n = x.length;
-  var data = [];
+    if (!assoc[item]) {
+      result_array.unshift(item);
+      assoc[item] = true;
+    }
+  }
 
-  for (var i = 0; i < n; i++) {
+  return result_array.sort(function (x, y) {
+    return x - y;
+  });
+}
+
+function limit_enforce_x_max(arr, x_max) {
+  var result_array = [];
+  var len = arr.length;
+  var assoc = {};
+
+  while (len--) {
+    var item = arr[len];
+
+    if (item < x_max && !assoc[item]) {
+      result_array.unshift(item);
+      assoc[item] = true;
+    }
+  }
+
+  result_array.push(x_max);
+  return result_array.sort(function (x, y) {
+    return x - y;
+  });
+}
+
+function chart_data_builder(obj, x_max_plot, xlabel, show_patterns) {
+  // x, y, m_y, G_x, G_y, xlabel, show_patterns) {
+  // builds the data for the charts based on F, G, FG etc
+  // TODO limit x ranges ot x_max_plot
+  // set up ranges
+  var x = obj.x.slice();
+  x = limit_enforce_x_max(x, x_max_plot);
+  var G_x = obj.G_x.slice();
+  G_x = limit_enforce_x_max(G_x, x_max_plot);
+  var FG_x = obj.FG_x.slice();
+  FG_x = limit_enforce_x_max(FG_x, x_max_plot);
+  var y = x.map(obj.F);
+  var m_y = x.map(obj.m_F);
+  var G_y = G_x.map(obj.G);
+  var FG_y = FG_x.map(obj.FG);
+  var m_FG_y = FG_x.map(obj.m_FG);
+  var data = []; // gross tax no pension contrib
+
+  for (var i = 0; i < x.length; i++) {
     data.push({
       x: x[i],
       y: y[i]
@@ -32727,19 +33315,37 @@ function chart_data_builder(x, y, m_y, G_x, G_y, xlabel) {
 
   var m_data = [];
 
-  for (var i = 0; i < n; i++) {
+  for (var _i = 0; _i < x.length; _i++) {
     m_data.push({
-      x: x[i],
-      y: m_y[i]
+      x: x[_i],
+      y: m_y[_i]
     });
   }
 
-  var G_data = [];
+  var G_data = []; // pension room
 
-  for (var i = 0; i < n; i++) {
+  for (var _i2 = 0; _i2 < G_x.length; _i2++) {
     G_data.push({
-      x: G_x[i],
-      y: G_y[i]
+      x: G_x[_i2],
+      y: G_y[_i2]
+    });
+  }
+
+  var data_p = []; // gross tax max pension contrib
+
+  for (var _i3 = 0; _i3 < FG_x.length; _i3++) {
+    data_p.push({
+      x: FG_x[_i3],
+      y: FG_y[_i3]
+    });
+  }
+
+  var m_data_p = [];
+
+  for (var _i4 = 0; _i4 < FG_x.length; _i4++) {
+    m_data_p.push({
+      x: FG_x[_i4],
+      y: m_FG_y[_i4]
     });
   }
 
@@ -32754,29 +33360,51 @@ function chart_data_builder(x, y, m_y, G_x, G_y, xlabel) {
         type: 'line',
         lineTension: 0,
         data: G_data,
-        backgroundColor: patternomaly_default.a.draw('diagonal', 'rgba(255,255,0,0.25)'),
+        backgroundColor: show_patterns ? patternomaly_default.a.draw('diagonal', 'rgba(0,255,0,0.35)') : 'rgba(0,255,0,0.35)',
         borderColor: '#333333',
         // repeat(n, '#36495d'),
         borderWidth: 2
       }, {
         steppedLine: 'before',
         // before/after it is the oposite of what you think
-        label: 'effective maginal rate',
+        label: 'effective marginal rate (no pension contrib)',
         yAxisID: 'right',
         type: 'line',
         lineTension: 0,
         data: m_data,
-        backgroundColor: patternomaly_default.a.draw('line-vertical', 'rgba(0,0,255,0.25)'),
+        backgroundColor: show_patterns ? patternomaly_default.a.draw('line-vertical', 'rgba(0,0,255,0.35)') : 'rgba(0,0,255,0.35)',
         borderColor: '#333333',
         // repeat(n, '#36495d'),
         borderWidth: 2
       }, {
-        label: 'gross tax',
+        label: 'gross tax (no pension contribution)',
         yAxisID: 'left',
         type: 'line',
         lineTension: 0,
         data: data,
-        backgroundColor: patternomaly_default.a.draw('circle', 'rgba(100,0,0,0.25)'),
+        backgroundColor: show_patterns ? patternomaly_default.a.draw('circle', 'rgba(255,0,0,0.35)') : 'rgba(255,0,0,0.35)',
+        borderColor: '#333333',
+        // repeat(n, '#36495d'),
+        borderWidth: 2
+      }, {
+        label: 'gross tax (max pension contribution)',
+        yAxisID: 'left',
+        type: 'line',
+        lineTension: 0,
+        data: data_p,
+        backgroundColor: show_patterns ? patternomaly_default.a.draw('square', 'rgba(255,0,255,0.35)') : 'rgba(255,0,255,0.35)',
+        borderColor: '#333333',
+        // repeat(n, '#36495d'),
+        borderWidth: 2
+      }, {
+        steppedLine: 'after',
+        // before/after it is the oposite of what you think
+        label: 'effective marginal rate (max pension contribution)',
+        yAxisID: 'right',
+        type: 'line',
+        lineTension: 0,
+        data: m_data_p,
+        backgroundColor: show_patterns ? patternomaly_default.a.draw('diamond', 'rgba(255,200,0,0.35)') : 'rgba(255,200,0,0.35)',
         borderColor: '#333333',
         // repeat(n, '#36495d'),
         borderWidth: 2
@@ -32802,7 +33430,7 @@ function chart_data_builder(x, y, m_y, G_x, G_y, xlabel) {
           id: 'left',
           scaleLabel: {
             display: true,
-            labelString: 'gross tax'
+            labelString: 'GBP'
           },
           ticks: {
             beginAtZero: true
@@ -32824,7 +33452,7 @@ function chart_data_builder(x, y, m_y, G_x, G_y, xlabel) {
 } // TODO how to stop this from killing node .load
 
 
- // export {get_tax_interp, get_pension_limit}
+
 // CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/TaxWidget.vue?vue&type=script&lang=js&
 //
 //
@@ -32854,21 +33482,88 @@ function chart_data_builder(x, y, m_y, G_x, G_y, xlabel) {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
+ // import _ from 'lodash';
 
+ // import { numeral } from 'numeral.js';
 
+var periods = 4;
+var internal_alpha = [];
 
-var split_xy = function split_xy(data) {
-  return {
-    x: data.map(function (xx) {
-      return xx[0];
-    }),
-    y: data.map(function (xx) {
-      return xx[1];
-    })
-  };
-};
+for (var TaxWidgetvue_type_script_lang_js_i = 0; TaxWidgetvue_type_script_lang_js_i < periods; TaxWidgetvue_type_script_lang_js_i++) {
+  internal_alpha.push(1 / (periods - TaxWidgetvue_type_script_lang_js_i));
+}
 
+var internal_beta = repeat(periods, 1);
 /* harmony default export */ var TaxWidgetvue_type_script_lang_js_ = ({
   components: {
     VueJsonPretty: vue_json_pretty_default.a
@@ -32886,40 +33581,75 @@ var split_xy = function split_xy(data) {
       year: "2018-2019",
       x_min: 0,
       x_max: 250000,
-      // allocations stuff
-      periods: 3,
-      mean_gross: 200000,
-      initial_room: 0,
-      internal_allocations: [0.5, 0.5, 0.5]
+      // income and pension allocations stuff
+      periods: periods,
+      Xmean: 200000,
+      // mean gross annual income
+      R0: 0,
+      // pension room available coming in to year 0
+      internal_alpha: internal_alpha,
+      // X_i = alpha_i * Xmean
+      internal_beta: internal_beta,
+      // y_i = beta * sum(Y[-3:]) + G(X_i)
+      chart_A: '',
+      chart_B: '',
+      show_patterns: false
     };
   },
+  watch: {
+    periods: function periods() {
+      while (this.internal_alpha.length < this.periods) {
+        this.internal_alpha.push(1);
+      }
+
+      while (this.internal_beta.length < this.periods) {
+        this.internal_beta.push(1);
+      }
+    },
+    chartData_B: function chartData_B() {
+      this.chart_B = createOrUpdateChart('tax-chart2', this.chartData_B, this.chart_B);
+    },
+    chartData_A: function chartData_A() {
+      this.chart_A = createOrUpdateChart('tax-chart2', this.chartData_A, this.chart_A);
+    }
+  },
   computed: {
+    period_calc: function period_calc() {
+      // returns state obj with X, R, C, T
+      return tax_calc(this.periods, this.Xmean, this.R0, this.alpha, this.beta, this.funcs.F, this.funcs.G);
+    },
+    alpha: {
+      get: function get() {
+        return this.internal_alpha.slice(0, this.periods);
+      }
+    },
+    beta: {
+      get: function get() {
+        return this.internal_beta.slice(0, this.periods);
+      }
+    },
     taxinfo: function taxinfo() {
       return this.fetchData();
     },
+    years: function years() {
+      return this.taxinfo.filter(function (x) {
+        return x.country == 'uk';
+      }).map(function (x) {
+        return x['year'];
+      });
+    },
     taxinfo_selected: function taxinfo_selected() {
+      var _this = this;
+
       // TODO handle if many exist
       return this.taxinfo.filter(function (x) {
-        return x.country == 'uk' && x.year == '2018-2019';
+        return x.country == 'uk' && x.year == _this.year;
       })[0];
     },
     funcs: function funcs() {
       // involves a lot scope, whatever
-      var xy = split_xy(this.taxinfo_selected['data_income_tax']['data']); // ignore the type for now, it is fixed
-
-      var F = get_tax_interp(xy.x, xy.y);
-      var G_xy = split_xy(this.taxinfo_selected['data_pension_limit']['data']);
-      var G = get_pension_limit(G_xy.x, G_xy.y);
-      var obj = {
-        G: G.G,
-        m_F: F.m_F,
-        F: F.F,
-        x: xy.x,
-        y: xy.y,
-        G_x: G_xy.x,
-        G_y: G_xy.y
-      };
-      return obj;
+      // TODO: refactor this into a simple js, data loader and processing step to product the funcs etc below
+      return get_tax_funcs(this.taxinfo_selected);
     },
     xrange: function xrange() {
       return linspace(this.x_min, this.x_max, 10);
@@ -32927,50 +33657,112 @@ var split_xy = function split_xy(data) {
     chartData_A: function chartData_A() {
       // call the funcs and get the data you will want to plot
       // TODO use better xrange later
-      var xrange = this.funcs.x.slice();
-      xrange.push(this.x_max);
-      var y = xrange.map(this.funcs.F);
-      var m_y = xrange.map(this.funcs.m_F); // pension
-
-      var G_xrange = this.funcs.G_x.slice();
-      G_xrange.push(this.x_max);
-      var G_y = G_xrange.map(this.funcs.G);
-      var data = chart_data_builder(xrange, y, m_y, G_xrange, G_y, 'gross income (' + this.currencyMap['uk'] + ')'); // console.log(data)
+      // var xrange = this.funcs.x.slice()
+      // xrange.push(this.x_max)
+      // var y = xrange.map(this.funcs.F)
+      // var m_y = xrange.map(this.funcs.m_F)
+      // // pension
+      // var G_xrange = this.funcs.G_x.slice()
+      // G_xrange.push(this.x_max)
+      // var G_y = G_xrange.map(this.funcs.G)
+      var data = chart_data_builder(this.funcs, this.x_max, 'gross income (' + this.currencyMap['uk'] + ')', this.show_patterns); // xrange, y, m_y, G_xrange, G_y, 'gross income (' + this.currencyMap['uk'] + ')', this.show_patterns)
+      // console.log(data)
 
       return data;
+    },
+    chartData_B: function chartData_B() {
+      this.show_patterns;
+      var labels = [];
+
+      for (var _i = 0; _i < this.periods; _i++) {
+        labels.push(_i);
+      }
+
+      return {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'income',
+            data: this.period_calc.X,
+            backgroundColor: this.show_patterns ? patternomaly_default.a.draw('diagonal', 'rgba(0,255,0,0.35)') : 'rgba(0,255,0,0.35)',
+            borderColor: '#333333',
+            // repeat(n, '#36495d'),
+            borderWidth: 2
+          }, {
+            label: 'tax',
+            data: this.period_calc.T,
+            backgroundColor: this.show_patterns ? patternomaly_default.a.draw('line-vertical', 'rgba(0,0,255,0.35)') : 'rgba(0,0,255,0.35)',
+            borderColor: '#333333',
+            // repeat(n, '#36495d'),
+            borderWidth: 2
+          }, {
+            label: 'pension',
+            data: this.period_calc.C,
+            backgroundColor: this.show_patterns ? patternomaly_default.a.draw('circle', 'rgba(255,0,0,0.35)') : 'rgba(255,0,0,0.35)',
+            borderColor: '#333333',
+            // repeat(n, '#36495d'),
+            borderWidth: 2
+          }, {
+            label: 'room',
+            data: this.period_calc.R.slice(1),
+            backgroundColor: this.show_patterns ? patternomaly_default.a.draw('line', 'rgba(0,255,255,0.35)') : 'rgba(0,255,255.0.35)',
+            borderColor: '#333333',
+            // repeat(n, '#36495d'),
+            borderWidth: 2
+          }]
+        },
+        options: {}
+      };
+    }
+  },
+  filters: {
+    sum: function sum(arr) {
+      return arr.reduce(function (x, y) {
+        return x + y;
+      });
+    },
+    toKMB: function toKMB(num) {
+      return num > 999999 ? (num / 1000000).toFixed(1) + 'M' : num > 999 ? (num / 1000).toFixed(1) + 'K' : num;
+    },
+    toFixed: function toFixed(value) {
+      return parseFloat(value).toFixed(2);
+    },
+    toPercent: function toPercent(value) {
+      return parseFloat(value * 100).toFixed(0) + "%";
     }
   },
   methods: {
     // uncache-ables
+    reset_pension: function reset_pension() {
+      for (var _i2 = 0; _i2 < this.periods; _i2++) {
+        // do not DO IT THIS WAY! https://vuejs.org/2016/02/06/common-gotchas/
+        // this.internal_alpha[i] = 1 / (this.periods - i)
+        this.internal_beta.splice(_i2, 1, 1);
+      }
+    },
+    reset_gross: function reset_gross() {
+      for (var _i3 = 0; _i3 < this.periods; _i3++) {
+        // do not DO IT THIS WAY! https://vuejs.org/2016/02/06/common-gotchas/
+        // this.internal_alpha[i] = 1 / (this.periods - i)
+        this.internal_alpha.splice(_i3, 1, 1 / (this.periods - _i3));
+      }
+    },
     fetchData: function fetchData() {
       var obj = __webpack_require__("7d01");
 
       return obj;
-    },
-    createChart: function createChart(chartId, chartData) {
-      var ctx = document.getElementById(chartId);
-
-      if (ctx === undefined) {
-        throw 'ctx undef';
-      }
-
-      var myChart = new chart_default.a(ctx, {
-        type: chartData.type,
-        data: chartData.data,
-        options: chartData.options
-      });
-      return myChart; // don't strictly need but eslint complains unused if not returned
     }
   },
   mounted: function mounted() {
-    this.fetchData();
-    this.createChart('tax-chart', this.chartData_A);
+    this.chart_A = createOrUpdateChart('tax-chart', this.chartData_A);
+    this.chart_B = createOrUpdateChart('tax-chart2', this.chartData_B);
   }
 });
 // CONCATENATED MODULE: ./src/components/TaxWidget.vue?vue&type=script&lang=js&
  /* harmony default export */ var components_TaxWidgetvue_type_script_lang_js_ = (TaxWidgetvue_type_script_lang_js_); 
-// EXTERNAL MODULE: ./src/components/TaxWidget.vue?vue&type=style&index=0&id=24645c6a&scoped=true&lang=css&
-var TaxWidgetvue_type_style_index_0_id_24645c6a_scoped_true_lang_css_ = __webpack_require__("0f2f");
+// EXTERNAL MODULE: ./src/components/TaxWidget.vue?vue&type=style&index=0&id=a112ca6c&scoped=true&lang=css&
+var TaxWidgetvue_type_style_index_0_id_a112ca6c_scoped_true_lang_css_ = __webpack_require__("dd8d");
 
 // CONCATENATED MODULE: ./node_modules/vue-loader/lib/runtime/componentNormalizer.js
 /* globals __VUE_SSR_CONTEXT__ */
@@ -33078,11 +33870,11 @@ function normalizeComponent (
 
 var component = normalizeComponent(
   components_TaxWidgetvue_type_script_lang_js_,
-  TaxWidgetvue_type_template_id_24645c6a_scoped_true_render,
-  TaxWidgetvue_type_template_id_24645c6a_scoped_true_staticRenderFns,
+  TaxWidgetvue_type_template_id_a112ca6c_scoped_true_render,
+  TaxWidgetvue_type_template_id_a112ca6c_scoped_true_staticRenderFns,
   false,
   null,
-  "24645c6a",
+  "a112ca6c",
   null
   
 )
