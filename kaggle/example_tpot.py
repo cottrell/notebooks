@@ -7,8 +7,8 @@ X = np.random.randn(100, 2)
 y = np.random.randn(100)
 
 class MyGP(GaussianProcessRegressor, sklearn.base.RegressorMixin):
-    def __init__(self, alpha=1, mu_x=1, mu_y=1):
-        mu = np.array([mu_x, mu_y])
+    def __init__(self, alpha=1):
+        mu = np.array([1, 1])
         super().__init__(alpha=alpha, copy_X_train=True, kernel=kernels.RBF(mu),
             n_restarts_optimizer=0, normalize_y=False,
             optimizer='fmin_l_bfgs_b', random_state=None)

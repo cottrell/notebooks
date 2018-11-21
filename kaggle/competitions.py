@@ -1,3 +1,6 @@
+"""
+main deal is to learn to use tpot and things like that
+"""
 import pandas as pd
 import glob
 import os
@@ -14,21 +17,23 @@ from autosklearn.regression import AutoSklearnRegressor
 import sklearn.model_selection
 import sklearn.datasets
 from sklearn.svm import LinearSVR, SVR
+import tpot
+tpot._RAISE_CONFIG_DICT_ERRORS = True
 from tpot import TPOTRegressor
 import sklearn.metrics
 from sklearn.compose import TransformedTargetRegressor
-from sklearn.preprocessing import QuantileTransformer
+from sklearn.preprocessing import QuantileTransformer, MinMaxScaler
+from sklearn.pipeline import FeatureUnion
 from sklearn.gaussian_process import GaussianProcessRegressor, kernels
 import autokeras as ak
 
 from mylib import attributedict_from_locals
 from mylib.cache import SimpleNode # just use joblib.Memory.cache
 import joblib
+
 _mydir = os.path.dirname(__file__)
 cachedir = os.path.join(_mydir, 'joblib_cache')
 memory = joblib.Memory(cachedir, verbose=1)
-
-_mydir = os.path.dirname(__file__)
 ion()
 
 def get_data():
@@ -45,11 +50,18 @@ def get_data():
     df['days_remaining'] = (df.deadline - datetime.datetime.today()).dt.days
     df_ = df[df.r > 0].copy()
     ycols = ['teamCount']
-    xcols = ['logr', 'days_remaining']
-    df_['logr'] = np.log10(df_.r)
+    xcols = ['r', 'days_remaining']
     # ugh better to label a column as train test
     y = df_[ycols]
     X = df_[xcols].astype(float) # just in case this matters
+
+    # ##########################
+    # # this is cheating the cv! learn to put these in tpot ...
+    # X = QuantileTransformer().fit_transform(X)
+    # # X = MinMaxScaler().fit_transform(X)
+    # X = pd.DataFrame(X, columns=xcols)
+    # ##########################
+
     data = df_[xcols + ycols].rename(columns={ycols[0]: 'target'})
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, random_state=1)
     return attributedict_from_locals('df,data,X_train,X_test,y_train,y_test')
@@ -66,32 +78,23 @@ def train_autokeras(l=None):
     model.fit(np.atleast_3d(l.X_train.values), l.y_train.values.squeeze())
     return attributedict_from_locals('model')
 
-class MyGP(GaussianProcessRegressor, sklearn.base.RegressorMixin):
-    def __init__(self, alpha=1, mu_x=1, mu_y=1):
-        mu = np.array([mu_x, mu_y])
-        super().__init__(alpha=alpha, copy_X_train=True, kernel=kernels.RBF(mu),
-            n_restarts_optimizer=0, normalize_y=False,
-            optimizer='fmin_l_bfgs_b', random_state=None)
-        # model = GaussianProcessRegressor(alpha=alpha, copy_X_train=True, kernel=kernels.RBF(mu),
-        #          n_restarts_optimizer=0, normalize_y=False,
-        #          optimizer='fmin_l_bfgs_b', random_state=None)
-        # self.__dict__.update(model.__dict__) # dunno
-        # self = model
-
-# @SimpleNode
+# @SimpleNode # can not pickle
 def train_gpr_tpot(l=None):
     # with auto tuning
     if l is None:
         l = get_data()
     config_dict = {
-            # 'sklearn.gaussian_process.GaussianProcessRegressor': {
-            #     'alpha': [1e1, 1, 1e-1]
-            #     },
-            'competitions.MyGP': {
-                'alpha': [1e1, 1, 1e-1],
-                # 'mu_x': np.logspace(-2, 4, 10),
-                # 'mu_y': np.logspace(-2, 4, 10),
-                }
+            'sklearn.gaussian_process.GaussianProcessRegressor': {
+                'alpha':np.logspace(-10, 1, 12),
+                },
+            'sklearn.pipeline.FeatureUnion': {},
+            'sklearn.preprocessing.QuantileTransformer': {},
+            'sklearn.preprocessing.MinMaxScaler': {},
+            # 'competitions.MyGP': {
+            #     'alpha':np.logspace(-10, 1, 12),
+            #     'mu_x': np.logspace(-1, 2, 4),
+            #     'mu_y': np.logspace(-1, 2, 4),
+            #     }
             }
     model = TPOTRegressor(config_dict=config_dict, crossover_rate=0.1, cv=5,
         disable_update_check=False, early_stop=None, generations=10,
@@ -103,7 +106,6 @@ def train_gpr_tpot(l=None):
         random_state=None, scoring=None, subsample=1.0, use_dask=False,
         verbosity=3, warm_start=False)
     model.fit(l.X_train.copy(), l.y_train.copy().squeeze())
-    return model
     model.export('tpot_gpr.py')
     return attributedict_from_locals('model')
 
@@ -112,7 +114,8 @@ def train_gpr(l=None):
     # basic no tuning
     if l is None:
         l = get_data()
-    model = GaussianProcessRegressor(alpha=1.8, copy_X_train=True, kernel=kernels.RBF(4.85 * np.array([4, 3000])),
+    model = GaussianProcessRegressor(alpha=1.8, copy_X_train=True,
+            # kernel=kernels.RBF(4.85 * np.array([4, 3000])),
              n_restarts_optimizer=0, normalize_y=False,
              optimizer='fmin_l_bfgs_b', random_state=None)
     # model = TransformedTargetRegressor(regressor=model, transformer=QuantileTransformer(output_distribution='normal'))
@@ -199,17 +202,17 @@ def plot_predict(model):
 
     n = 50
     mm = 40
-    df = d.df; df = df[df.r > 0]
-    logr = linspace(-1, df.logr.max(), mm)
-    days_remaining = linspace(df.days_remaining.min(), df.days_remaining.max(), n)
-    X, Y = meshgrid(logr, days_remaining)
+    # df = d.df; df = df[df.r > 0]
+    r = linspace(d.X_train.r.min(), d.X_train.r.max(), mm)
+    days_remaining = linspace(d.X_train.days_remaining.min(), d.X_train.days_remaining.max(), n)
+    X, Y = meshgrid(r, days_remaining)
     xy = np.vstack([X.ravel(), Y.ravel()]).T
     Z = model.predict(xy).reshape(X.shape)
 
     fig = plt.figure(2)
     ax = fig.add_subplot(111, projection='3d')
     surf = ax.plot_surface(X, Y, Z, linewidth=1, alpha=0.5)
-    ax.set_xlabel('log(r)')
+    ax.set_xlabel('r')
     ax.set_ylabel('days remaining')
     ax.set_zlabel('team count')
     plt.show()
@@ -252,8 +255,8 @@ if __name__ == '__main__':
 else:
     l = get_data()
     # globals().update(l)
-    df_orig = l['df']
-    df = df_orig[df_orig.r > 0]
+    # df_orig = l['df']
+    # df = df_orig[df_orig.r > 0]
     # do_plots(df=df)
     # l = train_svm()
     # plot_predict(l.model)
