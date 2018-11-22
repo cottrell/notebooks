@@ -117,6 +117,7 @@ def train_gpr_tfp(l=None):
 
     # Plot the loss evolution
     plt.figure(1, figsize=(12, 4))
+    clf()
     plt.plot(lls_)
     plt.xlabel("Training iteration")
     plt.ylabel("Log marginal likelihood")
@@ -124,20 +125,38 @@ def train_gpr_tfp(l=None):
 
     # tfp is a bit weird ... you need to create another model for inference ... it isn't a model really it is the thing that represents the distribution
     # notice that we now provide more arguments
-    model_infer = tfd.GaussianProcessRegressionModel(
-        kernel=kernel,  # Reuse the same kernel instance, with the same params
-        index_points=l.X_test.values,
-        observation_index_points=l.X_train.values,
-        observations=l.y_train.values.squeeze(),
-        observation_noise_variance=observation_noise_variance,
-        predictive_noise_variance=tf.constant(0., dtype=np.float64))
 
-    ## make a .predict wrapper. It is strange that model_infer does not explicitly have knowledge of the observations yet those are needed for inference.
-    # test:
+    model_infer = TFP_GRP_Wrapper(model_train, l.y_train.values.squeeze())
+    
     num_samples = 50
     samples = model_infer.sample(num_samples)
 
     return attributedict_from_locals('model_train,model_infer,samples')
+
+class TFP_GRP_Wrapper(tfd.GaussianProcess):
+    """
+    After you train, this creates inference instance and attaches a .predict method.
+    It is strange that model_infer does not explicitly have knowledge of the observations yet those are needed for inference.
+
+    usage: model_infer = tfp_gpr_predict_factory(model, y_train)
+    """
+    def __init__(self, model, y_train):
+        # this sort of breaks the whole tfd model, just hacking away errors. very fragile.
+        self.__dict__.update(model.__dict__)
+        self.model_train = model
+        self.y_train = y_train
+    def predict(self, X_test):
+        model_infer = self.get_model_infer(X_test)
+        # use mean for now for the API
+        return model_infer.mean().eval() # or use sess.run
+    def get_model_infer(self, X_test):
+        return tfd.GaussianProcessRegressionModel(
+            kernel=self.model_train.kernel,  # Reuse the same kernel instance, with the same params
+            index_points=X_test,
+            observation_index_points=self.model_train.index_points,
+            observations=self.y_train,
+            observation_noise_variance=self.model_train.observation_noise_variance,
+            predictive_noise_variance=tf.constant(0., dtype=np.float64))
 
 
 def get_data():
