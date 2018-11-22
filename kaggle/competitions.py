@@ -187,7 +187,7 @@ def get_data():
     # ##########################
 
     data = df_[xcols + ycols].rename(columns={ycols[0]: 'target'})
-    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, random_state=None)
+    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, random_state=100) # CHANGING THE RANDOM STATE WILL BREAK SOME OF THE TFP STUFF!
     return attributedict_from_locals('df,data,X_train,X_test,y_train,y_test')
 
 @SimpleNode
@@ -298,10 +298,10 @@ def train_autosklearn(l=None):
 def plot_predict(model):
     # model = train_autosklearn.get_latest().model
     d = get_data()
-    yh_train = model.predict(d.X_train).squeeze()
-    yh_test = model.predict(d.X_test).squeeze()
-    d.y_train = d.y_train.squeeze()
-    d.y_test = d.y_test.squeeze()
+    yh_train = model.predict(d.X_train.values).squeeze()
+    yh_test = model.predict(d.X_test.values).squeeze()
+    d.y_train = d.y_train # .values.squeeze()
+    d.y_test = d.y_test # .values.squeeze()
 
     figure(1)
     clf()
