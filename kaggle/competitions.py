@@ -32,6 +32,23 @@ from mylib import attributedict_from_locals
 from mylib.cache import SimpleNode # just use joblib.Memory.cache
 import joblib
 
+import tensorflow as tf
+# tf.enable_eager_execution() # breaks some patterns see below
+from tensorflow_probability import distributions as tfd
+from tensorflow_probability import positive_semidefinite_kernels as tfk
+
+def reset_session():
+  """Creates a new global, interactive session in Graph-mode."""
+  global sess
+  try:
+    tf.reset_default_graph()
+    sess.close()
+  except:
+    pass
+  sess = tf.InteractiveSession()
+
+reset_session()
+
 _mydir = os.path.dirname(__file__)
 cachedir = os.path.join(_mydir, 'joblib_cache')
 memory = joblib.Memory(cachedir, verbose=1)
@@ -59,6 +76,69 @@ def train_gpr(l=None):
     model.fit(l.X_train.values, l.y_train.values.squeeze())
     return attributedict_from_locals('model')
 
+def train_gpr_tfp(l=None):
+    if l is None:
+        l = get_data()
+    amplitude = (np.finfo(np.float64).tiny + tf.nn.softplus(tf.Variable(initial_value=1.,
+                                        name='amplitude',
+                                        dtype=np.float64)))
+    length_scale = (np.finfo(np.float64).tiny + tf.nn.softplus(tf.Variable(initial_value=1.,
+                                           name='length_scale',
+                                           dtype=np.float64)))
+    observation_noise_variance = (np.finfo(np.float64).tiny + tf.nn.softplus(tf.Variable(initial_value=1e-6,
+                               name='observation_noise_variance',
+                               dtype=np.float64)))
+    kernel = tfk.ExponentiatedQuadratic(amplitude, length_scale)
+    model_train = tfd.GaussianProcess(
+        kernel=kernel,
+        index_points=l.X_train.values,
+        observation_noise_variance=observation_noise_variance)
+    log_likelihood = model_train.log_prob(l.y_train.values.squeeze())
+    optimizer = tf.train.AdamOptimizer(learning_rate=.01)
+    train_op = optimizer.minimize(-log_likelihood)
+
+    # training
+    num_iters = 2000
+    # Store the likelihood values during training, so we can plot the progress
+    lls_ = np.zeros(num_iters, np.float64)
+    sess.run(tf.global_variables_initializer())
+    for i in range(num_iters):
+      _, lls_[i] = sess.run([train_op, log_likelihood])
+    [amplitude_,
+     length_scale_,
+     observation_noise_variance_] = sess.run([
+        amplitude,
+        length_scale,
+        observation_noise_variance])
+    print('Trained parameters:'.format(amplitude_))
+    print('amplitude: {}'.format(amplitude_))
+    print('length_scale: {}'.format(length_scale_))
+    print('observation_noise_variance: {}'.format(observation_noise_variance_))
+
+    # Plot the loss evolution
+    plt.figure(1, figsize=(12, 4))
+    plt.plot(lls_)
+    plt.xlabel("Training iteration")
+    plt.ylabel("Log marginal likelihood")
+    plt.show()
+
+    # tfp is a bit weird ... you need to create another model for inference ... it isn't a model really it is the thing that represents the distribution
+    # notice that we now provide more arguments
+    model_infer = tfd.GaussianProcessRegressionModel(
+        kernel=kernel,  # Reuse the same kernel instance, with the same params
+        index_points=l.X_test.values,
+        observation_index_points=l.X_train.values,
+        observations=l.y_train.values.squeeze(),
+        observation_noise_variance=observation_noise_variance,
+        predictive_noise_variance=tf.constant(0., dtype=np.float64))
+
+    ## make a .predict wrapper. It is strange that model_infer does not explicitly have knowledge of the observations yet those are needed for inference.
+    # test:
+    num_samples = 50
+    samples = model_infer.sample(num_samples)
+
+    return attributedict_from_locals('model_train,model_infer,samples')
+
 
 def get_data():
     df = pd.read_csv('kaggle_competitions.csv', parse_dates=['deadline'])
@@ -77,7 +157,7 @@ def get_data():
     ycols = ['teamCount']
     xcols = ['r', 'days_remaining']
     # ugh better to label a column as train test
-    y = df_[ycols]
+    y = df_[ycols].astype(float) # tf does not like it when int
     X = df_[xcols].astype(float) # just in case this matters
 
     # ##########################

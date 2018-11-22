@@ -14,14 +14,14 @@ features = tpot_data.drop('target', axis=1).values
 training_features, testing_features, training_target, testing_target = \
             train_test_split(features, tpot_data['target'].values, random_state=None)
 
-# Average CV score on the training set was:-788442.0003393994
+# Average CV score on the training set was:-852960.3711405548
 exported_pipeline = make_pipeline(
     make_union(
-        QuantileTransformer(),
+        FunctionTransformer(copy),
         FunctionTransformer(copy)
     ),
     QuantileTransformer(),
-    GaussianProcessRegressor(alpha=0.001)
+    GaussianProcessRegressor(alpha=0.1)
 )
 
 exported_pipeline.fit(training_features, training_target)
