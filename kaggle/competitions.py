@@ -47,7 +47,11 @@ def reset_session():
     pass
   sess = tf.InteractiveSession()
 
-reset_session()
+try:
+    sess
+except NameError as e:
+    print('resetting tf.sess')
+    reset_session()
 
 _mydir = os.path.dirname(__file__)
 cachedir = os.path.join(_mydir, 'joblib_cache')
