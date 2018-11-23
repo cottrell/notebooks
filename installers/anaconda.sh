@@ -1,14 +1,14 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 # consider using miniconda
 # https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
 
-if [[ $(uname) -eq Linux ]]; then
-    filename=Anaconda3-5.3.0-MacOSX-x86_64.sh
+if [[ $(uname) = "Linux" ]]; then
+    filename=Anaconda3-5.3.1-Linux-x86_64.sh
 else
-    filename=Anaconda3-5.3.0-Linux-x86_64.sh
+    filename=Anaconda3-5.3.1-MacOSX-x86_64.sh
 fi
-echo $filename
+echo Will install: $filename
 
 cd /tmp
 if [[ -e $filename ]]; then
