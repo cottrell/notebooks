@@ -29,13 +29,42 @@ else
 fi
 source ~/anaconda3/bin/activate 36
 echo installing packages
-conda install -y pip pandas ipython scipy Cython jupyter scikit-learn keras tensorboard setuptools ujson
-pip install --upgrade tensorflow tensorflow-probability
+conda install -y pip pandas ipython scipy Cython jupyter setuptools ujson
+conda install -y matplotlib seaborn bokeh
 conda install -y -c conda-forge xgboost nodejs jupyterlab
-# if you have problems with node, clear the ~/.npm dir
-# nodejs # maybe do not install node like this
-# brew install node
-
 conda install -y pytorch torchvision -c pytorch
+
 pip install --upgrade pip
+# keras is now part of tensorflow
+pip install --upgrade tensorboard tensorflow-probability
+if [[ $(uname) = "Linux" ]]; then
+	pip install tensorflow-gpu
+else
+	pip install tensorflow
+fi
+pip install scikit-learn auto-sklearn
+
+# if you have problems with node, clear the ~/.npm dir
+
 pip install lightgbm catboost
+
+hub
+
+cd ~/dev
+hub clone EpistasisLab/tpot
+cd tpot && python setup.py develop; cd -
+
+cd ~/dev
+hub clone jhfjhfj1/autokeras && cd autokeras && python setup.py develop; cd -
+
+
+# NOTES, YOU PROBABLY DON't want to live run this without reading
+source activate 36
+# dev clones
+cd ~/dev
+sudo apt install swig
+hub clone automl/auto-sklearn
+cd ~/dev/tensorflow
+hub clone tensorflow/tensorflow
+hub clone tensorflow/probability
+
