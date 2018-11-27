@@ -17,3 +17,5 @@ See ~/dev/tensorflow/tensorflow/examples
     docker pull tensorflow/tensorflow
 
 If you paste the check_gpu.py script in a notebook you can see output in the logs not the notebook.
+
+See the Dockerfiles https://github.com/tensorflow/tensorflow/tree/master/tensorflow/tools/docker
