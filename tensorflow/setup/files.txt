@@ -1,0 +1,13 @@
+cuda_9.0.176.1_linux.run
+cuda_9.0.176.2_linux.run
+cuda_9.0.176_384.81_linux.run
+cuda_9.0.176.3_linux.run
+cuda_9.0.176.4_linux.run
+cuda_9.2.148.1_linux.run
+cuda_9.2.148_396.37_linux.run
+cuda-repo-ubuntu1704-9-0-local_9.0.176-1_amd64.deb
+cudnn-9.0-linux-x64-v7.4.1.5.tgz
+cudnn-9.2-linux-x64-v7.4.1.5.tgz
+files.txt
+nccl_2.3.7-1+cuda9.2_x86_64.txz
+README.md
