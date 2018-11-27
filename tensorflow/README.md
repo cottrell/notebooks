@@ -15,3 +15,5 @@ See nvidia_docker for setting up docker.
 See ~/dev/tensorflow/tensorflow/examples
 
     docker pull tensorflow/tensorflow
+
+If you paste the check_gpu.py script in a notebook you can see output in the logs not the notebook.
