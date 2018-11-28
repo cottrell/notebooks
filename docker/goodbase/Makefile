@@ -1,2 +1,2 @@
 all:
-	docker build . -t goodbase
+	docker build . -t cottrell/goodbase:latest
