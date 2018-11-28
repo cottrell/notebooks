@@ -7,4 +7,5 @@
 # lshw -C network
 # dmesg | grep -e enx -e rtl
 # cat syslog | grep -e enx -e rtl
-cat /var/log/syslog | grep -e enx -e rtl | less
+tail -f /var/log/syslog
+# | grep -e enx -e rtl | less
