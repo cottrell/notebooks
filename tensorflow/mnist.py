@@ -31,7 +31,7 @@ model.add(Dense(n_classes, activation='softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-tensor_board = TensorBoard('/tmp/logs/LeNet-MNIST-1')
+# tensor_board = TensorBoard('/tmp/LeNet-MNIST-1')
 
 model.fit(X_train, y_train, batch_size=128, epochs=15, verbose=1, validation_data=(X_test,y_test)) # , callbacks=[tensor_board])
 
