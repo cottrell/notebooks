@@ -192,7 +192,10 @@ def get_data():
 
     data = df_[xcols + ycols].rename(columns={ycols[0]: 'target'})
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, random_state=100) # CHANGING THE RANDOM STATE WILL BREAK SOME OF THE TFP STUFF!
-    return attributedict_from_locals('df,data,X_train,X_test,y_train,y_test')
+    # for something else needed this shape
+    data_train = pd.concat([X_train, y_train], axis=1)
+    data_test = pd.concat([X_test, y_test], axis=1)
+    return attributedict_from_locals('data_train,data_test,df,data,df_,X_train,X_test,y_train,y_test')
 
 @SimpleNode
 def train_autokeras(l=None):
@@ -340,7 +343,7 @@ def plot_predict(model):
 def do_plots(df=None):
     if df is None:
         l = get_data()
-        df = l['df']
+        df = l['df_']
     figure(2)
     clf()
     ax = subplot(121)
@@ -353,7 +356,7 @@ def do_plots(df=None):
 
     fig = figure(3)
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(df.logr, df.days_remaining, df.teamCount) # , c=c, marker=m)
+    ax.scatter(df.r, df.days_remaining, df.teamCount) # , c=c, marker=m)
     ax.set_xlabel('log(r)')
     ax.set_ylabel('days remaining')
     ax.set_zlabel('team count')
@@ -362,8 +365,8 @@ def do_plots(df=None):
     figure(5)
     clf()
     subplot(121)
-    plot(l['X_train'].logr, l['y_train'].teamCount, 'bo', alpha=0.5)
-    plot(l['X_test'].logr, l['y_test'].teamCount, 'ro', alpha=0.5)
+    plot(l['X_train'].r, l['y_train'].teamCount, 'bo', alpha=0.5)
+    plot(l['X_test'].r, l['y_test'].teamCount, 'ro', alpha=0.5)
     subplot(122)
     plot(l['X_train'].days_remaining, l['y_train'].teamCount, 'bo', alpha=0.5)
     plot(l['X_test'].days_remaining, l['y_test'].teamCount, 'ro', alpha=0.5)
