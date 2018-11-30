@@ -8,3 +8,8 @@ else
 fi
 
 pip install -r requirements.txt
+
+# never finishes
+# pip install pybullet==2.3.6
+pip install pybullet
+

@@ -27,6 +27,51 @@ _mydir = os.path.dirname(os.path.realpath(__file__))
 cachedir = os.path.join(_mydir, 'joblib_cache')
 memory = Memory(cachedir, verbose=1)
 
+# WARNING: persistant state here, clear if worried
+_period_seconds = 1
+@memory.cache
+@sleep_and_retry
+@limits(calls=1, period=_period_seconds)
+def _get_data_yahoo(names, start, end):
+    return pdr.get_data_yahoo(names, start=start, end=end)
+
+def get_data_yahoo(names, start, end):
+    df = _get_data_yahoo(names, start, end)
+    if len(names) > 1:
+        df = df.stack()
+        df.index.names = ['date', 'name']
+    else:
+        df['name'] = names[0]
+    df = df.reset_index()
+    df.columns = [x.lower().replace(' ', '_') for x in df.columns]
+    return df
+
+def one_off_update_etfs():
+    start = datetime.date(2010, 1, 1)
+    end = datetime.date(2018, 11, 29)
+    product = 'etfs'
+    names = _meta[product]
+    base = os.path.join('raw/yahoo/')
+    if not os.path.exists(base):
+        os.makedirs(base)
+
+    # filenames = glob.glob(os.path.join(base, '*.parquet'))
+    # TODO: check dates on existing for the update
+
+    filename = os.path.join(base, '{}_to_{}.parquet'.format(start, end))
+    print('getting {} names'.format(len(names)))
+    df = get_data_yahoo(names, start, end)
+    df['product'] = product
+    table = pa.Table.from_pandas(df, preserve_index=False)
+    # partitioning by name is less efficient storage wise but makes for better joins in the next step
+    pq.write_to_dataset(table, root_path=outfile, partition_cols=['product', 'name'], preserve_index=False)
+    return df
+
+
+
+### IGNORE OLD
+
+
 def raw_source(dirname):
     return glob.glob(os.path.join(_mydir, 'raw', dirname, '*.txt.gz'))
 
@@ -133,14 +178,6 @@ def get_missing_dates(product, name):
     first_new_date = first_new_date.date() + datetime.timedelta(days=1)
     return missing_back_dates, first_new_date
 
-
-# WARNING: persistant state here, clear if worried
-_period_seconds = 1
-@memory.cache
-@sleep_and_retry
-@limits(calls=1, period=_period_seconds)
-def get_data_yahoo(names, start, end):
-    return pdr.get_data_yahoo(names, start=start, end=end)
 
 def download_update_one_from_yahoo(product, name, start_date=None, end_date=None):
     # example tan, if start_date is None use last avail date in the raw data
