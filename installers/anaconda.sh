@@ -48,6 +48,9 @@ pip install scikit-learn auto-sklearn
 
 pip install lightgbm catboost
 
+# not really but why not
+# pip install dask argh pyarrow bcolz toolz cloudpickle pandas_datareader
+
 hub
 
 cd ~/dev

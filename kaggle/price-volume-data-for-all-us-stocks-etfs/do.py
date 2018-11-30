@@ -15,7 +15,7 @@ import dask.bag as db
 
 from pandas_datareader import data as pdr
 import fix_yahoo_finance as yf
-yf.pdr_override() 
+yf.pdr_override()
 
 _mydir = os.path.dirname(os.path.realpath(__file__))
 
