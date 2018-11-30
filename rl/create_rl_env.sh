@@ -7,9 +7,13 @@ else
     echo rl exists
 fi
 
+# conda activate rl
 source activate rl
 
-pip install -r requirements.txt
+conda install ipython
+
+conda install tensorflow-gpu tensorboard
+pip install -r requirements_mod.txt
 
 # never finishes
 # pip install pybullet==2.3.6
