@@ -33,6 +33,7 @@ conda install -y pip pandas ipython scipy Cython jupyter setuptools ujson
 conda install -y matplotlib seaborn bokeh
 conda install -y -c conda-forge xgboost nodejs jupyterlab
 conda install -y pytorch torchvision -c pytorch
+# conda install -y pytorch-gpu torchvision -c pytorch
 
 pip install --upgrade pip
 # keras is now part of tensorflow
