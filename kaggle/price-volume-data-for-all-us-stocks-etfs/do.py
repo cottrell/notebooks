@@ -60,7 +60,7 @@ def one_off_update(product='etfs'):
     filename = os.path.join(base, '{}_to_{}'.format(start, end))
     filename_check = os.path.join(filename, 'product={}'.format(product)) # this is terrible
     if os.path.exists(filename_check):
-        print("{} exists".format(filename))
+        print("{} exists".format(filename_check))
         return
     print('getting {} names'.format(len(names)))
     df = get_data_yahoo(names, start, end)
