@@ -15,6 +15,14 @@ conda install ipython
 conda install tensorflow-gpu tensorboard
 pip install -r requirements_mod.txt
 
+[[ -d ~/dev/gym ]] || cd ~/dev && git clone https://github.com/openai/gym.git
+cd ~/dev/gym && python setup.py develop
+
+# conda install -y pytorch torchvision -c pytorch
+# pip install atari-py ptan opencv-python tensorboardX tensorflow tensorboard
+# pip install --upgrade pip
+
+
 # never finishes
 # pip install pybullet==2.3.6
 pip install pybullet

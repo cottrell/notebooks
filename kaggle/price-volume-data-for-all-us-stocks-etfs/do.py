@@ -57,9 +57,11 @@ def one_off_update(product='etfs'):
     # filenames = glob.glob(os.path.join(base, '*.parquet'))
     # TODO: check dates on existing for the update
 
-    filename = os.path.join(base, '{}_to_{}.parquet'.format(start, end))
-    if os.path.exists(filename):
+    filename = os.path.join(base, '{}_to_{}'.format(start, end))
+    filename_check = os.path.join(filename, 'product={}'.format(product)) # this is terrible
+    if os.path.exists(filename_check):
         print("{} exists".format(filename))
+        return
     print('getting {} names'.format(len(names)))
     df = get_data_yahoo(names, start, end)
     df['product'] = product
