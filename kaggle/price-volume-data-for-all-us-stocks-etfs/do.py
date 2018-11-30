@@ -69,7 +69,7 @@ def one_off_update_etfs():
 
 
 
-### IGNORE OLD
+### IGNORE OLD except for comparison?
 
 
 def raw_source(dirname):
