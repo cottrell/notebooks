@@ -46,10 +46,9 @@ def get_data_yahoo(names, start, end):
     df.columns = [x.lower().replace(' ', '_') for x in df.columns]
     return df
 
-def one_off_update_etfs():
+def one_off_update(product='etfs'):
     start = datetime.date(2010, 1, 1)
     end = datetime.date(2018, 11, 29)
-    product = 'etfs'
     names = _meta[product]
     base = os.path.join('raw/yahoo/')
     if not os.path.exists(base):
@@ -59,12 +58,14 @@ def one_off_update_etfs():
     # TODO: check dates on existing for the update
 
     filename = os.path.join(base, '{}_to_{}.parquet'.format(start, end))
+    if os.path.exists(filename):
+        print("{} exists".format(filename))
     print('getting {} names'.format(len(names)))
     df = get_data_yahoo(names, start, end)
     df['product'] = product
     table = pa.Table.from_pandas(df, preserve_index=False)
     # partitioning by name is less efficient storage wise but makes for better joins in the next step
-    pq.write_to_dataset(table, root_path=outfile, partition_cols=['product', 'name'], preserve_index=False)
+    pq.write_to_dataset(table, root_path=filename, partition_cols=['product', 'name'], preserve_index=False)
     return df
 
 

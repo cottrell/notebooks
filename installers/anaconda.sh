@@ -38,7 +38,9 @@ pip install --upgrade pip
 # keras is now part of tensorflow
 pip install --upgrade tensorboard tensorflow-probability
 if [[ $(uname) = "Linux" ]]; then
-	pip install tensorflow-gpu
+	# pip install tensorflow-gpu
+        conda install -c anaconda tensorflow-gpu
+
 else
 	pip install tensorflow
 fi
