@@ -60,7 +60,6 @@ cd tpot && python setup.py develop; cd -
 cd ~/dev
 hub clone jhfjhfj1/autokeras && cd autokeras && python setup.py develop; cd -
 
-
 # NOTES, YOU PROBABLY DON't want to live run this without reading
 source activate 36
 # dev clones
@@ -70,4 +69,3 @@ hub clone automl/auto-sklearn
 cd ~/dev/tensorflow
 hub clone tensorflow/tensorflow
 hub clone tensorflow/probability
-

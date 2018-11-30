@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from ratelimit import limits, sleep_and_retry
+import json
+import time
 import bcolz
 import numpy as np
 import datetime
@@ -12,6 +15,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import shutil
 import dask.bag as db
+from joblib import Memory
+
 
 from pandas_datareader import data as pdr
 import fix_yahoo_finance as yf
@@ -19,8 +24,11 @@ yf.pdr_override()
 
 _mydir = os.path.dirname(os.path.realpath(__file__))
 
+cachedir = os.path.join(_mydir, 'joblib_cache')
+memory = Memory(cachedir, verbose=1)
+
 def raw_source(dirname):
-    return glob.glob(os.path.join(_mydir, dirname, '*.txt.gz'))
+    return glob.glob(os.path.join(_mydir, 'raw', dirname, '*.txt.gz'))
 
 def raw_target(nrows=None):
     return os.path.join(_mydir, 'nrows={}'.format(nrows if nrows is not None else 'all'))
@@ -59,6 +67,7 @@ def run_raw(nrows=None, force=False):
                 print('{} of {} eta {} seconds for {}'.format(i, len(filenames), (time.time() - t) * (len(filenames) - i) / i, product))
         df = pd.concat(data, axis=0)
         df = df.sort_values(['name', 'Date'])
+        # TODO: add market back later if relevant
         df = df.drop(['market', 'OpenInt'], axis=1)
         df.columns = [x.lower() for x in df.columns]
         print('writing {}'.format(outfile))
@@ -67,31 +76,96 @@ def run_raw(nrows=None, force=False):
         # partitioning by name is less efficient storage wise but makes for better joins in the next step
         pq.write_to_dataset(table, root_path=outfile, partition_cols=['product', 'name'], preserve_index=False)
 
+_meta_filename = os.path.join(_mydir, 'meta.json')
+_meta = json.load(open(_meta_filename))
+
+# def raw_symlink_target():
+#     return os.path.join('raw/symlink')
+# 
+# def raw_symlink_concat():
+#     target_base = raw_symlink_target()
+#     raw = raw_target()
+#     update = download_update_target()
+#     allkeys = ['product={}/name={}'.format(product, name) for product, names in _meta.items() for name in names]
+#     for base in [raw, update]:
+#         for k in allkeys:
+#             pattern = os.path.join(base, k, '*.parquet')
+#             filenames = glob.glob(pattern)
+#             for source in filenames:
+#                 target = os.path.join(target_base, k, os.path.basename(source))
+#                 print(source, target)
+#                 if not os.path.exists(target) and os.path.exists(source):
+#                     source = os.path.relpath(source, os.path.dirname(target))
+#                     os.makedirs(os.path.dirname(target), exist_ok=True)
+#                     os.symlink(source, target)
+
 def download_update_target():
-    return os.path.join(_mydir, 'update')
+    dirname = os.path.join(_mydir, 'raw', 'update')
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+    return dirname
 
 def download_update(force=False):
-    input_dirname = raw_target()
-    product = 'etfs'
-    filenames = glob.glob(os.path.join(input_dirname, 'product={}/name=*/'.format(product))) # limit to etfs for now
+    input_dirname = raw_target() # nrows=all or raw_source?
+    product = 'etfs' # TODO: only etfs for now
+    filenames = glob.glob(os.path.join(input_dirname, 'product={}/name=*'.format(product))) # limit to etfs for now
     for filename in filenames:
-        name, market = os.path.basename(filename).split('.')[:2]
-        df = download_update_one_from_yahoo(name, product)
+        # TODO: ignoring market for now
+        name = os.path.basename(filename).split('=')[1]
+        print('download_update {} ignoring market (since everything is from US for now)'.format(name))
+        try:
+            download_update_one_from_yahoo(product, name)
+        except ValueError as e:
+            print("skipping error {} but adding to list of bad tickers".format(e))
+            if not os.path.exists('failed_updates'):
+                os.makedirs('failed_updates')
+            print(product, name, file=open(os.path.join('failed_updates', name), 'w'))
 
-def download_update_one_from_yahoo(name, product, start_date=None, end_date=None):
+def get_missing_dates(product, name):
+    # get start date from raw_target() and update
+    # TODO: actually do bdate range or whatever, currently making hard assumption of continuity in dates
+    missing_back_dates = [] # TODO: backfill check biz days etc
+    filename = os.path.join(raw_target(), 'product={}/name={}'.format(product, name))
+    first_new_date = pd.read_parquet(filename).date.max()
+    filename = os.path.join(download_update_target(), 'product={}/name={}'.format(product, name))
+    if len(glob.glob(os.path.join(filename, '*.parquet'))) > 0:
+        first_new_date = max(first_new_date, pd.read_parquet(filename).date.max())
+    first_new_date = first_new_date.date() + datetime.timedelta(days=1)
+    return missing_back_dates, first_new_date
+
+
+# WARNING: persistant state here, clear if worried
+_period_seconds = 1
+@memory.cache
+@sleep_and_retry
+@limits(calls=1, period=_period_seconds)
+def get_data_yahoo(names, start, end):
+    return pdr.get_data_yahoo(names, start=start, end=end)
+
+def download_update_one_from_yahoo(product, name, start_date=None, end_date=None):
     # example tan, if start_date is None use last avail date in the raw data
-    # if end_date is None:
-    #     end_date = datetime.datetime.today().date()
-    input_dirname = download_update_target()
+    output_dirname = download_update_target()
     filename = os.path.join
     if start_date is None:
-        # get start date from raw
-        filename = os.path.join(raw_target(), 'product={}/name={}'.format(product, name))
-        start_date = pd.read_parquet(filename).date.max()
-        start_date = start_date.date() + datetime.timedelta(days=1)
-    df = pdr.get_data_yahoo([name], start=start_date, end=end_date)
-    return df
+        missing_back_dates, start_date = get_missing_dates(product, name)
+    # TODO: worrying about exact timing
+    if start_date >= (datetime.date.today() - datetime.timedelta(days=1)):
+        print("{} {} has data up to but not including {}".format(product, name, start_date))
+        return
+    df = get_data_yahoo([name], start=start_date, end=end_date)
+    if missing_back_dates:
+        raise Exception('nip')
+    print('writing {}'.format(output_dirname))
+    df['product'] = product # TODO: better ways to do this but this is safer
+    df['name'] = name # TODO: better ways to do this but this is safer
+    df = df.reset_index()
+    df.columns = [x.lower() for x in df.columns]
+    table = pa.Table.from_pandas(df, preserve_index=False)
+    # this CAN lead to duplicate entries so deduping is necessary, idea is that this is basically append-only like
+    pq.write_to_dataset(table, root_path=output_dirname, partition_cols=['product', 'name'], preserve_index=False)
+    # return df
 
+# enrichment only
 
 def calc_rank_quantile_source(nrows=None):
     return raw_target(nrows=nrows)
