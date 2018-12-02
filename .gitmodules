@@ -28,3 +28,6 @@
 [submodule "hugo/hugoblog"]
 	path = hugo/hugoblog
 	url = git@gitlab.com:david-cottrell/hugoblog.git
+[submodule "naf/NAF"]
+	path = naf/NAF
+	url = https://github.com/CW-Huang/NAF.git

@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+parsing and enrichment etc
+"""
 from ratelimit import limits, sleep_and_retry
 import json
 import time
