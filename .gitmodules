@@ -31,3 +31,9 @@
 [submodule "naf/NAF"]
 	path = naf/NAF
 	url = https://github.com/CW-Huang/NAF.git
+[submodule "naf/torchkit"]
+	path = naf/torchkit
+	url = https://github.com/CW-Huang/torchkit
+[submodule "naf/naf_examples"]
+	path = naf/naf_examples
+	url = https://github.com/CW-Huang/naf_examples.git
