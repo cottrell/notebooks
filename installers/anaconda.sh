@@ -53,6 +53,7 @@ pip install lightgbm catboost
 
 # not really but why not
 # pip install dask argh pyarrow bcolz toolz cloudpickle pandas_datareader
+pip install boto3
 
 hub
 
