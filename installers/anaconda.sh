@@ -48,6 +48,8 @@ pip install scikit-learn auto-sklearn
 
 pip install lightgbm catboost
 
+pip install boto3
+
 hub
 
 cd ~/dev
