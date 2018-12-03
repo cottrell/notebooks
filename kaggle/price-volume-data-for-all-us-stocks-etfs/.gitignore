@@ -1,3 +1,4 @@
 *.parquet
 failed_updates
 joblib_cache
+errors.txt
