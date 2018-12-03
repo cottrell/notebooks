@@ -1,4 +1,5 @@
 #!/bin/sh -e
+sudo apt-get install automake bison flex g++ git libboost-all-dev libevent-dev libssl-dev libtool make pkg-config
 
 cd ~/dev
 if [ ! -d thrift-0.11.0 ]; then

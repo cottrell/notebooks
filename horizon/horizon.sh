@@ -1,4 +1,5 @@
 #!/bin/sh -e
+# https://xaviergeerinck.com/facebook-horizon
 cd ~/dev
 [ -d Horizon ] || git clone https://github.com/facebookresearch/Horizon.git
 cd Horizon
