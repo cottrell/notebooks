@@ -1,0 +1,2 @@
+#!/bin/sh
+wicd-client

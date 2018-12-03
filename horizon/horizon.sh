@@ -14,6 +14,7 @@ if [ "$1" = "local" ]; then
 
     pip install "gym[classic_control,box2d,atari]"
     thrift --gen py --out . ml/rl/thrift/core.thrift
+    pip install -e .
 elif [ "$1" = "docker_gpu" ]; then
     echo docker
     docker run --runtime=nvidia -v $PWD/../:/home/Horizon -p 0.0.0.0:6006:6006 -it horizon:dev
