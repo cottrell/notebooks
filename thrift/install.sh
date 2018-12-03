@@ -13,4 +13,4 @@ make
 make check
 sh test/test.sh
 sudo make install
-
+# copy/pasta waiting for complete ... probably didn't work if not hear back
