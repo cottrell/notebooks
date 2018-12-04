@@ -42,3 +42,4 @@ node_modules/
 *.egg-info
 .*.pid
 *.lock
+*.deb
