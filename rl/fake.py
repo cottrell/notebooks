@@ -4,6 +4,10 @@ Interested here in:
     * generating random networks
     * distribution of sensitivities
     * understanding ways of interpolating between two networks and what the responses look like on the paths between them
+
+
+
+https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/ops/parallel_for/gradients.py#L28
 """
 import numpy as np
 import scipy.sparse
@@ -42,21 +46,35 @@ def random_keras_network(input_dim, output_dim,
     return model
 
 import tensorflow as tf
-def gradients(model):
-    gradients = tf.gradients(model.outputs, model.inputs)
-    return gradients
+try:
+    sess
+except NameError as e:
+    sess = tf.InteractiveSession()
+    sess.run(tf.global_variables_initializer())
 
-def test():
+class GradientHelper():
+    def __init__(self, model, session=None):
+        self.sess = sess
+        if session is not None:
+            self.sess = session
+        self._x = model.inputs
+        self._y = model.outputs
+        self.gradients = tf.gradients(self._y, self._x)
+    def __call__(self, *inputs):
+        assert len(inputs) == len(self._x)
+        return self.sess.run(self.gradients, feed_dict={x: v for x, v in zip(self._x, inputs)})
+        
+
+def test_GradientHelper():
     input_dim = 3
     output_dim = 1
     model = random_keras_network(input_dim, output_dim)
-    g = gradients(model)
-    x = g[0]
-    with tf.Session() as sess:
-        print(sess.run(x))
-
+    a = np.random.randn(2, 1).astype(np.float32)
+    g = GradientHelper(model)
+    print(g(a))
 
 def default_summary():
+    # tf.reset_default_graph()
     writer = tf.summary.FileWriter('.')
     writer.add_graph(tf.get_default_graph())
 
