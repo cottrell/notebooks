@@ -77,4 +77,3 @@ def default_summary():
     # tf.reset_default_graph()
     writer = tf.summary.FileWriter('.')
     writer.add_graph(tf.get_default_graph())
-
