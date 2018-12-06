@@ -9,10 +9,6 @@ import numpy as np
 import scipy.sparse
 import scipy.stats
 
-def default_summary():
-    writer = tf.summary.FileWriter('.')
-    writer.add_graph(tf.get_default_graph())
-
 # watch out
 np.random.seed(0)
 
@@ -25,7 +21,8 @@ def random_keras_network(input_dim, output_dim,
         final_activiation='linear',
         weight_dist=scipy.stats.norm(),
         **kwargs):
-    n_layers = max(min_layers, n_layers_dist.rvs())
+    # n_layers = max(min_layers, n_layers_dist.rvs())
+    n_layers = 2
     dims = [input_dim] + layer_dim_dist.rvs(n_layers).tolist() + [output_dim]
     import tensorflow.keras as k
     from tensorflow.keras import Sequential
@@ -44,8 +41,8 @@ def random_keras_network(input_dim, output_dim,
     model.set_weights(random_weights)
     return model
 
+import tensorflow as tf
 def gradients(model):
-    import tensorflow as tf
     gradients = tf.gradients(model.outputs, model.inputs)
     return gradients
 
@@ -57,4 +54,9 @@ def test():
     x = g[0]
     with tf.Session() as sess:
         print(sess.run(x))
+
+
+def default_summary():
+    writer = tf.summary.FileWriter('.')
+    writer.add_graph(tf.get_default_graph())
 
