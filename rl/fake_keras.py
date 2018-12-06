@@ -63,7 +63,7 @@ class GradientHelper():
     def __call__(self, *inputs):
         assert len(inputs) == len(self._x)
         return self.sess.run(self.gradients, feed_dict={x: v for x, v in zip(self._x, inputs)})
-        
+
 
 def test_GradientHelper():
     input_dim = 3
