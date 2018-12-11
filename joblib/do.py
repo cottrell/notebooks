@@ -25,3 +25,11 @@ def f(x):
     return df
 
 # see do.f.call(1) and do.f.clear() for forcing/reseting etc
+
+# stupid trick: you call counter.call() to force it, counter() is fixed otherwise
+@memory.cache
+def counter():
+    if counter.check_call_in_cache():
+        return counter() + 1
+    else:
+        return 0

@@ -14,6 +14,7 @@ import pyarrow.parquet as pq
 def write_parquet(df, filename, partition_cols=None, preseve_index=False):
     table = pa.Table.from_pandas(df, preserve_index=False)
     pq.write_to_dataset(table, root_path=filename, partition_cols=partition_cols, preserve_index=preserve_index)
+
 # notes: you need all of this to use joblib and get the filename before calling! what is joblib actually missing if you simply return the location of the CACHED file?
 # pdr.memory.cached_requests_get.store_backend.location
 # _, args_id, metadata = pdr.memory.cached_requests_get._cached_call(('http://www.google.com',), {})
