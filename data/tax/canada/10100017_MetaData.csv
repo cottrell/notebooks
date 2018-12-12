@@ -1,0 +1,210 @@
+﻿"Cube Title","Product Id","CANSIM Id",URL,"Cube Notes","Archive Status",Frequency,"Start Reference Period","End Reference Period","Total number of dimensions"
+"Canadian government finance statistics for the provincial and territorial governments",10100017,385-0034,"https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1010001701",1;2;3;4,"CURRENT - a cube available to the public and that is current",Annual,2007-01-01,2017-01-01,4
+
+"Dimension ID","Dimension name","Dimension Notes","Dimension Definitions"
+1,Geography,3,
+2,"Public sector components",,
+3,"Display value",5,
+4,"Statement of operations and balance sheet",,
+
+"Dimension ID","Member Name","Classification Code","Member ID","Parent Member ID",Terminated,"Member Notes","Member Definitions"
+1,"Newfoundland and Labrador",[10],1,,,,
+1,"Prince Edward Island",[11],2,,,,
+1,"Nova Scotia",[12],3,,,,
+1,"New Brunswick",[13],4,,,,
+1,Quebec,[24],5,,,,
+1,Ontario,[35],6,,,,
+1,Manitoba,[46],7,,,,
+1,Saskatchewan,[47],8,,,,
+1,Alberta,[48],9,,,,
+1,"British Columbia",[59],10,,,,
+1,Yukon,[60],11,,,,
+1,"Northwest Territories",[61],12,,,,
+1,Nunavut,[62],13,,,,
+2,"Provincial and territorial governments",,1,,,,
+3,Stocks,,1,,,,
+3,"Transactions and other economic flows",,2,,,,
+4,"Gross operating balance",,1,,,18,
+4,"Net operating balance",,2,,,,
+4,Revenue,[1],3,2,,,
+4,Taxes,[11],4,3,,,
+4,"Taxes on income, profits and capital gains",[111],5,4,,,
+4,"Taxes on income, profits and capital gains payable by individuals",[1111],6,5,,,
+4,"Taxes on income, profits and capital gains payable by corporations and other enterprises",[1112],7,5,,,
+4,"Taxes on income, profits and capital gains payable by nonresidents",[1113],8,5,,,
+4,"Taxes on payroll and workforce",[112],9,4,,,
+4,"Taxes on property",[113],10,4,,7,
+4,"Taxes on goods and services",[114],11,4,,,
+4,"General taxes on goods and services",[1141],12,11,,,
+4,Excises,[1142],13,11,,,
+4,"Liquor taxes",[1142],14,13,,,
+4,"Tobacco taxes",[1142],15,13,,,
+4,"Gasoline and motive fuel taxes",[1142],16,13,,,
+4,"Other excise taxes",[1142],17,13,,,
+4,"Profits of fiscal monopolies",[1143],18,11,,8,
+4,"Remitted liquor profits",[1143],19,18,,,
+4,"Remitted profits on games of chance and other",[1143],20,18,,,
+4,"Taxes on specific services",[1144],21,11,,9,
+4,"Taxes on use of goods and on permission to use goods or perform activities",[1145],22,11,,,
+4,"Motor vehicle taxes",[11451],23,22,,,
+4,"Other taxes on use of goods and on permission to use goods or perform activities",[11452],24,22,,,
+4,"Other taxes on goods and services",[1146],25,11,,,
+4,"Other taxes","[115, 116]",26,4,,,
+4,"Social contributions",[12],27,3,,,
+4,"Social security contributions",[121],28,27,,,
+4,"Contributions to workers' compensation boards",[1212],29,28,,,
+4,"Other social security contributions","[1211, 1212, 1213, 1214]",30,28,,,
+4,"Other social contributions",[122],31,27,,,
+4,"Grants, revenue",[13],32,3,,,
+4,"Grants from foreign governments and international governmental organizations","[131, 132]",33,32,,,
+4,"Grants from general government units","[133, 134]",34,32,,,
+4,"Other revenue",[14],35,3,,,
+4,"Property income",[141],36,35,,,
+4,"Interest revenue",[1411],37,36,,,
+4,Dividends,"[1412, 1413, 1414]",38,36,,,
+4,Rent,[1415],39,36,,10,
+4,"Oil and gas royalties",[1415],40,39,,,
+4,"Forestry royalties",[1415],41,39,,,
+4,"Mineral royalties",[1415],42,39,,11,
+4,"Water power royalties",[1415],43,39,,,
+4,"Other rent and property income","[1415, 1416]",44,39,,12,
+4,"Sales of goods and services",[142],45,35,,,
+4,"Administrative fees",[1422],46,45,,,
+4,"Other sales of goods and services","[1421, 1423, 1424]",47,45,,,
+4,"Fines, penalties and forfeits",[143],48,35,,,
+4,"Voluntary transfers other than grants",[144],49,35,,,
+4,"Miscellaneous revenue",[145],50,35,,13,
+4,Expense,[2],51,2,,,
+4,"Compensation of employees",[21],52,51,,14,
+4,"Use of goods and services",[22],53,51,,14,
+4,"Consumption of fixed capital",[23],54,51,,15,
+4,"Interest expense",[24],55,51,,,
+4,Subsidies,[25],56,51,,,
+4,"Subsidies to government business enterprises",[251],57,56,,,
+4,"Subsidies to private enterprises",[252],58,56,,,
+4,"Agricultural subsidies to private enterprises",[2521],59,58,,,
+4,"Other subsidies to private enterprises on products","[2521, 2522]",60,58,,,
+4,"Other subsidies to private enterprises on production","[2521, 2522]",61,58,,,
+4,"Grants, expense",[26],62,51,,,
+4,"Grants to foreign governments and international governmental organizations","[261, 262]",63,62,,,
+4,"Grants to general government units","[263, 264]",64,62,,,
+4,"Social benefits",[27],65,51,,,
+4,"Social security benefits",[271],66,65,,,
+4,"Employment insurance and parental insurance benefits",[2711],67,66,,,
+4,"Workers' compensation benefits",[2711],68,66,,,
+4,"Other social security benefits","[2711, 2712]",69,66,,,
+4,"Social assistance benefits",[272],70,65,,,
+4,"Employer social benefits",[273],71,65,,,
+4,"Other expense",[28],72,51,,,
+4,"Property expense other than interest",[281],73,72,,,
+4,"Miscellaneous other expense",[282],74,72,,,
+4,"Miscellaneous other current expense",[2821],75,74,,,
+4,"Tax expense",[2821],76,75,,,
+4,"Transfers to persons",[2821],77,75,,,
+4,"Transfers to non-profit institutions",[2821],78,75,,,
+4,"Other miscellaneous current expenses",[2821],79,75,,16,
+4,"Miscellaneous other capital expense",[2822],80,74,,,
+4,"Memorandum items, total expenditures",,81,,,6;17;19,
+4,"Memorandum items, capitalized research and development costs",,82,,,6;14;17,
+4,"Memorandum items, capitalized research and development compensation of employees",,83,82,,6;14;17,
+4,"Memorandum items, capitalized research and development use of goods and services",,84,82,,6;14;17,
+4,"Memorandum items, tangible assets amortization expense according to public sector accounts",,85,,,6;15;17,
+4,"Net worth",[6],86,,,4;20;21,
+4,"Nonfinancial assets",[61],87,86,,15,
+4,"Net financial worth",,88,86,,22,
+4,"Financial assets",[62],89,88,,,
+4,"Currency and deposits, assets","[6212, 6222]",90,89,,,
+4,"Debt securities, assets","[6213, 6223]",91,89,,,
+4,"Treasury bills, assets","[6213, 6223]",92,91,,,
+4,"Finance and other short-term paper, assets","[6213, 6223]",93,91,,,
+4,"Bonds, assets","[6213, 6223]",94,91,,,
+4,"Loans, assets","[6214, 6224]",95,89,,,
+4,"Loans and advances, assets","[6214, 6224]",96,95,,,
+4,"Mortgages, assets","[6214, 6224]",97,95,,,
+4,"Equity and investment fund shares, assets","[6215, 6225]",98,89,,,
+4,"Marketable shares","[6215, 6225]",99,98,,,
+4,"Non-marketable shares and other equity","[6215, 6225]",100,98,,,
+4,"Investment fund shares","[6215, 6225]",101,98,,,
+4,"Insurance and pension, assets","[6216, 6226]",102,89,,,
+4,"Other accounts receivable","[6218, 6228]",103,89,,,
+4,"Trade credits and advances, receivable","[6218, 6228]",104,103,,,
+4,"Other receivable","[6217, 6218, 6227, 6228]",105,103,,23,
+4,"Monetary gold and special drawing rights (SDR), assets",[623],106,89,,,
+4,Liabilities,[63],107,88,,,
+4,"Currency and deposits, liabilities","[6312, 6322]",108,107,,,
+4,"Debt securities, liabilities","[6313, 6323]",109,107,,,
+4,"Treasury bills, liabilities","[6313, 6323]",110,109,,,
+4,"Finance and other short-term paper, liabilities","[6313, 6323]",111,109,,,
+4,"Saving bonds","[6313, 6323]",112,109,,,
+4,"Bonds, liabilities","[6313, 6323]",113,109,,,
+4,"Loans, liabilities","[6314, 6324]",114,107,,,
+4,"Bank overdrafts","[6314, 6324]",115,114,,,
+4,"Loans and advances, liabilities","[6314, 6324]",116,114,,,
+4,"Mortgages, liabilities","[6314, 6324]",117,114,,,
+4,"Equity, liabilities","[6315, 6325]",118,107,,,
+4,"Insurance, pension and standardized guarantee schemes, liabilities","[6316, 6326]",119,107,,,
+4,"Pensions plans, liabilities","[6316, 6326]",120,119,,,
+4,"Insurance and standardized guarantee schemes, liabilities","[6316, 6326]",121,119,,,
+4,"Other accounts payable","[6318, 6328]",122,107,,,
+4,"Trade credits and advances, payable","[6318, 6328]",123,122,,,
+4,"Other payable","[6317, 6318, 6327, 6328]",124,122,,24,
+4,"Monetary gold and special drawing rights (SDR), liabilities",,125,107,,,
+4,"Memorandum items, nonfinancial assets according to public sector accounts",,126,,,15;17,
+4,"Memorandum items, liabilities at nominal value",,127,,,17;25,
+4,"Memorandum items, employee future benefits",,128,,,17,
+4,"Memorandum items, environmental liabilities",,129,,,17,
+4,"Memorandum items, Quebec abatement",,130,,,26,
+
+Symbol Legend
+Description,Symbol
+"not available for a specific reference period",..
+"less than the limit of detection",<LOD
+"value rounded to 0 (zero) where there is a meaningful distinction between true zero and the value that was rounded",0s
+"data quality: excellent",A
+"data quality: very good",B
+"data quality: good",C
+"data quality: acceptable",D
+"use with caution",E
+"too unreliable to be published.",F
+"not applicable",...
+preliminary,p
+revised,r
+"suppressed to meet the confidentiality requirements of the Statistics Act",x
+terminated,t
+
+"Survey Code","Survey Name"
+5218,"Canadian Government Finance Statistics"
+
+"Subject Code","Subject Name"
+10,Government
+
+"Note ID",Note
+1,"Data may not add to the total due to rounding."
+2,"End of fiscal year closest to December 31st."
+3,"This table contains provincial and territorial government data that are not consolidated for inter-provincial transactions and debtor-creditor relationships, therefore the geography dimension for Canada is not available. The presentation of a Canada total using unconsolidated provincial and territorial government data would result in double counts in transactions and debtor-creditor relationships. Consolidation involves the elimination of all transactions and debtor-creditor relationships that occur among the units being consolidated. In other words, a transaction of one unit is paired with the same transaction as recorded for the second unit and both transactions are eliminated. For example, if one provincial and territorial government unit owns a bond issued by a second provincial and territorial government unit located in a different province and data for the two units are being consolidated, then the stocks of bonds held as assets and liabilities are reported as if the bond did not exist. Statement of operations and balance sheet for consolidated governments are available in CANSIM table 385-0042."
+4,"For 2007 only stocks for balance sheet statement are available, they represent the opening stocks for 2008, the start of the observed period."
+5,"Balance sheet data can be displayed as flows or stocks. Flows are monetary expressions of economic actions that occur within the accounting period. Stocks refer to holdings of assets and liabilities at a specific time - the end of the accounting period."
+6,"The net operating balance is a summary measure of the ongoing sustainability of the government operations. Net operating balance equals total revenues less total expenses."
+7,"Includes taxes on immovable property, net wealth, estate, inheritance, gift and, financial and capital transactions."
+8,"Includes the part of the profits of fiscal monopolies transferred to the government. Fiscal monopolies are government business enterprises that exercise the taxing power of government by the use of monopoly powers over the production or distribution of a particular kind of good or service. Typical commodities subject to fiscal monopolies are alcoholic beverages, lotteries and games of chance."
+9,"Includes racetrack betting taxes, other amusement taxes, taxes on meals and hotels, taxes on insurance premiums, and taxes on specific services not elsewhere classified."
+10,"Rent should not be confused with the rental of produced assets, which is treated as sales of goods and services. The difference in treatment arises because lessors of produced assets are engaged in a production process whereby they provide services (maintaining inventories, repairing and maintaining the leased assets). In the case of rent, general government units that own land or subsoil assets merely place these assets at the disposal of other units and are not considered to be engaged in productive activity."
+11,"Mineral royalties for Newfoundland and Labrador include both mining taxes and mineral royalties."
+12,"Includes other natural resource royalties, natural resource exploration fees and licences, leases of land, rent and property income not elsewhere classified."
+13,"Miscellaneous revenue includes auto insurance premiums, drug plan premiums and revenue not elsewhere classified. It may also include the consolidation statistical discrepancy. This discrepancy reflects differences between paired transactions (e.g. grant revenue and grant expense) and must be recorded in the statement of operation in order to preserve the operating balances (gross or net). While in theory, the paired transactions to be consolidated should be of the same value, in practice, they are not always aligned as a result of multiple cause (availability of economic and counterparty classification details, time of recording, different fiscal year end, deferrals, etc.). When paired transactions are eliminated, there must be no impact on the operating balance, therefore a consolidation statistical discrepancy is recorded in revenue or expense, depending on the situation."
+14,"Canadian Government Finance Statistics (CGFS) estimates for compensation of employees and use of goods and services are adjusted to account for the capitalisation of research and development expenses using data from the Canadian System of Macroeconomic Accounts (CSMA). This memorandum item provides the amounts capitalised for research and development to facilitate comparison with the public accounting sources."
+15,"Within the Canadian Government Finance Statistics system (CGFS), the value of nonfinancial assets and related consumption of fixed capital is estimated using the Canadian System of Macroeconomic Accounts (CSMA) perpetual inventory method (PIM). The results of the PIM model can differ substantially from the values found in the public accounting sources of a specific level of government. In order to better understand these differences, the value of nonfinancial assets and related consumption of fixed capital found in the public accounting sources are presented in the memorandum items ""consumption of fixed capital according to public sector accounts"" and ""Nonfinancial assets according to public sector accounts"". For more information on the PIM model please consult additional information on the survey or statistical program in the CANSIM related information tab."
+16,"Other miscellaneous current expenses include expenses of insurers and miscellaneous other current expenses not elsewhere classified. They may also include the consolidation statistical discrepancy. This discrepancy reflects differences between paired transactions (e.g. grant revenue and grant expense) and must be recorded in the statement of operation in order to preserve the operating balances (gross or net). While in theory, the paired transactions to be consolidated should be of the same value, in practice, they are not always aligned as a result of multiple cause (availability of economic and counterparty classification details, time of recording, different fiscal year end, deferrals, etc.). When paired transactions are eliminated, there must be no impact on the operating balance, therefore a consolidation statistical discrepancy is recorded in revenue or expense, depending on the situation."
+17,"Memorandum items provide supplemental information or alternative presentation of related items, but the memorandum items amounts are not included in Canadian Government Finance Statistics (CGFS) structure and totals."
+18,"The gross operating balance equals revenue minus expense other than consumption of fixed capital."
+19,"Total expenditures equals expense plus the net acquisition of nonfinancial assets less consumption of fixed capital."
+20,"The balance sheet records the stocks of assets, liabilities, and the net worth for each accounting period. Net worth is defined as the total assets less total liabilities and is an important measure for assessing the sustainability of fiscal activities."
+21,"The balance sheet components include domestic and foreign counterparts."
+22,"The net financial worth position equals total stock of financial assets minus liabilities."
+23,"Includes the following assets: securities repurchase agreement (repo), financial derivatives, taxes receivable, interest receivable, other accounts receivable, deposits, prepaid expenses, other financial assets not elsewhere classified and related allowances."
+24,"Includes the following liabilities: securities repurchase agreement (repo), financial derivatives, taxes payable, interest payable, other payable, deposits due, deferred revenue and contributions, discounts and premiums on outstanding debt, other liabilities not elsewhere classified and related allowances."
+25,"In the Canadian Government Finance Statistics system (CGFS), liabilities are valued at current market prices, but this memorandum item provides the alternate nominal value. The nominal valuation only differs from the current market prices in the case of debt securities. The nominal value is the amount that the debtor owes to the creditor at any moment. It reflects the value of the instrument at creation and subsequent economic flows, such as transactions, valuation changes (excluding market price changes), and other changes, such as debt forgiveness. Conceptually, the nominal value is equal to the required future payments of principal and interest discounted at the existing contractual interest rate. Nominal value is not necessarily face value, which is the undiscounted amount of principal to be repaid."
+26,"The Quebec Abatement consists of a reduction of 16.5 percentage points of federal personal income tax for all tax filers in Quebec. This Abatement is the sum of the Alternative Payments for Standing Programs and the Youth Allowances Recovery. The Government of Canada reduced, or ""abated"", personal income tax while Quebec increased its personal income taxes by an equivalent amount. In the Canadian government finance statistics framework, Quebec receive the value of these extra tax points through its own income tax system under the ""Taxes on income, profits and capital gains payable by individuals"" category, while other provinces receive the corresponding amounts in cash under the ""Grants from general government units"" category. This memorandum item presents the Abatement as calculated by the Ministère des finances du Québec and facilitate comparisons, between provinces, of tax revenue and Grants."
+
+"Correction ID","Correction Date","Correction Note"
+
