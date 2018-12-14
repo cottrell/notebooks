@@ -11,7 +11,7 @@ import os
 from mylib.tools import run_tasks_in_parallel
 
 # _mydir = os.path.dirname(os.path.realpath(__file__))
-_basedir = os.path.join(os.path.expanduser('~/projects/data/quandl'))
+_basedir = os.path.join(os.path.expanduser('~/projects/data/extractor=quandl'))
 _datadir = os.path.join(_basedir, 'data')
 _metadatadir = os.path.join(_basedir, 'metadata')
 def mkdir_if_needed(k):
