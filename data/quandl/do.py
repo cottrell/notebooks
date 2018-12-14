@@ -10,8 +10,8 @@ import quandl
 import os
 from mylib.tools import run_tasks_in_parallel
 
-_mydir = os.path.dirname(os.path.realpath(__file__))
-_basedir = os.path.join(_mydir, 'quandl')
+# _mydir = os.path.dirname(os.path.realpath(__file__))
+_basedir = os.path.join(os.path.expanduser('~/projects/data/quandl'))
 _datadir = os.path.join(_basedir, 'data')
 _metadatadir = os.path.join(_basedir, 'metadata')
 def mkdir_if_needed(k):
@@ -33,10 +33,12 @@ def get_from_quandl(code=None, trim_start=_trim_start, trim_end=_trim_end, **kwa
 
 # library/bulk
 
+_bulk_downloadable = ['LBMA', 'UGID', 'OECD', 'ECONOMIST', 'FRED', 'OSE', 'SHFE']
+
 def get_all(force=False, cleanup=False):
-    dbnames = get_list()
+    # dbnames = get_list()
     tasks_meta = [functools.partial(get_metadata, k) for k in dbnames]
-    tasks_bulk = [functools.partial(get_bulk_zip, k) for k in dbnames]
+    tasks_bulk = [functools.partial(get_bulk_zip, k) for k in _bulk_downloadable] # hard coded
     tasks = tasks_meta + tasks_bulk
     print('running {} tasks'.format(len(tasks)))
     run_tasks_in_parallel(*tasks, max_workers=20)
@@ -47,7 +49,10 @@ def get_list():
     a = db.all()
     return [x.code for x in a]
 
+
 def get_bulk_zip(dbname, return_data=False, force=False):
+    if dbname not in _bulk_downloadable:
+        raise Exception('I do not think this is bulk downloadable {}'.format(dname))
     print('getting bulk for {}'.format(dbname))
     # example bulk, these are bigger 43 mm lines
     filename_zip = os.path.join(_datadir, 'raw', dbname + '.zip')
@@ -81,6 +86,7 @@ def get_metadata(name, return_data=False, force=False, cleanup=False):
         try_convert_inplace(df)
         if os.path.exists(filename):
             move_and_remove_nonblocking(filename)
+        print('writing {}'.format(filename))
         write_parquet(df, filename)
         if cleanup:
             move_and_remove_nonblocking(filename_zip)
