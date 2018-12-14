@@ -5,3 +5,8 @@ See [this link](https://www150.statcan.gc.ca/t1/tbl1/en/cv!recreate.action?pid=1
 Basically you have to customize, select ALL across all the sets and then download.
 
 Tried using data.world in the public project `cottrell/canada` but got frustrated with the API.
+
+
+# Population data
+
+https://www150.statcan.gc.ca/t1/tbl1/en/cv!recreate.action?pid=1710000501&selectedNodeIds=1D1,2D1,3D1,3D7All,3D7,3D13,3D19,3D25,3D31,3D37,3D43,3D49,3D55,3D61,3D67,3D73,3D79,3D85,3D86,3D87,3D88,3D89,3D126,3D132,3D138,3D91,3D92,3D93,3D94,3D95,3D96,3D97,3D98,3D101,3D90,3D105,&checkedLevels=0D1,0D2,1D1,1D2,2D1,2D2,2D3,&refPeriods=20070101,20170101&dimensionLayouts=layout3,layout3,layout3,layout2&vectorDisplay=true

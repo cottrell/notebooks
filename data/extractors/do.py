@@ -1,12 +1,40 @@
 #!/usr/bin/env python
+import pandas as pd
 import pandas_datareader as pdr
 import pandas_datareader.fred as fred
 import os
 
-_data_dir = os.path.join(os.path.expanduser('~/projects/data'))
+_mydir = os.path.dirname(__file__)
 
+_data_dir = os.path.join(os.path.expanduser('~/projects/data'))
 if not os.path.exists(_data_dir):
     os.makedirs(_data_dir)
+
+date_format = '%Y-%m-%d'
+date_ranges = {
+        'bulk': {'start': '2010-01-01', 'end': '2018-12-09'}
+        }
+
+def get_sources():
+    sources_filename = os.path.join(_mydir, 'sources.csv')
+    return pd.read_csv(sources_filename)
+
+def render_date_arg(start, end=None):
+    """
+    start = 'bulk' to use hard coded bulk range.
+    """
+    parse = lambda x: datetime.datetime.strptime(x, date_format).date()
+    if end in date_ranges:
+        start = parse(date_ranges[start]['start'])
+        end = parse(date_ranges[start]['end'])
+    else:
+        if isinstance(end, str):
+            end = parse(end)
+        if start is None:
+            start = end - datetime.timedelta(days=1)
+        elif isinstance(start, str):
+            start = parse(start)
+    return start, end
 
 # utils
 import pyarrow as pa
@@ -14,6 +42,13 @@ import pyarrow.parquet as pq
 def write_parquet(df, filename, partition_cols=None, preseve_index=False):
     table = pa.Table.from_pandas(df, preserve_index=False)
     pq.write_to_dataset(table, root_path=filename, partition_cols=partition_cols, preserve_index=preserve_index)
+
+def get_data(name, symbol, start, end):
+    pdr.DataReader(symbol, data_source=name, start=start, end=end)
+
+class ImpureObservation():
+    def __init__(self, fun):
+        self.fun = fun
 
 # notes: you need all of this to use joblib and get the filename before calling! what is joblib actually missing if you simply return the location of the CACHED file?
 # pdr.memory.cached_requests_get.store_backend.location
