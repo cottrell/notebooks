@@ -1,3 +1,6 @@
+"""
+No date stuff yet just pulls the bulks.
+"""
 import requests
 import functools
 import tempfile
@@ -10,14 +13,9 @@ import quandl
 import os
 from mylib.tools import run_tasks_in_parallel
 
-# _mydir = os.path.dirname(os.path.realpath(__file__))
-_basedir = os.path.join(os.path.expanduser('~/projects/data/extractor=quandl'))
-_datadir = os.path.join(_basedir, 'data')
-_metadatadir = os.path.join(_basedir, 'metadata')
-def mkdir_if_needed(k):
-    if not os.path.exists(k):
-        print('mkdir {}'.format(k))
-        os.makedirs(k)
+from .. import lib
+_mydir, _myname, _basedir, _datadir, _metadatadir = lib.say_my_name()
+
 for k in [_basedir, _datadir, _metadatadir]:
     mkdir_if_needed(k)
 

@@ -1,14 +1,12 @@
 #!/usr/bin/env python
+"""
+"""
 import pandas as pd
 import pandas_datareader as pdr
 import pandas_datareader.fred as fred
 import os
-
-_mydir = os.path.dirname(__file__)
-
-_data_dir = os.path.join(os.path.expanduser('~/projects/data'))
-if not os.path.exists(_data_dir):
-    os.makedirs(_data_dir)
+from .. import lib
+_mydir, _myname, _basedir, _datadir, _metadatadir = lib.say_my_name()
 
 date_format = '%Y-%m-%d'
 date_ranges = {
