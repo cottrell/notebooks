@@ -8,38 +8,13 @@ import os
 from .. import lib
 _mydir, _myname, _basedir, _datadir, _metadatadir = lib.say_my_name()
 
-date_format = '%Y-%m-%d'
-date_ranges = {
-        'bulk': {'start': '2010-01-01', 'end': '2018-12-09'}
-        }
+def get_fred_tag_rate_daily(tag='rate,daily'):
+    df = fred.get_series_by_tag('rate,daily')
+    filename = os.path.join(_metadatadir, 'parquet', name + '.parquet')
 
 def get_sources():
     sources_filename = os.path.join(_mydir, 'sources.csv')
     return pd.read_csv(sources_filename)
-
-def render_date_arg(start, end=None):
-    """
-    start = 'bulk' to use hard coded bulk range.
-    """
-    parse = lambda x: datetime.datetime.strptime(x, date_format).date()
-    if end in date_ranges:
-        start = parse(date_ranges[start]['start'])
-        end = parse(date_ranges[start]['end'])
-    else:
-        if isinstance(end, str):
-            end = parse(end)
-        if start is None:
-            start = end - datetime.timedelta(days=1)
-        elif isinstance(start, str):
-            start = parse(start)
-    return start, end
-
-# utils
-import pyarrow as pa
-import pyarrow.parquet as pq
-def write_parquet(df, filename, partition_cols=None, preseve_index=False):
-    table = pa.Table.from_pandas(df, preserve_index=False)
-    pq.write_to_dataset(table, root_path=filename, partition_cols=partition_cols, preserve_index=preserve_index)
 
 def get_data(name, symbol, start, end):
     pdr.DataReader(symbol, data_source=name, start=start, end=end)
@@ -70,11 +45,3 @@ class ImpureObservation():
 # In [69]: pdr.memory.cached_requests_get.store_backend.contains_item(('pandas_datareader/memory/cached_requests_get', '9bfe189d9b33cbe8965991a1d0a77227'))
 # Out[69]: True
 
-
-def something(x, a=1):
-    print(a)
-    return x, a
-
-
-def get_fred_tag_rate_daily():
-    df = fred.get_series_by_tag('rate,daily')

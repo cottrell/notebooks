@@ -3,10 +3,6 @@ No date stuff yet just pulls the bulks.
 """
 import requests
 import functools
-import tempfile
-import logging
-import threading
-import shutil
 import json
 import pandas as pd
 import quandl
@@ -63,12 +59,12 @@ def get_bulk_zip(dbname, return_data=False, force=False):
         print('{} exists set force=True to repull'.format(filename_zip))
     return filename_zip
 
-# no idea wher this is in the api
 def get_metadata(name, return_data=False, force=False, cleanup=False):
+    # no idea where this is in the api
     print('getting metadata for {}'.format(name))
     filename_zip = os.path.join(_metadatadir, 'raw', name + '.zip')
     filename = os.path.join(_metadatadir, 'parquet', name + '.parquet')
-    mkdir_if_needed(os.path.dirname(filename_zip))
+    mkdir_if_needed(os.path.dirname(filename))
     mkdir_if_needed(os.path.dirname(filename_zip))
     if not os.path.exists(filename) or force:
         print('{} does not exist'.format(filename))
@@ -81,34 +77,14 @@ def get_metadata(name, return_data=False, force=False, cleanup=False):
         else:
             print('{} exists. set force to True to repull'.format(filename_zip))
         df = pd.read_csv(filename_zip, compression='zip')
-        try_convert_inplace(df)
+        lib.try_convert_inplace(df)
         if os.path.exists(filename):
-            move_and_remove_nonblocking(filename)
-        print('writing {}'.format(filename))
-        write_parquet(df, filename)
+            lib.move_and_remove_nonblocking(filename)
+        lib.write_parquet(df, filename)
         if cleanup:
-            move_and_remove_nonblocking(filename_zip)
+            lib.move_and_remove_nonblocking(filename_zip)
     else:
         print('{} exists. set force to True to repull'.format(filename))
     if return_data:
         return pd.read_parquet(filename)
-
-def try_convert_inplace(df):
-    for k in df:
-        try:
-            df[k] = pd.to_datetime(df[k])
-        except Exception as e:
-            continue
-
-import pyarrow as pa
-import pyarrow.parquet as pq
-def write_parquet(df, filename, partition_cols=None, preserve_index=False):
-    table = pa.Table.from_pandas(df, preserve_index=False)
-    pq.write_to_dataset(table, root_path=filename, partition_cols=partition_cols, preserve_index=preserve_index)
-
-def move_and_remove_nonblocking(path):
-    tempdir = tempfile.mkdtemp()
-    logging.warning("mv %s %s && rmdir %s &" % (path, tempdir, tempdir))
-    shutil.move(path, tempdir)
-    threading.Thread(target=shutil.rmtree, args=[tempdir]).start()
 

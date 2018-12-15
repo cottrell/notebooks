@@ -1,5 +1,7 @@
 from ratelimit import limits, sleep_and_retry
 from joblib import Memory
+import superbasic
+import joblib
 import os
 import pandas as pd
 import numpy as np
@@ -10,7 +12,7 @@ cachedir = os.path.join(_mydir, 'joblib_cache')
 A = nr.randn(100000, 50)
 df = pd.DataFrame(A)
 
-memory = Memory(cachedir, verbose=1)
+memory = Memory(cachedir, verbose=10, backend='superbasic')
 
 # @sleep_and_retry
 # @limits(calls=1, period=_period_seconds)
@@ -20,9 +22,19 @@ _period_seconds = 1
 def f(x):
     print("more")
     print("here!")
-    df = pd.DataFrame(np.random.randn(1000000, 5))
+    df = pd.DataFrame(np.random.randn(100, 5))
     df['category'] = 'something'
-    return df
+    return {'a': df , 'b': [1,2,3,], 'c': 'this is ok'}
+
+def dumb(fun):
+    def inner(*args, **kwargs):
+        args = []
+
+
+@memory.cache
+def g(x, y):
+    print('g')
+    return x + y
 
 # see do.f.call(1) and do.f.clear() for forcing/reseting etc
 
