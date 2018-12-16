@@ -48,7 +48,7 @@ class WSClient(object):
     def start(self):
         websocket_connect(
             self.url,
-            self.ioloop,
+        #     self.ioloop, # no longer takes this arg?
             callback=self.on_connected,
             on_message_callback=self.on_message)
         self.ioloop.start()
