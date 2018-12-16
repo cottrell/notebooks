@@ -36,10 +36,12 @@ def run_command_get_output(cmd, shell=True, splitlines=True):
         err = err.split('\n')
     return dict(out=out, err=err, status=status)
 
-def convert_to_categorical_inplace(df):
+def convert_to_categorical_inplace(df, thresh_hold=1000, na_value='None'):
     for k in df:
         if df[k].dtype.name in ('object', 'str'):
-            df[k] = df[k].astype('category')
+            df[k] = df[k].fillna('None')
+            if df[k].nunique() < thresh_hold:
+                df[k] = df[k].astype('category')
 
 def dict_of_lists_to_dict(d):
     r = dict()
