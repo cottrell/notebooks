@@ -29,7 +29,7 @@ def standard_filename_generator(*args, **kwargs):
     # might need tuple ordering: TODO
     if kwargs:
         raise Exception('nip')
-    return 'data'
+    return ''
 
 class StandardExtractorAppender():
     # no partitioning for now
@@ -50,9 +50,12 @@ class StandardExtractorAppender():
         target = os.path.join(_trash,
                 os.path.basename(self.basedir) + datetime.datetime.now().isoformat())
         try:
+            print('{} -> {}'.format(self.basedir, target))
             shutil.move(self.basedir, target)
         except Exception as e:
             print('no dir to clear {}'.format(self.basedir))
+    def load(self):
+        return pd.read_parquet(self.basedir)
     def call(self, *args, **kwargs):
         """ Call only. No write """
         now = datetime.datetime.now()
@@ -98,7 +101,9 @@ class StandardExtractorAppender():
                 if mask.any():
                     write_parquet(df.iloc[mask], filename)
                 else:
-                    print('no new entries. not appending anything.')
+                    print('no new entries. not appending anything')
+        print('ls -l {}'.format(filename))
+        os.system('ls -l {}'.format(filename))
 
 
 import traceback
@@ -157,7 +162,7 @@ def render_date_arg(start, end=None):
 
 def write_parquet(df, filename, partition_cols=None, preserve_index=False):
     """ write parquet dataset. *appends* to existing data. """
-    print('writing {}'.format(filename))
+    print('writing to {}'.format(filename))
     table = pa.Table.from_pandas(df, preserve_index=False)
     pq.write_to_dataset(table, root_path=filename, partition_cols=partition_cols, preserve_index=preserve_index)
 
