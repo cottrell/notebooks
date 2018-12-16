@@ -32,9 +32,13 @@ def standard_filename_generator(*args, **kwargs):
     return ''
 
 class StandardExtractorAppender():
-    # no partitioning for now
-    # always call, then diff and append if differences
-    # add timestamp
+    """
+    Single file! Use partitioning if you need to split it do not add complicated accessors for load.
+
+    No partitioning for now.
+
+    Each call adds a timestamp col. Writes only new entries.
+    """
     def __init__(self, fun, filename=None, arg_gen=None):
         self.name = get_name(fun)
         self.fun = fun

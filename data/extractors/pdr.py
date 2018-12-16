@@ -16,6 +16,6 @@ def get_fred_meta_rate_daily():
 # def get_sources():
 #     sources_filename = os.path.join(_mydir, 'sources.csv')
 #     return pd.read_csv(sources_filename)
-# 
+#
 # def get_data(name, symbol, start, end):
 #     pdr.DataReader(symbol, data_source=name, start=start, end=end)
