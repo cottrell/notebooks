@@ -37,6 +37,16 @@ def standard_arg_generator():
 def standard_filename_generator():
     return ''
 
+def move_to_trash(filename_or_dirname):
+    mkdir_if_needed(_trash)
+    target = os.path.join(_trash,
+            os.path.basename(filename_or_dirname) + '.' + datetime.datetime.now().isoformat())
+    try:
+        print('{} -> {}'.format(filename_or_dirname, target))
+        shutil.move(filename_or_dirname, target)
+    except Exception as e:
+        print('no dir to clear {}'.format(filename_or_dirname))
+
 class StandardExtractorAppender():
     """
     Single file (per filename_generator args)!
@@ -57,16 +67,8 @@ class StandardExtractorAppender():
         return os.path.join(self.basedir, self._filename_generator(*args, **kwargs))
     def clear(self):
         """ Move entire dir to trash. Dangerous. TODO """
-        mkdir_if_needed(_trash)
-        target = os.path.join(_trash,
-                os.path.basename(self.basedir) + '.' + datetime.datetime.now().isoformat())
         print('clear {} manually for now. Dangerous'.format(self.basedir))
         return
-        try:
-            print('{} -> {}'.format(self.basedir, target))
-            shutil.move(self.basedir, target)
-        except Exception as e:
-            print('no dir to clear {}'.format(self.basedir))
     def load(self, *args, **kwargs):
         if args or kwargs:
             filename = self.filename(*args, **kwargs)

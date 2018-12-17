@@ -2,6 +2,7 @@
 No date stuff yet just pulls the bulks.
 API limits are 50k calls a day on logged in free.
 """
+import concurrent
 import gzip
 import zipfile
 import requests
@@ -14,6 +15,7 @@ import os
 from mylib.tools import run_tasks_in_parallel, run_command_get_output, dict_of_lists_to_dict, invert_dict
 from . import lib
 import tempfile
+from mylib import bok, wok
 
 _mydir, _myname = lib.say_my_name()
 
@@ -56,13 +58,55 @@ def get_bulk_zip(dbname, force=False):
     return filename
 
 def split_bulk_zip(filename):
-    pass
+    """Split the bulk file into separate chunks by part of symbol.
+    Best guess at the moment. Even the column data appears to be messed up.
+    currenly always override
+    """
+    print('splitting {}'.format(filename))
+    assert filename.endswith('.zip')
+    dirname = filename[:-4]
+    if os.path.exists(dirname):
+        lib.move_to_trash(dirname)
+    lib.mkdir_if_needed(dirname)
+    zf = zipfile.ZipFile(filename)
+    # this will likely be pretty slow in python
+    symbol_last = ''
+    for y in zf.infolist():
+        for x in zf.open(y):
+            symbol = x.split(b',', 1)[0].split(b'_')[0]
+            if symbol_last != symbol:
+                outfile = os.path.join(dirname, symbol.decode())
+                print('opening {}'.format(outfile))
+                writer = open(outfile, 'ab')
+            writer.write(x)
+            symbol_last = symbol
 
+def open_zipfile(filename):
+    zf = zipfile.ZipFile(filename)
+    for y in zf.infolist():
+        for x in zf.open(y):
+            yield x
 
-def get_all_bulks_and_missing_headers():
+# column analysis
+# In [34]: set(map(lambda x: (x.split(b',', 1)[0], x.find(b',')),  q.open_zipfile(os.path.expanduser('~/projects/data/tmp/LBMA.zip'))))
+# Out[34]: {(b'DAILY', 5), (b'GOFO', 4), (b'GOLD', 4), (b'SILVER', 6)}
+
+# UGID is all over the place
+# In [38]: a = set(map(lambda x: (x.split(b',', 1)[0], x.find(b',')),  q.open_zipfile(os.path.expanduser('~/projects/data/tmp/UGID.zip'))))
+# In [39]: len(a)
+# Out[39]: 8831
+
+def get_all_bulks_and_missing_headers(max_workers=10):
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
+    fut = list()
     for k in _bulk_downloadable:
-        get_bulk_zip(k)
-        get_missing_headers(k) # mostly this should no-op after first setup
+        filename = get_bulk_zip(k)
+        if k in ['LBMA', 'UGID']:
+            split_bulk_zip(filename)
+            # fut.append(executor.submit(split_bulk_zip, filename))
+            # seems like only LBMA AND UGID have varying cols
+            get_missing_headers(k) # mostly this should no-op after first setup
+    res = [x.result() for x in fut]
 
 def get_header(ticker):
     start, end = lib.render_date_arg(start='oneweek')
@@ -72,15 +116,23 @@ def get_header(ticker):
 
 def get_missing_headers(dbname):
     global _headers
-    filename = _zip_filename(dbname)
-    changed = False
-    for symbol in get_symbols_from_zipfile(filename):
-        ticker = '{}/{}'.format(dbname, symbol)
-        if ticker not in _headers:
-            _headers[ticker] = get_header(ticker)
-            changed = True
-    if changed:
-        _dump_headers()
+    if dbname in ['LBMA', 'UGID']:
+        filename = _zip_filename(dbname)
+        changed = False
+        for symbol in get_symbols_from_zipfile(filename):
+            ticker = '{}/{}'.format(dbname, symbol)
+            if ticker not in _headers:
+                _headers[ticker] = get_header(ticker)
+                changed = True
+        if changed:
+            print('updating missing headers for {}'.format(dbname))
+            _dump_headers()
+        else:
+            print('no missing headers for {}'.format(dbname))
+    else:
+        # OR GET ANY SINGLE TICKER AND HOPE FOR THE BEST
+        print('skipping get missing headers for {}'.format(dbname))
+        return
 
 # single sysmbol
 @ratelimit.limits(calls=50000, period=60*60*24)
@@ -106,7 +158,7 @@ try:
     _headers
 except NameError as e:
     if os.path.exists(_header_filename):
-        _load_headers()()
+        _load_headers()
     else:
         _headers = dict()
 
@@ -123,8 +175,7 @@ def _zip_filename(dbname):
     # _tempdir = '/tmp' # tempfile.mkdtemp()
     tempdir = os.path.join(lib._basedir, 'tmp')
     lib.mkdir_if_needed(tempdir)
-    # TODO: add .zip and move the files
-    return os.path.join(tempdir, dbname)
+    return os.path.join(tempdir, dbname) + '.zip'
 
 def get_quandl_metadata_database(name, force=False, cleanup=False):
     # no idea where this is in the api
