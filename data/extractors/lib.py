@@ -132,6 +132,7 @@ class StandardExtractorAppender():
                     print('no new entries. not appending anything')
         print('ls -l {}'.format(filename))
         os.system('ls -l {}'.format(filename))
+        return filename
 
 
 import traceback
@@ -169,7 +170,11 @@ def render_date_arg(start=None, end=None):
     if start is None:
         start = date_ranges['default']['start']
     if isinstance(start, str):
-        start = parse(start)
+        if start == 'oneweek':
+            end = datetime.date.today()
+            start = end - datetime.timedelta(days=7)
+        else:
+            start = parse(start)
     return start, end
 
 def write_parquet(df, filename, partition_cols=None, preserve_index=False):
