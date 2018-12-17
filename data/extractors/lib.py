@@ -12,10 +12,16 @@ import os
 import sys
 import datetime
 from mylib import bok, wok
+from mylib.tools import run_tasks_in_parallel
 
 _timecol = 'ingress_time'
 _basedir = os.path.expanduser('~/projects/data')
 _trash = os.path.join(_basedir, 'trash')
+
+date_format = '%Y-%m-%d'
+date_ranges = {
+        'default': {'start': '2010-01-01'}
+        }
 
 def get_basedir(extractor_name):
     return os.path.join(_basedir, extractor_name)
@@ -25,41 +31,48 @@ def extractor(**kwargs):
         return StandardExtractorAppender(fun, **kwargs)
     return inner
 
-def standard_filename_generator(*args, **kwargs):
-    # might need tuple ordering: TODO
-    if kwargs:
-        raise Exception('nip')
+def standard_arg_generator():
+    return tuple(), dict()
+
+def standard_filename_generator():
     return ''
 
 class StandardExtractorAppender():
     """
-    Single file! Use partitioning if you need to split it do not add complicated accessors for load.
+    Single file (per filename_generator args)!
+    Use partitioning if you need to split it do not add complicated accessors for load.
 
     No partitioning for now.
 
     Each call adds a timestamp col. Writes only new entries.
     """
-    def __init__(self, fun, filename=None, arg_gen=None):
+    def __init__(self, fun, arg_generator=None, filename_generator=None):
         self.name = get_name(fun)
         self.fun = fun
         self.basedir = get_basedir(self.name)
         # actually a dirname
-        self._filename_generator = standard_filename_generator if filename is None else filename
-        self.arg_gen = arg_gen # for examples, nip
+        self._filename_generator = standard_filename_generator if filename_generator is None else filename_generator
+        self._arg_generator = standard_arg_generator if arg_generator is None else arg_generator
     def filename(self, *args, **kwargs):
         return os.path.join(self.basedir, self._filename_generator(*args, **kwargs))
     def clear(self):
         """ Move entire dir to trash. Dangerous. TODO """
         mkdir_if_needed(_trash)
         target = os.path.join(_trash,
-                os.path.basename(self.basedir) + datetime.datetime.now().isoformat())
+                os.path.basename(self.basedir) + '.' + datetime.datetime.now().isoformat())
+        print('clear {} manually for now. Dangerous'.format(self.basedir))
+        return
         try:
             print('{} -> {}'.format(self.basedir, target))
             shutil.move(self.basedir, target)
         except Exception as e:
             print('no dir to clear {}'.format(self.basedir))
-    def load(self):
-        return pd.read_parquet(self.basedir)
+    def load(self, *args, **kwargs):
+        if args or kwargs:
+            filename = self.filename(*args, **kwargs)
+        else:
+            filename = self.basedir
+        return pd.read_parquet(filename)
     def call(self, *args, **kwargs):
         """ Call only. No write """
         now = datetime.datetime.now()
@@ -67,6 +80,14 @@ class StandardExtractorAppender():
         df[_timecol] = now
         convert_to_categorical_inplace(df)
         return df
+    def get_all(self, max_workers=1, wait=True, raise_exceptions=False, run=True):
+        # watch out for throttle/block
+        tasks = [functools.partial(self, *args, **kwargs) for args, kwargs in self._arg_generator()]
+        if not run:
+            return tasks
+        r = run_tasks_in_parallel(*tasks, max_workers=max_workers,
+                wait=wait, raise_exceptions=raise_exceptions)
+        return r
     def __call__(self, *args, **kwargs):
         """ call and write *new entries* to file.
 
@@ -84,25 +105,28 @@ class StandardExtractorAppender():
             cols = [x for x in df_orig.columns if x != _timecol]
             a = pd.util.hash_pandas_object(df_orig[cols], index=False)
             b = pd.util.hash_pandas_object(df[cols], index=False)
-            same = set(b).intersection(set(a))
-            if len(same) == 0:
+            hashes_in_both = set(b).intersection(set(a))
+            if len(hashes_in_both) == 0:
                 # all new, nothing to check unless read write is busted`
-                print('{} new entries.'.format(len(df.shape[0])))
+                print('{} (100%) new entries.'.format(len(df.shape[0])))
                 write_parquet(df, filename)
             else:
-                # are sames actually same?
+                new_hashes_or_values = set(b) - set(a)
+                # for hashes in both, check if values are actually the same
+
                 # index is NOT used so can mess with it
                 df_orig.index = a.values
                 df.index = b.values
-                same = list(same) # not sure if needed
+
                 # use == bc safer on case of nan etc
-                same_but_diff = ~(df.loc[same][cols] == df.loc[same][cols]).all(axis=1)
-                mask = same_but_diff.values
-                if any(same_but_diff):
+                same_hashes_different_values = ~(df.loc[hashes_in_both][cols] == df_orig.loc[hashes_in_both][cols]).all(axis=1)
+                same_hashes_different_values = set(same_hashes_different_values[same_hashes_different_values].index)
+                if same_hashes_different_values:
                     print('found same but diff. this is unusual.')
-                    different = ~df.index.isin(same)
-                    mask = mask | different
-                if mask.any():
+                    new_hashes_or_values.update(same_hashes_different_values)
+                if new_hashes_or_values:
+                    mask = df.index.isin(new_hashes_or_values)
+                    print('{} out of {} new entries.'.format(mask.shape[0], df.shape[0]))
                     write_parquet(df.iloc[mask], filename)
                 else:
                     print('no new entries. not appending anything')
@@ -127,14 +151,7 @@ def say_my_name(depth=-1):
     mydir = os.path.dirname(filename)
     if myname == '__init__':
         myname = os.path.basename(mydir)
-    # assert '_extractor' in myname
-    # myname = myname.replace('_extractor', '')
-    basedir = get_basedir(myname)
-    datadir = os.path.join(basedir, 'data')
-    metadatadir = os.path.join(basedir, 'metadata')
-    # TODO: consider named tuple
-    dirs = [mkdir_if_needed(x) for x in [mydir, myname, basedir, datadir, metadatadir]]
-    return dirs
+    return [mydir, myname]
 
 def mkdir_if_needed(k):
     if not os.path.exists(k):
@@ -142,31 +159,22 @@ def mkdir_if_needed(k):
         os.makedirs(k)
     return k
 
-date_format = '%Y-%m-%d'
-date_ranges = {
-        'bulk': {'start': '2010-01-01', 'end': '2018-12-09'}
-        }
-
-def render_date_arg(start, end=None):
-    """
-    start = 'bulk' to use hard coded bulk range.
-    """
+def render_date_arg(start=None, end=None):
+    """ None means defaults. """
     parse = lambda x: datetime.datetime.strptime(x, date_format).date()
-    if end in date_ranges:
-        start = parse(date_ranges[start]['start'])
-        end = parse(date_ranges[start]['end'])
-    else:
-        if isinstance(end, str):
-            end = parse(end)
-        if start is None:
-            start = end - datetime.timedelta(days=1)
-        elif isinstance(start, str):
-            start = parse(start)
+    if end is None:
+        end = datetime.date.today()
+    elif isinstance(end, str):
+        end = parse(end)
+    if start is None:
+        start = date_ranges['default']['start']
+    if isinstance(start, str):
+        start = parse(start)
     return start, end
 
 def write_parquet(df, filename, partition_cols=None, preserve_index=False):
     """ write parquet dataset. *appends* to existing data. """
-    print('writing to {}'.format(filename))
+    print('writing df.shape = {} to {}'.format(df.shape, filename))
     table = pa.Table.from_pandas(df, preserve_index=False)
     pq.write_to_dataset(table, root_path=filename, partition_cols=partition_cols, preserve_index=preserve_index)
 
