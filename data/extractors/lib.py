@@ -80,7 +80,7 @@ class StandardExtractorAppender():
         df[_timecol] = now
         convert_to_categorical_inplace(df)
         return df
-    def get_all(self, max_workers=1, wait=True, raise_exceptions=False, run=True):
+    def get_all(self, max_workers=2, wait=True, raise_exceptions=False, run=True):
         # watch out for throttle/block
         tasks = [functools.partial(self, *args, **kwargs) for args, kwargs in self._arg_generator()]
         if not run:

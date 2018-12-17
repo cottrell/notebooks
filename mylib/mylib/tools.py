@@ -69,6 +69,11 @@ def invert_dict(d):
 def df_to_schema_tuples(df):
     return list(df.dtypes.map(lambda x: x.name).items())
 
+def apply_schema_to_df_inplace(df, schema):
+    for k in df.columns:
+        if df[k].dtype.name != schema[k]:
+            df[k] = df[k].astype(schema[k])
+
 def schedule_coroutine(target, *, loop=None):
     """Schedules target coroutine in the given event loop
 
