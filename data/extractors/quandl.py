@@ -6,11 +6,12 @@ import gzip
 import zipfile
 import requests
 import functools
+import ratelimit
 import json
 import pandas as pd
 import quandl
 import os
-from mylib.tools import run_tasks_in_parallel, dict_of_lists_to_dict, invert_dict
+from mylib.tools import run_tasks_in_parallel, run_command_get_output, dict_of_lists_to_dict, invert_dict
 from . import lib
 import tempfile
 
@@ -20,6 +21,23 @@ token = json.load(open(os.path.expanduser('~/.cred/quandl/auth.json')))['APIKEY'
 quandl.save_key(token)
 
 _bulk_downloadable = ['LBMA', 'UGID', 'OECD', 'ECONOMIST', 'FRED', 'OSE', 'SHFE']
+
+def _get_bulk_args():
+    pass
+
+def _bulk_filename():
+    pass
+
+@lib.extractor(
+        arg_generator=_get_bulk_args,
+        filename_generator=_bulk_filename
+        )
+def get_quandl_bulkable(db, name, start=None, end=None):
+    # get the zip, then do the thing
+    filename = get_bulk_zip(db)
+    # df = pd.read_csv(pd.compat.StringIO(df_str), sep=r'\s*\|\s*', engine='python')
+    df = pd.read_csv(filename, compression='zip')
+
 
 def get_bulk_zip(dbname, force=False):
     if dbname not in _bulk_downloadable:
@@ -31,9 +49,15 @@ def get_bulk_zip(dbname, force=False):
         db = quandl.Database(dbname)
         lib.mkdir_if_needed(os.path.dirname(filename))
         db.bulk_download_to_file(filename, params=dict(api_key=token))
+        get_missing_headers(dname)
     else:
         print('{} exists set force=True to repull'.format(filename))
+    # split TODO: move into if above
     return filename
+
+def split_bulk_zip(filename):
+    pass
+
 
 def get_all_bulks_and_missing_headers():
     for k in _bulk_downloadable:
@@ -49,23 +73,20 @@ def get_header(ticker):
 def get_missing_headers(dbname):
     global _headers
     filename = _zip_filename(dbname)
+    changed = False
     for symbol in get_symbols_from_zipfile(filename):
         ticker = '{}/{}'.format(dbname, symbol)
         if ticker not in _headers:
             _headers[ticker] = get_header(ticker)
-
-
-
-
+            changed = True
+    if changed:
+        _dump_headers()
 
 # single sysmbol
+@ratelimit.limits(calls=50000, period=60*60*24)
 def get_from_quandl(code=None, start=None, end=None, **kwargs):
     start, end = lib.render_date_arg(start, end)
     return quandl.get(code, trim_start=start, authtoken=token, trim_end=end, **kwargs).reset_index()
-
-def get_headers(db):
-    # loop through every simple in the bulk file and extract the headers
-    pass
 
 def _load_headers():
     global _headers
@@ -75,6 +96,7 @@ def _load_headers():
     _headers = d
 
 def _dump_headers():
+    print('saving headers')
     d = {k: ','.join(v) for k, v in _headers.items()}
     d = invert_dict(d)
     json.dump(d, open(_header_filename, 'w'), indent=4, sort_keys=True)
@@ -101,37 +123,8 @@ def _zip_filename(dbname):
     # _tempdir = '/tmp' # tempfile.mkdtemp()
     tempdir = os.path.join(lib._basedir, 'tmp')
     lib.mkdir_if_needed(tempdir)
+    # TODO: add .zip and move the files
     return os.path.join(tempdir, dbname)
-
-def _get_bulk_args():
-    pass
-
-def _bulk_filename():
-    pass
-
-@lib.extractor(
-        arg_generator=_get_bulk_args,
-        filename_generator=_bulk_filename
-        )
-def get_quandl_bulkable(db, name, start=None, end=None):
-    # get the zip, then do the thing
-    filename = get_bulk_zip(db)
-    df = pd.read_csv(filename, compression='zip')
-
-
-# def get_all(force=False, cleanup=False):
-#     dbnames = get_list()
-#     tasks_meta = [functools.partial(get_metadata, k) for k in dbnames]
-#     tasks_bulk = [functools.partial(get_bulk_zip, k) for k in _bulk_downloadable] # hard coded
-#     tasks = tasks_meta + tasks_bulk
-#     print('running {} tasks'.format(len(tasks)))
-#     run_tasks_in_parallel(*tasks, max_workers=20)
- 
- 
-# def get_list():
-#     db = quandl.Database('')
-#     a = db.all()
-#     return [x.code for x in a]
 
 def get_quandl_metadata_database(name, force=False, cleanup=False):
     # no idea where this is in the api
@@ -152,3 +145,19 @@ def get_quandl_metadata_database(name, force=False, cleanup=False):
     if cleanup:
         lib.move_and_remove_nonblocking(filename_zip)
     return df
+
+
+# def get_all(force=False, cleanup=False):
+#     dbnames = get_list()
+#     tasks_meta = [functools.partial(get_metadata, k) for k in dbnames]
+#     tasks_bulk = [functools.partial(get_bulk_zip, k) for k in _bulk_downloadable] # hard coded
+#     tasks = tasks_meta + tasks_bulk
+#     print('running {} tasks'.format(len(tasks)))
+#     run_tasks_in_parallel(*tasks, max_workers=20)
+ 
+ 
+# def get_list():
+#     db = quandl.Database('')
+#     a = db.all()
+#     return [x.code for x in a]
+
