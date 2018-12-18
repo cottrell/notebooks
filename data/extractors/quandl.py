@@ -24,21 +24,23 @@ quandl.save_key(token)
 
 _bulk_downloadable = ['LBMA', 'UGID', 'OECD', 'ECONOMIST', 'FRED', 'OSE', 'SHFE']
 
-def _get_bulk_args():
-    pass
-
-def _bulk_filename():
-    pass
+def _bulk_filename(db, **kwargs):
+    return 'db={}'.format(db)
 
 @lib.extractor(
-        arg_generator=_get_bulk_args,
         filename_generator=_bulk_filename
         )
-def get_quandl_bulkable(db, name, start=None, end=None):
-    # get the zip, then do the thing
-    filename = get_bulk_zip(db)
-    # df = pd.read_csv(pd.compat.StringIO(df_str), sep=r'\s*\|\s*', engine='python')
-    df = pd.read_csv(filename, compression='zip')
+def get_quandl_bulk(db, start=None, end=None, nrows=None):
+    filename = get_bulk_zip(db) # should be no op, force to repull
+    if db in ['FRED', 'OECD', 'ECONOMIST', 'OSE', 'SHFE']:
+        columns = _headers[db]
+        print('reading {}'.format(filename))
+        df = pd.read_csv(filename, compression='zip', nrows=nrows)
+        print('df.shape={}'.format(df.shape))
+        df.columns = columns
+    else:
+        raise Exception('nip')
+    return df
 
 
 def get_bulk_zip(dbname, force=False):

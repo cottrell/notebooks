@@ -49,6 +49,9 @@ def move_to_trash(filename_or_dirname):
 
 class StandardExtractorAppender():
     """
+    Oriented around the DATA PULLING process and efficient updates/diff checks
+    Not how you would like it to be stored for later.
+
     Single file (per filename_generator args)!
     Use partitioning if you need to split it do not add complicated accessors for load.
 
@@ -79,8 +82,14 @@ class StandardExtractorAppender():
         """ Call only. No write """
         now = datetime.datetime.now()
         df = self.fun(*args, **kwargs)
-        df[_timecol] = now
-        convert_to_categorical_inplace(df)
+        def transform(df);
+            df[_timecol] = now
+            convert_to_categorical_inplace(df)
+            return df
+        if isinstance(df, types.GeneratorType):
+            df = map(transform, df)
+        else:
+            df = transform(df)
         return df
     def get_all(self, max_workers=2, wait=True, raise_exceptions=False, run=True):
         # watch out for throttle/block
