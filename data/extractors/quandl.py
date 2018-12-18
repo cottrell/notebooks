@@ -51,7 +51,6 @@ def get_bulk_zip(dbname, force=False):
         db = quandl.Database(dbname)
         lib.mkdir_if_needed(os.path.dirname(filename))
         db.bulk_download_to_file(filename, params=dict(api_key=token))
-        get_missing_headers(dname)
     else:
         print('{} exists set force=True to repull'.format(filename))
     # split TODO: move into if above
@@ -61,6 +60,8 @@ def split_bulk_zip(filename):
     """Split the bulk file into separate chunks by part of symbol.
     Best guess at the moment. Even the column data appears to be messed up.
     currenly always override
+
+    ONLY DO THIS FOR LBMA or UGID.
     """
     print('splitting {}'.format(filename))
     assert filename.endswith('.zip')
@@ -116,23 +117,29 @@ def get_header(ticker):
 
 def get_missing_headers(dbname):
     global _headers
+    filename = _zip_filename(dbname)
     if dbname in ['LBMA', 'UGID']:
-        filename = _zip_filename(dbname)
         changed = False
         for symbol in get_symbols_from_zipfile(filename):
             ticker = '{}/{}'.format(dbname, symbol)
             if ticker not in _headers:
                 _headers[ticker] = get_header(ticker)
                 changed = True
-        if changed:
-            print('updating missing headers for {}'.format(dbname))
-            _dump_headers()
-        else:
-            print('no missing headers for {}'.format(dbname))
     else:
-        # OR GET ANY SINGLE TICKER AND HOPE FOR THE BEST
-        print('skipping get missing headers for {}'.format(dbname))
-        return
+        if dbname not in _headers:
+            # else, get first ticker and assume all cols are the same
+            for symbol in get_symbols_from_zipfile(filename):
+                break
+            ticker = '{}/{}'.format(dbname, symbol)
+            print('geting one header from {} for all of {}'.format(ticker, dbname))
+            print("PROBABLY BEST TO GET THE HEADERS MANUALLY!")
+            _headers[dbname] = get_header(ticker)
+            changed = True
+    if changed:
+        print('updating missing headers for {}'.format(dbname))
+        _dump_headers()
+    else:
+        print('no missing headers for {}'.format(dbname))
 
 # single sysmbol
 @ratelimit.limits(calls=50000, period=60*60*24)
