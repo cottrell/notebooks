@@ -1,4 +1,7 @@
 import inspect
+import time
+import concurrent
+from contextlib import contextmanager
 import glob
 import pandas as pd
 import functools
@@ -31,12 +34,6 @@ def extractor(**kwargs):
         return StandardExtractorAppender(fun, **kwargs)
     return inner
 
-def standard_arg_generator():
-    return tuple(), dict()
-
-def standard_filename_generator():
-    return ''
-
 def move_to_trash(filename_or_dirname):
     mkdir_if_needed(_trash)
     target = os.path.join(_trash,
@@ -47,67 +44,114 @@ def move_to_trash(filename_or_dirname):
     except Exception as e:
         print('no dir to clear {}'.format(filename_or_dirname))
 
+def partition_enforcer(partition_cols):
+    def inner(fun):
+        def _inner(*args, **kwargs):
+            for partition_dict, df in fun(*args, **kwargs):
+                for k in partition_dict:
+                    if k in df.columns:
+                        raise Exception('{} found in partition_dict *and* df.columns! Not allowed.')
+                pcols = [x for x in partition_cols if x not in partition_dict]
+                if pcols:
+                    g = df.groupby(pcols)
+                    pdict = dict(partition_dict)
+                    for k, v in g:
+                        if not isinstance(k, tuple):
+                            k = (k,)
+                        pdict.update(dict(zip(pcols, k)))
+                        v = v.drop(pcols, axis=1)
+                        yield pdict, v
+                else:
+                    yield partition_dict, df
+        return _inner
+    return inner
+
+@contextmanager
+def dumblock(dirname):
+    """ requires write access to location of dirname """
+    lockdir = os.path.join(dirname, '_lock')
+    locked = False
+    attempts = 0
+    sleepseconds = 1
+    # TODO: test on kill, is not removing lockdir
+    while not locked:
+        try:
+            os.makedirs(lockdir)
+            locked = True
+        except FileExistsError as e:
+            print('{} exists. attempt {}. sleeping {}'.format(lockdir, attempts, sleepseconds))
+            time.sleep(sleepseconds)
+        except Exception as e:
+            # only do this on other errors or success, not finally
+            os.rmdir(lockdir)
+            raise e
+    yield
+    os.rmdir(lockdir)
+
 class StandardExtractorAppender():
     """
-    Oriented around the DATA PULLING process and efficient updates/diff checks
+    Oriented around the DATA PULLING process and efficient updates/diff checks.
     Not how you would like it to be stored for later.
 
-    Single file (per filename_generator args)!
-    Use partitioning if you need to split it do not add complicated accessors for load.
-
-    No partitioning for now.
+    fun: must be a generator function.
 
     Each call adds a timestamp col. Writes only new entries.
+
+    Partitions can be given in the partition_dict or the df.
+
+    You do not know the filename before running the function necessarily. This is now changed.
     """
-    def __init__(self, fun, arg_generator=None, filename_generator=None):
+    def __init__(self, fun, partition_cols=None):
+        self.partition_cols = partition_cols
         self.name = get_name(fun)
-        self.fun = fun
+        self.fun = partition_enforcer(partition_cols)(fun)
         self.basedir = get_basedir(self.name)
-        # actually a dirname
-        self._filename_generator = standard_filename_generator if filename_generator is None else filename_generator
-        self._arg_generator = standard_arg_generator if arg_generator is None else arg_generator
-    def filename(self, *args, **kwargs):
-        return os.path.join(self.basedir, self._filename_generator(*args, **kwargs))
+    def filename(self, partition_dict):
+        p = ['{}={}'.format(k, partition_dict[k]) for k in self.partition_cols]
+        p = os.path.join(*p)
+        return os.path.join(self.basedir, p)
     def clear(self):
         """ Move entire dir to trash. Dangerous. TODO """
         print('clear {} manually for now. Dangerous'.format(self.basedir))
         return
-    def load(self, *args, **kwargs):
-        if args or kwargs:
-            filename = self.filename(*args, **kwargs)
-        else:
-            filename = self.basedir
-        return pd.read_parquet(filename)
     def call(self, *args, **kwargs):
-        """ Call only. No write """
-        now = datetime.datetime.now()
-        df = self.fun(*args, **kwargs)
-        def transform(df);
+        """ Call only gen fun directly. Enrich, categorize and group. No write """
+        now = datetime.datetime.now() # not sure which time this should be
+        for partition_dict, df in self.fun(*args, **kwargs):
             df[_timecol] = now
             convert_to_categorical_inplace(df)
-            return df
-        if isinstance(df, types.GeneratorType):
-            df = map(transform, df)
-        else:
-            df = transform(df)
-        return df
-    def get_all(self, max_workers=2, wait=True, raise_exceptions=False, run=True):
-        # watch out for throttle/block
-        tasks = [functools.partial(self, *args, **kwargs) for args, kwargs in self._arg_generator()]
-        if not run:
-            return tasks
-        r = run_tasks_in_parallel(*tasks, max_workers=max_workers,
-                wait=wait, raise_exceptions=raise_exceptions)
-        return r
+            yield partition_dict, df
     def __call__(self, *args, **kwargs):
-        """ call and write *new entries* to file.
+        """Call and write *new entries* to file.
 
-        New entries are computed by diffing to existin.
+        New entries are computed by diffing to existing.
+
+        TODO: lockfile on filename
+
+        this logic is pretty awful, probably a better way to do this with.
         """
-        df = self.call(*args, **kwargs)
-        filename = self.filename(*args, **kwargs)
-        if not os.path.exists(filename):
-            mkdir_if_needed(filename)
+        max_workers = 10
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
+        fut = list()
+        total_rows = 0
+        for partition_dict, df in self.call(*args, **kwargs):
+            total_rows += df.shape[0]
+            filename = self.filename(partition_dict)
+            # maybe_update(filename, df)
+            fut.append(executor.submit(maybe_update, filename, df))
+            print('{} rows processed'.format(total_rows))
+        res = [x.result() for x in fut]
+        # TODO: agg the reports
+        return res
+    def load(self):
+        filename = self.basedir
+        return pd.read_parquet(filename)
+
+def maybe_update(filename, df):
+    report = dict(changed=[], unchanged=[])
+    if not os.path.exists(filename):
+        mkdir_if_needed(filename)
+    with dumblock(filename):
         if len(glob.glob(os.path.join(filename, '*.parquet'))) == 0:
             write_parquet(df, filename)
         else: # a file exists
@@ -119,31 +163,32 @@ class StandardExtractorAppender():
             hashes_in_both = set(b).intersection(set(a))
             if len(hashes_in_both) == 0:
                 # all new, nothing to check unless read write is busted`
-                print('{} (100%) new entries.'.format(len(df.shape[0])))
+                print('{} (100%) new entries.'.format(df.shape[0]))
                 write_parquet(df, filename)
             else:
                 new_hashes_or_values = set(b) - set(a)
                 # for hashes in both, check if values are actually the same
-
                 # index is NOT used so can mess with it
                 df_orig.index = a.values
                 df.index = b.values
-
                 # use == bc safer on case of nan etc
                 same_hashes_different_values = ~(df.loc[hashes_in_both][cols] == df_orig.loc[hashes_in_both][cols]).all(axis=1)
                 same_hashes_different_values = set(same_hashes_different_values[same_hashes_different_values].index)
+                myprint = lambda x: print('{}: {}'.format(x, filename))
                 if same_hashes_different_values:
-                    print('found same but diff. this is unusual.')
+                    myprint('found same but diff. this is unusual.')
                     new_hashes_or_values.update(same_hashes_different_values)
                 if new_hashes_or_values:
                     mask = df.index.isin(new_hashes_or_values)
-                    print('{} out of {} new entries.'.format(mask.shape[0], df.shape[0]))
+                    myprint('{} out of {} new entries.'.format(mask.shape[0], df.shape[0]))
                     write_parquet(df.iloc[mask], filename)
+                    report['changed'].append(filename)
                 else:
-                    print('no new entries. not appending anything')
-        print('ls -l {}'.format(filename))
-        os.system('ls -l {}'.format(filename))
-        return filename
+                    myprint('no new entries. not appending anything')
+                    report['unchanged'].append(filename)
+            # print('ls -l {}'.format(filename))
+            # os.system('ls -l {}'.format(filename))
+    return report
 
 
 import traceback

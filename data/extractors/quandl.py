@@ -24,23 +24,30 @@ quandl.save_key(token)
 
 _bulk_downloadable = ['LBMA', 'UGID', 'OECD', 'ECONOMIST', 'FRED', 'OSE', 'SHFE']
 
-def _bulk_filename(db, **kwargs):
-    return 'db={}'.format(db)
+# NOTES:
+# FRED has about 339619 symbols. 43 mm rows.
 
-@lib.extractor(
-        filename_generator=_bulk_filename
-        )
-def get_quandl_bulk(db, start=None, end=None, nrows=None):
+# @lib.partition_enforcer(['db', 'symbol'])
+@lib.extractor(partition_cols=['db', 'bucket'])
+def get_quandl_bulk(db, start=None, end=None, chunksize=1000000):
     filename = get_bulk_zip(db) # should be no op, force to repull
+    # 43 mm / 32 is about 1-2 mm rows in each bucket
+    bucketizer = lambda df: pd.util.hash_pandas_object(df['symbol'], index=False).mod(32)
     if db in ['FRED', 'OECD', 'ECONOMIST', 'OSE', 'SHFE']:
         columns = _headers[db]
         print('reading {}'.format(filename))
-        df = pd.read_csv(filename, compression='zip', nrows=nrows)
-        print('df.shape={}'.format(df.shape))
-        df.columns = columns
+        if chunksize is None:
+            df = pd.read_csv(filename, compression='zip')
+            df.columns = columns
+            df['bucket'] = bucketizer(df)
+            yield {'db': db}, df
+        else:
+            for df in pd.read_csv(filename, compression='zip', chunksize=chunksize):
+                df.columns = columns
+                df['bucket'] = bucketizer(df)
+                yield {'db': db}, df
     else:
         raise Exception('nip')
-    return df
 
 
 def get_bulk_zip(dbname, force=False):
@@ -99,17 +106,17 @@ def open_zipfile(filename):
 # In [39]: len(a)
 # Out[39]: 8831
 
-def get_all_bulks_and_missing_headers(max_workers=10):
-    executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
-    fut = list()
-    for k in _bulk_downloadable:
-        filename = get_bulk_zip(k)
-        if k in ['LBMA', 'UGID']:
-            split_bulk_zip(filename)
-            # fut.append(executor.submit(split_bulk_zip, filename))
-            # seems like only LBMA AND UGID have varying cols
-            get_missing_headers(k) # mostly this should no-op after first setup
-    res = [x.result() for x in fut]
+# def get_all_bulks_and_missing_headers(max_workers=10):
+#     executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
+#     fut = list()
+#     for k in _bulk_downloadable:
+#         filename = get_bulk_zip(k)
+#         if k in ['LBMA', 'UGID']:
+#             split_bulk_zip(filename)
+#             # fut.append(executor.submit(split_bulk_zip, filename))
+#             # seems like only LBMA AND UGID have varying cols
+#             get_missing_headers(k) # mostly this should no-op after first setup
+#     res = [x.result() for x in fut]
 
 def get_header(ticker):
     start, end = lib.render_date_arg(start='oneweek')

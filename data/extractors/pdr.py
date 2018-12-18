@@ -41,8 +41,6 @@ def apply_schema_to_df_inplace(df, schema):
 
 # 2000 per hour max
 @lib.extractor(
-arg_generator=_get_yahoo_args,
-filename_generator=_yahoo_filename,
 )
 def get_yahoo_price_volume(symbol, start=None, end=None):
     start, end = lib.render_date_arg(start, end)
@@ -59,7 +57,7 @@ def get_yahoo_price_volume(symbol, start=None, end=None):
             }
     df = pdr.DataReader(symbol, data_source='yahoo', start=start, end=end).reset_index()
     apply_schema_to_df_inplace(df, schema)
-    return df
+    yield df
 
 def fix():
     schema = {'Date': 'datetime64[ns]',
