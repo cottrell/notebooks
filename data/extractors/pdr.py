@@ -64,21 +64,21 @@ def get_yahoo_price_volume(symbol, start=None, end=None):
     apply_schema_to_df_inplace(df, schema)
     yield {'product': product, 'symbol': symbol}, df
 
-def fix():
-    schema = {'Date': 'datetime64[ns]',
-            'High': 'float64',
-            'Low': 'float64',
-            'Open': 'float64',
-            'Close': 'float64',
-            'Volume': 'float64',
-            'Adj Close': 'float64',
-            'ingress_time': 'datetime64[ns]'
-            }
-    for k in _get_yahoo_args():
-        filename = get_yahoo_price_volume.filename(*k[0], **k[1])
-        if os.path.exists(filename):
-            df = get_yahoo_price_volume.load(*k[0], **k[1])
-            if df.dtypes.to_dict() != schema:
-                print('bad {}'.format(filename))
-                os.system('rm -rf {}'.format(filename))
+# def fix():
+#     schema = {'Date': 'datetime64[ns]',
+#             'High': 'float64',
+#             'Low': 'float64',
+#             'Open': 'float64',
+#             'Close': 'float64',
+#             'Volume': 'float64',
+#             'Adj Close': 'float64',
+#             'ingress_time': 'datetime64[ns]'
+#             }
+#     for k in _get_yahoo_args():
+#         filename = get_yahoo_price_volume.filename(*k[0], **k[1])
+#         if os.path.exists(filename):
+#             df = get_yahoo_price_volume.load(*k[0], **k[1])
+#             if df.dtypes.to_dict() != schema:
+#                 print('bad {}'.format(filename))
+#                 os.system('rm -rf {}'.format(filename))
 
