@@ -101,18 +101,24 @@ class StandardExtractorAppender():
 
     You do not know the filename before running the function necessarily. This is now changed.
     """
-    def __init__(self, fun, partition_cols=None):
-        self.partition_cols = partition_cols
+    def __init__(self, fun, partition_cols=None, clearable=False):
+        self.partition_cols = [] if partition_cols is None else partition_cols
         self.name = get_name(fun)
-        self.fun = partition_enforcer(partition_cols)(fun)
+        self.fun = partition_enforcer(self.partition_cols)(fun)
         self.basedir = get_basedir(self.name)
+        self.clearable = clearable
     def filename(self, partition_dict):
-        p = ['{}={}'.format(k, partition_dict[k]) for k in self.partition_cols]
-        p = os.path.join(*p)
+        p = ''
+        if self.partition_cols:
+            p = ['{}={}'.format(k, partition_dict[k]) for k in self.partition_cols]
+            p = os.path.join(*p)
         return os.path.join(self.basedir, p)
     def clear(self):
         """ Move entire dir to trash. Dangerous. TODO """
-        print('clear {} manually for now. Dangerous'.format(self.basedir))
+        if self.clearable:
+            move_to_trash(self.basedir)
+        else:
+            print('clear {} manually for now. Dangerous as is large and mistakes costly.'.format(self.basedir))
         return
     def call(self, *args, **kwargs):
         """ Call only gen fun directly. Enrich, categorize and group. No write """
@@ -145,6 +151,7 @@ class StandardExtractorAppender():
         return res
     def load(self):
         filename = self.basedir
+        print('read_parquet {}'.format(self.basedir))
         return pd.read_parquet(filename)
 
 def maybe_update(filename, df):
@@ -172,11 +179,16 @@ def maybe_update(filename, df):
                 df_orig.index = a.values
                 df.index = b.values
                 # use == bc safer on case of nan etc
-                same_hashes_different_values = ~(df.loc[hashes_in_both][cols] == df_orig.loc[hashes_in_both][cols]).all(axis=1)
+                new = df.loc[hashes_in_both][cols]
+                old = df_orig.loc[hashes_in_both][cols]
+                # nans are a pain
+                same_hashes_different_values = ~(
+                        (new ==  old) | (new.isnull() & old.isnull())
+                        ).all(axis=1)
                 same_hashes_different_values = set(same_hashes_different_values[same_hashes_different_values].index)
                 myprint = lambda x: print('{}: {}'.format(x, filename))
                 if same_hashes_different_values:
-                    myprint('found same but diff. this is unusual.')
+                    myprint('found same hashes but diff values. this is unusual.')
                     new_hashes_or_values.update(same_hashes_different_values)
                 if new_hashes_or_values:
                     mask = df.index.isin(new_hashes_or_values)
