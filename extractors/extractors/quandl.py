@@ -2,6 +2,7 @@
 No date stuff yet just pulls the bulks.
 API limits are 50k calls a day on logged in free.
 """
+from io import StringIO
 import concurrent
 import gzip
 import zipfile
@@ -59,6 +60,33 @@ def _get_bulk(db, start=None, end=None, chunksize=1000000):
             df.columns = columns
             df['bucket'] = bucketizer(df)
             yield {'db': db}, df
+
+@lib.extractor(partition_cols=['symbol'], clearable=True)
+def get_lbma(start=None, end=None):
+    db = 'LBMA'
+    filename = _get_bulk_zip(db) # should be no op, force to repull
+    print('reading {}'.format(filename))
+    def read_to_df(a, symbol):
+        a.seek(0)
+        df = pd.read_csv(a, header=None)
+        df = df.drop(0, axis=1)
+        df.columns = _headers['{}/{}'.format(db, symbol_last)]
+        return {'symbol': symbol_last}, df
+    zf = zipfile.ZipFile(filename)
+    # this will likely be pretty slow in python
+    symbol_last = None
+    a = StringIO()
+    for y in zf.infolist():
+        for x in zf.open(y):
+            x = x.decode()
+            symbol = x.split(',', 1)[0]
+            if (symbol_last is not None) and (symbol_last != symbol):
+                yield read_to_df(a, symbol_last)
+                a = StringIO()
+            a.write(x)
+            symbol_last = symbol
+    a.seek(0)
+    yield read_to_df(a, symbol_last)
 
 @lib.extractor(clearable=True)
 def get_shfe(start=None, end=None):
@@ -126,7 +154,8 @@ def split_bulk_zip(filename):
     symbol_last = ''
     for y in zf.infolist():
         for x in zf.open(y):
-            symbol = x.split(b',', 1)[0].split(b'_')[0]
+            symbol = x.split(b',', 1)[0]
+            # .split(b'_')[0]
             if symbol_last != symbol:
                 outfile = os.path.join(dirname, symbol.decode())
                 print('opening {}'.format(outfile))
@@ -230,11 +259,14 @@ def get_metadata_database(name, force=False, cleanup=False):
 #             get_missing_headers(k) # mostly this should no-op after first setup
 #     res = [x.result() for x in fut]
 
-# def get_header(ticker):
-#     start, end = lib.render_date_arg(start='oneweek')
-#     print('getting missing header for {}'.format(ticker))
-#     h = get_from_quandl(ticker, start=start, end=end)
-#     return list(h.columns)
+def get_header(ticker):
+    global _headers
+    start, end = lib.render_date_arg(start='oneweek')
+    print('getting missing header for {}'.format(ticker))
+    h = get_from_quandl(ticker, start=start, end=end)
+    c = list(h.columns)
+    _headers[ticker] = c
+    return c
 
 # def get_missing_headers(dbname):
 #     global _headers

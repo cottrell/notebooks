@@ -50,7 +50,7 @@ def partition_enforcer(partition_cols):
             for partition_dict, df in fun(*args, **kwargs):
                 for k in partition_dict:
                     if k in df.columns:
-                        raise Exception('{} found in partition_dict *and* df.columns! Not allowed.')
+                        raise Exception('{} found in partition_dict *and* df.columns! Not allowed.'.format(k))
                 pcols = [x for x in partition_cols if x not in partition_dict]
                 if pcols:
                     g = df.groupby(pcols)
@@ -178,6 +178,7 @@ def maybe_update(filename, df):
                 # all new, nothing to check unless read write is busted`
                 print('{} (100%) new entries.'.format(df.shape[0]))
                 write_parquet(df, filename)
+                report['changed'].append(filename)
             else:
                 new_hashes_or_values = set(b) - set(a)
                 # for hashes in both, check if values are actually the same

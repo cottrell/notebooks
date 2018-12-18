@@ -575,7 +575,7 @@
     "date,alcoholic beverages; tobacco and narcotics,housing; water; electricity; gas and other fuels,plus: direct purchases abroad by residents,equals: household final consumption expenditure,plus:,food and non-alcoholic beverages,less: direct purchases in domestic market by non-residents": [
         "UGID/INDEXP_100_BLZ"
     ],
-    "date,am usd,am gbp,pm usd,pm gbp": [
+    "date,am_usd,am_gbp,pm_usd,pm_gbp": [
         "LBMA/DAILY"
     ],
     "date,area harvested (i$),yield (hg/ha),production (i$),seed (tonnes)": [
@@ -1238,9 +1238,6 @@
         "UGID/CO2_ZAF",
         "UGID/CO2_ZMB",
         "UGID/CO2_ZWE"
-    ],
-    "symbol,date,open,high,low,last,change,volume,sett_price,open_interest": [
-        "OSE"
     ],
     "date,const. mortality (medium),constant-fertility scenario,high variant,instant replacement,low variant,medium variant,no change (const. fer.; mor.; zero migration),zero migration (medium)": [
         "UGID/CHLMOR_5001",
@@ -3378,7 +3375,7 @@
         "UGID/GOVEXP_100_MKD",
         "UGID/GOVEXP_200_CUB"
     ],
-    "date,gofo - 1 month,gofo - 2 months,gofo - 3 months,gofo - 6 months,gofo - 12 months,libor - 1 month,libor - 2 months,libor - 3 months,libor - 6 months,libor - 12 months,libor-gofo - 1 month,libor-gofo - 2 months,libor-gofo - 3 months,libor-gofo - 6 months,libor-gofo - 12 months": [
+    "date,gofo_1month,gofo_2months,gofo_3months,gofo_6months,gofo_12months,libor_1month,libor_2months,libor_3months,libor_6months,libor_12months,libor_gofo_1month,libor_gofo_2months,libor_gofo_3months,libor_gofo_6months,libor_gofo_12months": [
         "LBMA/GOFO"
     ],
     "date,gross domestic product": [
@@ -5870,9 +5867,6 @@
     ],
     "date,ppi output manufacturing industry; index number,ppi / wpi; index number,reer from rel.wpi; index number": [
         "UGID/WPR_IRL"
-    ],
-    "symbol,date,pre_settle,open,high,low,close,settle,ch1,ch2,volume,oi,change": [
-        "SHFE"
     ],
     "date,prices:manu.producer; index number,ppi / wpi; index number,reer from rel.wpi; index number": [
         "UGID/WPR_FIN"
@@ -8788,11 +8782,11 @@
         "UGID/TRKS_TUR",
         "UGID/TRKS_URY"
     ],
-    "date,usd (am),usd (pm),gbp (am),gbp (pm),euro (am),euro (pm)": [
-        "LBMA/GOLD"
-    ],
     "date,usd,gbp,euro": [
         "LBMA/SILVER"
+    ],
+    "date,usd_am,usd_pm,gbp_am,gbp_pm,euro_am,euro_pm": [
+        "LBMA/GOLD"
     ],
     "date,value": [
         "OECD/AFA_CALC_OUT3_S10_14_NOE_HUN",
@@ -86116,6 +86110,12 @@
     ],
     "symbol,date,local_price,dollar_ex,dollar_price,dollar_ppp,dollar_valuation,dollar_adj_valuation,euro_adj_valuation,sterling_adj_valuation,yen_adj_valuation,yuan_adj_valuation": [
         "ECONOMIST"
+    ],
+    "symbol,date,open,high,low,last,change,volume,sett_price,open_interest": [
+        "OSE"
+    ],
+    "symbol,date,pre_settle,open,high,low,close,settle,ch1,ch2,volume,oi,change": [
+        "SHFE"
     ],
     "symbol,date,value": [
         "FRED",
