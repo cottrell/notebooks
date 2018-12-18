@@ -105,6 +105,7 @@ class StandardExtractorAppender():
     bucket to check diffs. Could be smart with an index except THE WHOLE ROW is the index really.
 
     TODO: lock file clean up on kill
+    TODO: incorporate schema see pdr
     """
     def __init__(self, fun, partition_cols=None, clearable=False):
         self.partition_cols = [] if partition_cols is None else partition_cols

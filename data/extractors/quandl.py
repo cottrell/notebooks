@@ -25,6 +25,7 @@ quandl.save_key(token)
 _bulk_downloadable = ['LBMA', 'UGID', 'OECD', 'ECONOMIST', 'FRED', 'OSE', 'SHFE']
 
 # TODO: LBMA AND UGID
+# TODO: apply schemas see pdr
 
 # NOTES:
 # FRED has about 339k symbols. 43 mm rows.

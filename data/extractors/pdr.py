@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import time
 import pandas as pd
 import json
 import pandas_datareader as pdr
@@ -10,7 +11,7 @@ _mydir, _myname = lib.say_my_name()
 
 @lib.extractor()
 def get_fred_meta_rate_daily():
-    return fred.get_series_by_tag('rate;daily')
+    yield {}, fred.get_series_by_tag('rate;daily')
 
 def _get_yahoo_product_map():
     d = json.load(open(os.path.join(_mydir, 'yahoo_meta.json')))
@@ -24,25 +25,29 @@ def _get_yahoo_product_map():
 
 _yahoo_product_map = _get_yahoo_product_map()
 
-def _get_yahoo_args():
-    kwargs = {}
-    for symbol in _yahoo_product_map:
-        args = (symbol,)
-        yield args, kwargs
-
-def _yahoo_filename(symbol):
-    product = _yahoo_product_map[symbol]
-    return 'product={}/symbol={}'.format(product, symbol)
-
 def apply_schema_to_df_inplace(df, schema):
     for k in df.columns:
         if df[k].dtype.name != schema[k]:
             df[k] = df[k].astype(schema[k])
 
-# 2000 per hour max
-@lib.extractor(
-)
+# 2000 per hour max, my version of pandas DataReader is throttled but count is not persisted
+
+_maybe_inactive = dict()
+def get_all_yahoo():
+    global _maybe_inactive
+    kwargs = {}
+    start, end = lib.render_date_arg('oneweek')
+    for symbol in _yahoo_product_map:
+        try:
+            get_yahoo_price_volume(symbol, start=start, end=end)
+        except Exception as e:
+            _maybe_inactive[symbol] = e
+
+
+
+@lib.extractor(partition_cols=['product', 'symbol'])
 def get_yahoo_price_volume(symbol, start=None, end=None):
+    product = _yahoo_product_map[symbol]
     start, end = lib.render_date_arg(start, end)
     # pdr should have a rate limit in my hacked version
     # need to fix scheme/enforce etfs/stocks different
@@ -57,7 +62,7 @@ def get_yahoo_price_volume(symbol, start=None, end=None):
             }
     df = pdr.DataReader(symbol, data_source='yahoo', start=start, end=end).reset_index()
     apply_schema_to_df_inplace(df, schema)
-    yield df
+    yield {'product': product, 'symbol': symbol}, df
 
 def fix():
     schema = {'Date': 'datetime64[ns]',
