@@ -41,7 +41,8 @@ def get_all_yahoo():
         try:
             get_yahoo_price_volume(symbol, start=start, end=end)
         except Exception as e:
-            _maybe_inactive[symbol] = e
+            _maybe_inactive[symbol] = str(e)
+    json.dump(_maybe_inactive, open('yahoo_errors.json', 'w'))
 
 
 
