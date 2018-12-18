@@ -24,23 +24,24 @@ quandl.save_key(token)
 
 _bulk_downloadable = ['LBMA', 'UGID', 'OECD', 'ECONOMIST', 'FRED', 'OSE', 'SHFE']
 
+# TODO: LBMA AND UGID
+
 # NOTES:
 # FRED has about 339k symbols. 43 mm rows.
 # OECD has about 1mm symbols. 30 mm rows.
 # LBMA and UGID are irregular and need a special pattern
 # the otheres are tiny
 
-# TODO: db is not really needed anymore
 
-@lib.extractor(partition_cols=['db', 'bucket'])
-def get_quandl_fred(start=None, end=None, chunksize=1000000):
-    return _get_quandl_bulk('FRED', start=start, end=end, chunksize=chunksize)
+@lib.extractor(partition_cols=['bucket'])
+def get_fred(start=None, end=None, chunksize=1000000):
+    return _get_bulk('FRED', start=start, end=end, chunksize=chunksize)
 
-@lib.extractor(partition_cols=['db', 'bucket'])
-def get_quandl_oecd(start=None, end=None, chunksize=1000000):
-    return _get_quandl_bulk('OECD', start=start, end=end, chunksize=chunksize)
+@lib.extractor(partition_cols=['bucket'])
+def get_oecd(start=None, end=None, chunksize=10000000):
+    return _get_bulk('OECD', start=start, end=end, chunksize=chunksize)
 
-def _get_quandl_bulk(db, start=None, end=None, chunksize=1000000):
+def _get_bulk(db, start=None, end=None, chunksize=1000000):
     assert db in {'FRED', 'OECD'}
     filename = _get_bulk_zip(db) # should be no op, force to repull
     # 43 mm / 32 is about 1-2 mm rows in each bucket
@@ -59,7 +60,7 @@ def _get_quandl_bulk(db, start=None, end=None, chunksize=1000000):
             yield {'db': db}, df
 
 @lib.extractor(clearable=True)
-def get_quandl_shfe(start=None, end=None):
+def get_shfe(start=None, end=None):
     db = 'SHFE'
     filename = _get_bulk_zip(db) # should be no op, force to repull
     print('reading {}'.format(filename))
@@ -68,7 +69,7 @@ def get_quandl_shfe(start=None, end=None):
     yield {}, df
 
 @lib.extractor(clearable=True)
-def get_quandl_ose(start=None, end=None):
+def get_ose(start=None, end=None):
     db = 'OSE'
     filename = _get_bulk_zip(db) # should be no op, force to repull
     columns = _headers[db]
@@ -79,7 +80,7 @@ def get_quandl_ose(start=None, end=None):
     yield {}, df
 
 @lib.extractor(clearable=True)
-def get_quandl_economist(start=None, end=None):
+def get_economist(start=None, end=None):
     db = 'ECONOMIST'
     filename = _get_bulk_zip(db) # should be no op, force to repull
     print('reading {}'.format(filename))
@@ -104,7 +105,6 @@ def _get_bulk_zip(dbname, force=False):
         db.bulk_download_to_file(filename, params=dict(api_key=token))
     else:
         print('{} exists set force=True to repull'.format(filename))
-    # split TODO: move into if above
     return filename
 
 def split_bulk_zip(filename):
@@ -173,7 +173,7 @@ def _zip_filename(dbname):
     lib.mkdir_if_needed(tempdir)
     return os.path.join(tempdir, dbname) + '.zip'
 
-def get_quandl_metadata_database(name, force=False, cleanup=False):
+def get_metadata_database(name, force=False, cleanup=False):
     # no idea where this is in the api
     filename_zip = _zip_filename('metadata_database_{}'.format(name))
     lib.mkdir_if_needed(os.path.dirname(filename_zip))

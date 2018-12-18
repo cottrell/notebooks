@@ -100,6 +100,11 @@ class StandardExtractorAppender():
     Partitions can be given in the partition_dict or the df.
 
     You do not know the filename before running the function necessarily. This is now changed.
+
+    This is not amazing. Pretty bad perf depending how the blocks come in. Have to load the entire
+    bucket to check diffs. Could be smart with an index except THE WHOLE ROW is the index really.
+
+    TODO: lock file clean up on kill
     """
     def __init__(self, fun, partition_cols=None, clearable=False):
         self.partition_cols = [] if partition_cols is None else partition_cols
