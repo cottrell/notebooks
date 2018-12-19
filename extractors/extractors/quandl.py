@@ -25,7 +25,7 @@ quandl.save_key(token)
 
 _bulk_downloadable = ['LBMA', 'UGID', 'OECD', 'ECONOMIST', 'FRED', 'OSE', 'SHFE']
 
-# TODO: LBMA AND UGID
+# TODO: UGID
 # TODO: apply schemas see pdr
 
 # NOTES:
@@ -61,6 +61,62 @@ def _get_bulk(db, start=None, end=None, chunksize=1000000):
             df['bucket'] = bucketizer(df)
             yield {'db': db}, df
 
+
+def _log_bad_symbol(db, symbol):
+    fout = open(os.path.join(_mydir, 'bad_symbols.txt'), 'w')
+    fout.write('{}/{}'.format(db, symbol))
+    fout.close()
+
+@lib.extractor(
+        # partition_cols=['symbol'],
+        clearable=True)
+def get_ugid(start=None, end=None):
+    # DO NOT DO THIS IT IS TOO CHOPPY NEED TO AGG BEFORE WRITE
+    db = 'UGID'
+    filename = _get_bulk_zip(db) # should be no op, force to repull
+    print('reading {}'.format(filename))
+    def read_to_df(a, symbol):
+        a.seek(0)
+        df = pd.read_csv(a, header=None)
+        # df = df.drop(0, axis=1)
+        cols = ['symbol'] + _headers['{}/{}'.format(db, symbol)]
+        if df.shape[1] != len(cols):
+            print("problem with col shape of {}/{}. using generic columns".format(db, symbol))
+            _log_bad_symbol(db, symbol)
+            cols = ['symbol', 'date'] + ['col_{:02d}'.format(i) for i in range(df.shape[1] - 2)]
+        df.columns = cols
+        s = df.set_index(['symbol', 'date']).stack().reset_index()
+        s.columns = ['symbol', 'date', 'feature', 'value']
+        return s
+    zf = zipfile.ZipFile(filename)
+    # this will likely be pretty slow in python
+    symbol_last = None
+    a = StringIO()
+    dfs = list()
+    write_every_n = 1000
+    for y in zf.infolist():
+        for x in zf.open(y):
+            x = x.decode()
+            symbol = x.split(',', 1)[0]
+            if (symbol_last is not None) and (symbol_last != symbol):
+                try:
+                    dfs.append(read_to_df(a, symbol_last))
+                except ValueError as e:
+                    raise e
+                    print('problem with {}. skipping'.format(symbol_last))
+                    _log_bad_symbol(db, symbol_last)
+                a = StringIO() # reset regardless
+            a.write(x)
+            symbol_last = symbol
+            if len(dfs) >= 1000:
+                df = pd.concat(dfs, axis=0)
+                yield {}, df
+                dfs = list()
+    a.seek(0)
+    dfs.append(read_to_df(a, symbol_last))
+    df = pd.concat(dfs, axis=0)
+    yield {}, df
+
 @lib.extractor(partition_cols=['symbol'], clearable=True)
 def get_lbma(start=None, end=None):
     db = 'LBMA'
@@ -70,8 +126,8 @@ def get_lbma(start=None, end=None):
         a.seek(0)
         df = pd.read_csv(a, header=None)
         df = df.drop(0, axis=1)
-        df.columns = _headers['{}/{}'.format(db, symbol_last)]
-        return {'symbol': symbol_last}, df
+        df.columns = _headers['{}/{}'.format(db, symbol)]
+        return {'symbol': symbol}, df
     zf = zipfile.ZipFile(filename)
     # this will likely be pretty slow in python
     symbol_last = None

@@ -51,10 +51,8 @@
         "UGID/INDEXP_1000_UKR",
         "UGID/INDEXP_300_UKR"
     ],
-    "date,alcoholic beverages; tobacco and narcotics,clothing and footwear,housing; water; electricity; gas and other fuels,furnishings; household equipment and routine maintenance of the house,health,communication,recreation and culture,education,restaurants and hotels,miscellaneous goods and services,equals: household final consumption expenditure in domestic market,equals: household final consumption expenditure,equals: npishs final consumption expenditure,equals: individual consumption expenditure of general government,equals: total actual individual consumption,housing,plus:,social protection,other services,food and non-alcoholic beverages,transport": [
-        "UGID/INDEXP_1000_BLR"
-    ],
     "date,alcoholic beverages; tobacco and narcotics,clothing and footwear,housing; water; electricity; gas and other fuels,furnishings; household equipment and routine maintenance of the house,health,communication,recreation and culture,education,restaurants and hotels,miscellaneous goods and services,equals: household final consumption expenditure in domestic market,equals: household final consumption expenditure,equals: npishs final consumption expenditure,equals: individual consumption expenditure of general government,equals: total actual individual consumption,housing,social protection,other services,food and non-alcoholic beverages,transport": [
+        "UGID/INDEXP_1000_BLR",
         "UGID/INDEXP_1000_CRI",
         "UGID/INDEXP_200_BLR",
         "UGID/INDEXP_300_BLR"
