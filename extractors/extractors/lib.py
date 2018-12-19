@@ -165,7 +165,9 @@ class StandardExtractorAppender():
         """
         filename = self.basedir
         print('read_parquet {}'.format(self.basedir))
+        t = time.time()
         df = pd.read_parquet(filename)
+        t = tprint(t)
         # TODO: remove this once you fix yahoo and the things you did before the code change
         df.columns = [x.lower() for x in df.columns]
         if coalesce_to_latest:
@@ -179,7 +181,12 @@ class StandardExtractorAppender():
             df.sort_values(by=['ingress_time'], inplace=True)
             df.drop_duplicates(subset=cols, keep='last', inplace=True)
             print('df.shape = {} (after)'.format(df.shape))
+            tprint(t)
         return df
+
+def tprint(t):
+    print('... took {} seconds'.format(time.time() - t))
+    return time.time()
 
 def maybe_update(filename, df):
     report = dict(changed=[], unchanged=[])
