@@ -15,7 +15,7 @@ import os
 import sys
 import datetime
 from mylib import bok, wok
-from mylib.tools import run_tasks_in_parallel
+from mylib.tools import run_tasks_in_parallel, AttrDict
 
 _timecol = 'ingress_time'
 _basedir = os.path.expanduser('~/projects/data')
@@ -88,6 +88,9 @@ def dumblock(dirname):
     yield
     os.rmdir(lockdir)
 
+
+all_extractors = AttrDict()
+
 class StandardExtractorAppender():
     """
     Oriented around the DATA PULLING process and efficient updates/diff checks.
@@ -113,6 +116,7 @@ class StandardExtractorAppender():
         self.fun = partition_enforcer(self.partition_cols)(fun)
         self.basedir = get_basedir(self.name)
         self.clearable = clearable
+        all_extractors[self.name.replace('extractors/', '').replace('/', '_')] = self
     def filename(self, partition_dict):
         p = ''
         if self.partition_cols:
