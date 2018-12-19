@@ -159,10 +159,27 @@ class StandardExtractorAppender():
         res = [x.result() for x in fut]
         # TODO: agg the reports
         return res
-    def load(self):
+    def load(self, coalesce_to_latest=True):
+        """
+        Load data, attempt a drop by latest.
+        """
         filename = self.basedir
         print('read_parquet {}'.format(self.basedir))
-        return pd.read_parquet(filename)
+        df = pd.read_parquet(filename)
+        # TODO: remove this once you fix yahoo and the things you did before the code change
+        df.columns = [x.lower() for x in df.columns]
+        if coalesce_to_latest:
+            # WARNING: this is not a robust way of detecting whether it is in stacked or basic format
+            if 'feature' in df.columns:
+                cols = ['symbol', 'feature', 'date']
+            else:
+                cols = ['symbol', 'date']
+            print('coalescing to latest by {}'.format(cols))
+            print('df.shape = {} (before)'.format(df.shape))
+            df.sort_values(by=['ingress_time'], inplace=True)
+            df.drop_duplicates(subset=cols, keep='last', inplace=True)
+            print('df.shape = {} (after)'.format(df.shape))
+        return df
 
 def maybe_update(filename, df):
     report = dict(changed=[], unchanged=[])
@@ -269,7 +286,8 @@ def move_and_remove_nonblocking(path):
     shutil.move(path, tempdir)
     threading.Thread(target=shutil.rmtree, args=[tempdir]).start()
 
-def convert_to_categorical_inplace(df, thresh_hold=1000, na_value='None'):
+def convert_to_categorical_inplace(df, thresh_hold=10000, na_value='None'):
+    # TODO: not sure what optimal value of thresh_hold should be. Probably should be more based on size of df vs number of entries.
     for k in df:
         if df[k].dtype.name in ('object', 'str'):
             df[k] = df[k].fillna('None')
