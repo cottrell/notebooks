@@ -13,10 +13,8 @@ import json
 import pandas as pd
 import quandl
 import os
-from mylib.tools import run_tasks_in_parallel, run_command_get_output, dict_of_lists_to_dict, invert_dict
 from . import lib
 import tempfile
-from mylib import bok, wok
 
 _mydir, _myname = lib.say_my_name()
 
@@ -237,14 +235,14 @@ def get_from_quandl(code=None, start=None, end=None, **kwargs):
 def _load_headers():
     global _headers
     d = json.load(open(_header_filename))
-    d = dict_of_lists_to_dict(d)
+    d = lib.dict_of_lists_to_dict(d)
     d = {k: v.lower().split(',') for k, v in d.items()}
     _headers = d
 
 def _dump_headers():
     print('saving headers')
     d = {k: ','.join(v) for k, v in _headers.items()}
-    d = invert_dict(d)
+    d = lib.invert_dict(d)
     json.dump(d, open(_header_filename, 'w'), indent=4, sort_keys=True)
 
 _header_filename = os.path.join(_mydir, 'headers.json')
@@ -283,15 +281,6 @@ def get_metadata_database(name, force=False, cleanup=False):
     return df
 
 
-# def get_all(force=False, cleanup=False):
-#     dbnames = get_list()
-#     tasks_meta = [functools.partial(get_metadata, k) for k in dbnames]
-#     tasks_bulk = [functools.partial(_get_bulk_zip, k) for k in _bulk_downloadable] # hard coded
-#     tasks = tasks_meta + tasks_bulk
-#     print('running {} tasks'.format(len(tasks)))
-#     run_tasks_in_parallel(*tasks, max_workers=20)
- 
- 
 # def get_list():
 #     db = quandl.Database('')
 #     a = db.all()
@@ -306,18 +295,6 @@ def get_metadata_database(name, force=False, cleanup=False):
 # In [39]: len(a)
 # Out[39]: 8831
 
-# def get_all_bulks_and_missing_headers(max_workers=10):
-#     executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
-#     fut = list()
-#     for k in _bulk_downloadable:
-#         filename = _get_bulk_zip(k)
-#         if k in ['LBMA', 'UGID']:
-#             split_bulk_zip(filename)
-#             # fut.append(executor.submit(split_bulk_zip, filename))
-#             # seems like only LBMA AND UGID have varying cols
-#             get_missing_headers(k) # mostly this should no-op after first setup
-#     res = [x.result() for x in fut]
-
 def get_header(ticker):
     global _headers
     start, end = lib.render_date_arg(start='oneweek')
@@ -326,39 +303,3 @@ def get_header(ticker):
     c = list(h.columns)
     _headers[ticker] = c
     return c
-
-# def get_missing_headers(dbname):
-#     global _headers
-#     filename = _zip_filename(dbname)
-#     if dbname in ['LBMA', 'UGID']:
-#         changed = False
-#         for symbol in get_symbols_from_zipfile(filename):
-#             ticker = '{}/{}'.format(dbname, symbol)
-#             if ticker not in _headers:
-#                 _headers[ticker] = get_header(ticker)
-#                 changed = True
-#     else:
-#         if dbname not in _headers:
-#             # else, get first ticker and assume all cols are the same
-#             for symbol in get_symbols_from_zipfile(filename):
-#                 break
-#             ticker = '{}/{}'.format(dbname, symbol)
-#             print('geting one header from {} for all of {}'.format(ticker, dbname))
-#             print("PROBABLY BEST TO GET THE HEADERS MANUALLY!")
-#             _headers[dbname] = get_header(ticker)
-#             changed = True
-#     if changed:
-#         print('updating missing headers for {}'.format(dbname))
-#         _dump_headers()
-#     else:
-#         print('no missing headers for {}'.format(dbname))
-
-
-# def get_symbols_from_zipfile(filename):
-#     zf = zipfile.ZipFile(filename)
-#     a = set()
-#     for y in zf.infolist():
-#         for x in zf.open(y):
-#             x = x.decode().strip().split(',', 1)[0]
-#             a.add(x)
-#     return a
