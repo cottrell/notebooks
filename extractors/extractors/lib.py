@@ -182,7 +182,7 @@ class StandardExtractorAppender():
         now = datetime.datetime.now() # not sure which time this should be
         for partition_dict, df in self.fun(*args, **kwargs):
             df[_timecol] = now
-            convert_to_categorical_inplace(df)
+            df = generic_converter(df)
             yield partition_dict, df
     def __call__(self, *args, **kwargs):
         """Call and write *new entries* to file.
@@ -232,6 +232,13 @@ class StandardExtractorAppender():
 def tprint(t):
     print('... took {} seconds'.format(time.time() - t))
     return time.time()
+
+def mangle_cols(df):
+    # lowercase
+    cols = [x.lower() for x in df.columns]
+    assert len(set(cols)) == len(cols)
+    df.columns = cols
+    return df
 
 def maybe_update(filename, df):
     report = dict(changed=[], unchanged=[])
@@ -329,7 +336,6 @@ def render_date_arg(start=None, end=None):
 def write_parquet(df, filename, partition_cols=None, preserve_index=False):
     """ write parquet dataset. *appends* to existing data. """
     print('writing df.shape = {} to {}'.format(df.shape, filename))
-    df = generic_converter(df)
     # TODO: something wrong with parquet pyarrow use_dictionary=True does not work
     table = pa.Table.from_pandas(df, preserve_index=False)
     pq.write_to_dataset(table, root_path=filename,
@@ -352,10 +358,7 @@ def convert_to_categorical_inplace(df, thresh_hold=2000000, na_value='None'):
 
 def generic_converter(df):
     # WARNING: will do some inplace things TODO
-    # lowercase
-    cols = [x.lower() for x in df.columns]
-    assert len(set(cols)) == len(cols)
-    df.columns = cols
+    df = mangle_cols(df)
 
     # enforce orderings, rethink this stuff later TODO
     cols = list()
