@@ -26,6 +26,8 @@ date_ranges = {
         'default': {'start': '2010-01-01'}
         }
 
+_datdir = os.path.join(_basedir, 'extractors')
+
 def get_basedir(extractor_name):
     return os.path.join(_basedir, extractor_name)
 
