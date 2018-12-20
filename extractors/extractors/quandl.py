@@ -48,6 +48,7 @@ def _get_bulk(db, start=None, end=None, chunksize=1000000):
     filename = _get_bulk_zip(db) # should be no op, force to repull
     # 43 mm / 32 is about 1-2 mm rows in each bucket
     bucketizer = lambda df: pd.util.hash_pandas_object(df['symbol'], index=False).mod(32)
+    # TODO consider bucket by YEAR?
     columns = _headers[db]
     print('reading {}'.format(filename))
     if chunksize is None:
