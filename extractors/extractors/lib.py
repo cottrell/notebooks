@@ -155,7 +155,6 @@ class StandardExtractorAppender():
     This is not amazing. Pretty bad perf depending how the blocks come in. Have to load the entire
     bucket to check diffs. Could be smart with an index except THE WHOLE ROW is the index really.
 
-    TODO: lock file clean up on kill
     TODO: incorporate schema see pdr
     """
     def __init__(self, fun, partition_cols=None, clearable=False):
@@ -190,8 +189,6 @@ class StandardExtractorAppender():
 
         New entries are computed by diffing to existing.
 
-        TODO: lockfile on filename
-
         this logic is pretty awful, probably a better way to do this with.
         """
         max_workers = 10
@@ -216,8 +213,6 @@ class StandardExtractorAppender():
         t = time.time()
         df = pd.read_parquet(filename, engine='pyarrow')
         t = tprint(t)
-        # TODO: remove this once you fix yahoo and the things you did before the code change
-        df.columns = [x.lower() for x in df.columns]
         if coalesce_to_latest:
             # WARNING: this is not a robust way of detecting whether it is in stacked or basic format
             if 'feature' in df.columns:
