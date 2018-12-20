@@ -285,6 +285,18 @@ def render_date_arg(start=None, end=None):
 def write_parquet(df, filename, partition_cols=None, preserve_index=False):
     """ write parquet dataset. *appends* to existing data. """
     print('writing df.shape = {} to {}'.format(df.shape, filename))
+    # mangle columns
+    cols = [x.lower() for x in df.columns]
+    assert len(set(cols)) == len(cols)
+    df.columns = cols
+    # enforce orderings
+    if 'feature' in df.columns:
+        cols = ['symbol', 'feature', 'date']
+    else:
+        cols = ['symbol', 'date']
+    assert set(cols).issubset(set(df.columns))
+    cols = cols + [x for x in df.columns if x not in cols]
+    df = df[cols]
     table = pa.Table.from_pandas(df, preserve_index=False)
     pq.write_to_dataset(table, root_path=filename, partition_cols=partition_cols, preserve_index=preserve_index)
 
