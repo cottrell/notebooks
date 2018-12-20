@@ -1,4 +1,5 @@
 import inspect
+import subprocess
 import time
 import concurrent
 from contextlib import contextmanager
@@ -27,6 +28,30 @@ date_ranges = {
         }
 
 _datdir = os.path.join(_basedir, 'extractors')
+
+def _init_dat(title='extractors', description='Data for ml fun.', dirname=_datdir):
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+    cmd = "dat create --dir {}".format(dirname)
+    print("initializing {} via cmd={}".format(dirname, cmd))
+    # TODO: I think you need some sort of async to use multiple pipes at once so just don't bother for now
+    # p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, shell=True)
+    p.stdin.write('{}\r{}\r'.format(title, description).encode())
+    out, err = p.communicate()
+    status = p.returncode
+    res = dict(status=status, out=out, err=err)
+    if status != 0:
+        raise Exception('Error initializing dat {}'.format(res))
+    return res
+
+def _dat_share(dirname=_datdir):
+    # fire and forget
+    cmd = 'dat share {} &'.format(dirname)
+    print('RUNNING: {}'.format(cmd))
+    res = run_command_get_output(cmd)
+
+
 
 def get_basedir(extractor_name):
     return os.path.join(_basedir, extractor_name)
