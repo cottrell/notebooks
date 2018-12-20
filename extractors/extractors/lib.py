@@ -73,20 +73,41 @@ def dumblock(dirname):
     locked = False
     attempts = 0
     sleepseconds = 1
-    # TODO: test on kill, is not removing lockdir
     while not locked:
         try:
             os.makedirs(lockdir)
             locked = True
         except FileExistsError as e:
+            # in here, there is no lockdir, nothing to clean up on error
             print('{} exists. attempt {}. sleeping {}'.format(lockdir, attempts, sleepseconds))
             time.sleep(sleepseconds)
-        except Exception as e:
-            # only do this on other errors or success, not finally
-            os.rmdir(lockdir)
-            raise e
-    yield
+    try:
+        yield
+    except Exception as e:
+        os.rmdir(lockdir)
+        raise e
     os.rmdir(lockdir)
+
+def test_dumblock():
+    fun = lambda : 1
+    _test_dumblock(fun)
+    fun = lambda : asdf
+    _test_dumblock(fun)
+
+def _test_dumblock(fun):
+    testdir = tempfile.mkdtemp()
+    try:
+        with dumblock(testdir):
+            fun()
+    except Exception as e:
+        print(e)
+        pass
+    os.system('ls {}'.format(testdir))
+    if os.path.exists(os.path.join(testdir, '_lock')):
+        print('fail')
+        raise Exception('fail dumblock removal')
+    print('pass')
+
 
 
 all_extractors = AttrDict()
@@ -166,7 +187,7 @@ class StandardExtractorAppender():
         filename = self.basedir
         print('read_parquet {}'.format(self.basedir))
         t = time.time()
-        df = pd.read_parquet(filename)
+        df = pd.read_parquet(filename, engine='pyarrow')
         t = tprint(t)
         # TODO: remove this once you fix yahoo and the things you did before the code change
         df.columns = [x.lower() for x in df.columns]
@@ -197,8 +218,9 @@ def maybe_update(filename, df):
     with dumblock(filename):
         if len(glob.glob(os.path.join(filename, '*.parquet'))) == 0:
             write_parquet(df, filename)
+            report['changed'].append(filename)
         else: # a file exists
-            df_orig = pd.read_parquet(filename)
+            df_orig = pd.read_parquet(filename, engine='pyarrow')
             # TODO: put df through write read cycle if worried
             cols = [x for x in df_orig.columns if x != _timecol]
             a = pd.util.hash_pandas_object(df_orig[cols], index=False)
@@ -285,20 +307,11 @@ def render_date_arg(start=None, end=None):
 def write_parquet(df, filename, partition_cols=None, preserve_index=False):
     """ write parquet dataset. *appends* to existing data. """
     print('writing df.shape = {} to {}'.format(df.shape, filename))
-    # mangle columns
-    cols = [x.lower() for x in df.columns]
-    assert len(set(cols)) == len(cols)
-    df.columns = cols
-    # enforce orderings
-    if 'feature' in df.columns:
-        cols = ['symbol', 'feature', 'date']
-    else:
-        cols = ['symbol', 'date']
-    assert set(cols).issubset(set(df.columns))
-    cols = cols + [x for x in df.columns if x not in cols]
-    df = df[cols]
+    df = generic_converter(df)
+    # TODO: something wrong with parquet pyarrow use_dictionary=True does not work
     table = pa.Table.from_pandas(df, preserve_index=False)
-    pq.write_to_dataset(table, root_path=filename, partition_cols=partition_cols, preserve_index=preserve_index)
+    pq.write_to_dataset(table, root_path=filename,
+            partition_cols=partition_cols, preserve_index=preserve_index, use_dictionary=True)
 
 
 def move_and_remove_nonblocking(path):
@@ -307,7 +320,7 @@ def move_and_remove_nonblocking(path):
     shutil.move(path, tempdir)
     threading.Thread(target=shutil.rmtree, args=[tempdir]).start()
 
-def convert_to_categorical_inplace(df, thresh_hold=10000, na_value='None'):
+def convert_to_categorical_inplace(df, thresh_hold=2000000, na_value='None'):
     # TODO: not sure what optimal value of thresh_hold should be. Probably should be more based on size of df vs number of entries.
     for k in df:
         if df[k].dtype.name in ('object', 'str'):
@@ -315,10 +328,34 @@ def convert_to_categorical_inplace(df, thresh_hold=10000, na_value='None'):
             if df[k].nunique() < thresh_hold:
                 df[k] = df[k].astype('category')
 
-def try_convert_inplace(df):
-    for k in df:
-        try:
-            df[k] = pd.to_datetime(df[k])
-        except Exception as e:
-            continue
+def generic_converter(df):
+    # WARNING: will do some inplace things TODO
+    # lowercase
+    cols = [x.lower() for x in df.columns]
+    assert len(set(cols)) == len(cols)
+    df.columns = cols
+
+    # enforce orderings, rethink this stuff later TODO
+    cols = list()
+    for k in ['symbol', 'feature']:
+        if k in df.columns:
+            cols.append(k)
+    cols.append('date') # always require date? TODO
+    assert set(cols).issubset(set(df.columns))
+    cols = cols + [x for x in df.columns if x not in cols]
+    df = df[cols]
+
+    # dates. CONSIDER TRY EXCEPT BUT PROBABLY NEVER DO THAT
+    if 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date'])
+
+    # cats
+    convert_to_categorical_inplace(df)
+    # TODO: parquet pandas categoricals are not persisted?
+    return df
+
+def apply_schema_to_df_inplace(df, schema):
+    for k in df.columns:
+        if df[k].dtype.name != schema[k]:
+            df[k] = df[k].astype(schema[k])
 

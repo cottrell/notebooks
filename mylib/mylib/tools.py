@@ -167,3 +167,7 @@ class AttrDict(dict):
         super(AttrDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
 
+def hashed_pandas_apply(s, fun):
+    u = s.unique()
+    v = [fun(x) for x in u]
+    return s.map(dict(zip(u, v)))

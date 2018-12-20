@@ -127,7 +127,9 @@ def get_lbma(start=None, end=None):
         df = pd.read_csv(a, header=None)
         df = df.drop(0, axis=1)
         df.columns = _headers['{}/{}'.format(db, symbol)]
-        return {'symbol': symbol}, df
+        s = df.set_index(['date']).stack().reset_index()
+        s.columns = ['date', 'feature', 'value']
+        return {'symbol': symbol}, s
     zf = zipfile.ZipFile(filename)
     # this will likely be pretty slow in python
     symbol_last = None

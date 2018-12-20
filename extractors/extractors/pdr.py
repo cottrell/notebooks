@@ -25,11 +25,6 @@ def _get_yahoo_product_map():
 
 _yahoo_product_map = _get_yahoo_product_map()
 
-def apply_schema_to_df_inplace(df, schema):
-    for k in df.columns:
-        if df[k].dtype.name != schema[k]:
-            df[k] = df[k].astype(schema[k])
-
 # 2000 per hour max, my version of pandas DataReader is throttled but count is not persisted
 
 _maybe_inactive = dict()
@@ -62,7 +57,7 @@ def get_yahoo_price_volume(symbol, start=None, end=None):
             'ingress_time': 'datetime64[ns]'
             }
     df = pdr.DataReader(symbol, data_source='yahoo', start=start, end=end).reset_index()
-    apply_schema_to_df_inplace(df, schema)
+    lib.apply_schema_to_df_inplace(df, schema)
     yield {'product': product, 'symbol': symbol}, df
 
 # def fix():
