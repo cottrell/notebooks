@@ -57,7 +57,8 @@ def get_yahoo_price_volume(symbol, start=None, end=None):
             'Adj Close': 'float64',
             'ingress_time': 'datetime64[ns]'
             }
-    df = pdr.DataReader(symbol, data_source='yahoo', start=start, end=end).reset_index()
+    # not sure about get_actions if we really need them
+    df = pdr.DataReader(symbol, data_source='yahoo', start=start, end=end, get_actions=False).reset_index()
     lib.apply_schema_to_df_inplace(df, schema)
     yield {'product': product, 'symbol': symbol}, df
 
