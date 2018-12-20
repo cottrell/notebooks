@@ -40,3 +40,6 @@
 [submodule "nodepython/node-python-roulette"]
 	path = nodepython/node-python-roulette
 	url = https://github.com/laholmes/node-python-roulette.git
+[submodule "asdf/superbasic"]
+	path = superbasic
+	url = https://github.com/cottrell/superbasic.git
