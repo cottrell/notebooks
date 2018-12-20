@@ -159,7 +159,7 @@ class StandardExtractorAppender():
         res = [x.result() for x in fut]
         # TODO: agg the reports
         return res
-    def load(self, coalesce_to_latest=True):
+    def load(self, coalesce_to_latest=True, drop_ingress_time=True):
         """
         Load data, attempt a drop by latest.
         """
@@ -180,6 +180,8 @@ class StandardExtractorAppender():
             print('df.shape = {} (before)'.format(df.shape))
             df.sort_values(by=['ingress_time'], inplace=True)
             df.drop_duplicates(subset=cols, keep='last', inplace=True)
+            if drop_ingress_time:
+                df = df.drop(_timecol, axis=1)
             print('df.shape = {} (after)'.format(df.shape))
             tprint(t)
         return df
