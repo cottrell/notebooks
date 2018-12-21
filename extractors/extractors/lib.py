@@ -219,6 +219,9 @@ class StandardExtractorAppender():
                 cols = ['symbol', 'feature', 'date']
             else:
                 cols = ['symbol', 'date']
+            if not {'symbol', 'date'}.issubset(set(df.columns)):
+                print("WARNING: not date and symbol in columns. Can not coalesce? FIX THE DATA")
+                return df
             print('coalescing to latest by {}'.format(cols))
             print('df.shape = {} (before)'.format(df.shape))
             df.sort_values(by=['ingress_time'], inplace=True)
@@ -362,10 +365,9 @@ def generic_converter(df):
 
     # enforce orderings, rethink this stuff later TODO
     cols = list()
-    for k in ['symbol', 'feature']:
+    for k in ['symbol', 'feature', 'date']:
         if k in df.columns:
             cols.append(k)
-    cols.append('date') # always require date? TODO
     assert set(cols).issubset(set(df.columns))
     cols = cols + [x for x in df.columns if x not in cols]
     df = df[cols]

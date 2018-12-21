@@ -4,5 +4,5 @@ setup(name='extractors',
       version='0.1',
       description='extracting data',
       install_requires=['ratelimit'],
-      packages=['extractors'],
+      packages=['extractors', 'quandl'],
       zip_safe=False)
