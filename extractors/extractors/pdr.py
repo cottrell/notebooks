@@ -28,10 +28,11 @@ _yahoo_product_map = _get_yahoo_product_map()
 # 2000 per hour max, my version of pandas DataReader is throttled but count is not persisted
 
 _maybe_inactive = dict()
-def get_all_yahoo():
+def get_all_yahoo(period='oneweek'):
+    """ use period None for full history """
     global _maybe_inactive
     kwargs = {}
-    start, end = lib.render_date_arg('oneweek')
+    start, end = lib.render_date_arg(period)
     for symbol in _yahoo_product_map:
         try:
             get_yahoo_price_volume(symbol, start=start, end=end)
@@ -56,7 +57,8 @@ def get_yahoo_price_volume(symbol, start=None, end=None):
             'Adj Close': 'float64',
             'ingress_time': 'datetime64[ns]'
             }
-    df = pdr.DataReader(symbol, data_source='yahoo', start=start, end=end).reset_index()
+    # not sure about get_actions if we really need them
+    df = pdr.DataReader(symbol, data_source='yahoo', start=start, end=end, get_actions=False).reset_index()
     lib.apply_schema_to_df_inplace(df, schema)
     yield {'product': product, 'symbol': symbol}, df
 

@@ -1,4 +1,5 @@
 import inspect
+import subprocess
 import time
 import concurrent
 from contextlib import contextmanager
@@ -25,6 +26,32 @@ date_format = '%Y-%m-%d'
 date_ranges = {
         'default': {'start': '2010-01-01'}
         }
+
+_datdir = os.path.join(_basedir, 'extractors')
+
+def _init_dat(title='extractors', description='Data for ml fun.', dirname=_datdir):
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+    cmd = "dat create --dir {}".format(dirname)
+    print("initializing {} via cmd={}".format(dirname, cmd))
+    # TODO: I think you need some sort of async to use multiple pipes at once so just don't bother for now
+    # p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, shell=True)
+    p.stdin.write('{}\r{}\r'.format(title, description).encode())
+    out, err = p.communicate()
+    status = p.returncode
+    res = dict(status=status, out=out, err=err)
+    if status != 0:
+        raise Exception('Error initializing dat {}'.format(res))
+    return res
+
+def _dat_share(dirname=_datdir):
+    # fire and forget
+    cmd = 'dat share {} &'.format(dirname)
+    print('RUNNING: {}'.format(cmd))
+    res = run_command_get_output(cmd)
+
+
 
 def get_basedir(extractor_name):
     return os.path.join(_basedir, extractor_name)
@@ -128,7 +155,6 @@ class StandardExtractorAppender():
     This is not amazing. Pretty bad perf depending how the blocks come in. Have to load the entire
     bucket to check diffs. Could be smart with an index except THE WHOLE ROW is the index really.
 
-    TODO: lock file clean up on kill
     TODO: incorporate schema see pdr
     """
     def __init__(self, fun, partition_cols=None, clearable=False):
@@ -156,14 +182,12 @@ class StandardExtractorAppender():
         now = datetime.datetime.now() # not sure which time this should be
         for partition_dict, df in self.fun(*args, **kwargs):
             df[_timecol] = now
-            convert_to_categorical_inplace(df)
+            df = generic_converter(df)
             yield partition_dict, df
     def __call__(self, *args, **kwargs):
         """Call and write *new entries* to file.
 
         New entries are computed by diffing to existing.
-
-        TODO: lockfile on filename
 
         this logic is pretty awful, probably a better way to do this with.
         """
@@ -189,8 +213,6 @@ class StandardExtractorAppender():
         t = time.time()
         df = pd.read_parquet(filename, engine='pyarrow')
         t = tprint(t)
-        # TODO: remove this once you fix yahoo and the things you did before the code change
-        df.columns = [x.lower() for x in df.columns]
         if coalesce_to_latest:
             # WARNING: this is not a robust way of detecting whether it is in stacked or basic format
             if 'feature' in df.columns:
@@ -210,6 +232,13 @@ class StandardExtractorAppender():
 def tprint(t):
     print('... took {} seconds'.format(time.time() - t))
     return time.time()
+
+def mangle_cols(df):
+    # lowercase
+    cols = [x.lower() for x in df.columns]
+    assert len(set(cols)) == len(cols)
+    df.columns = cols
+    return df
 
 def maybe_update(filename, df):
     report = dict(changed=[], unchanged=[])
@@ -307,7 +336,6 @@ def render_date_arg(start=None, end=None):
 def write_parquet(df, filename, partition_cols=None, preserve_index=False):
     """ write parquet dataset. *appends* to existing data. """
     print('writing df.shape = {} to {}'.format(df.shape, filename))
-    df = generic_converter(df)
     # TODO: something wrong with parquet pyarrow use_dictionary=True does not work
     table = pa.Table.from_pandas(df, preserve_index=False)
     pq.write_to_dataset(table, root_path=filename,
@@ -330,10 +358,7 @@ def convert_to_categorical_inplace(df, thresh_hold=2000000, na_value='None'):
 
 def generic_converter(df):
     # WARNING: will do some inplace things TODO
-    # lowercase
-    cols = [x.lower() for x in df.columns]
-    assert len(set(cols)) == len(cols)
-    df.columns = cols
+    df = mangle_cols(df)
 
     # enforce orderings, rethink this stuff later TODO
     cols = list()
