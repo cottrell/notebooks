@@ -21,3 +21,8 @@
     sudo apt install wicd-gtk
     sudo apt remove network-manager-gnome network-manager
     sudo dpkg --purge network-manager-gnome network-manager
+
+
+
+    smtp
+    relay.plus.net
