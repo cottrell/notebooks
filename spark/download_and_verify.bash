@@ -46,4 +46,5 @@ echo "add this manually to .bash_aliases"
 echo alias "pyspark_ipython='PYSPARK_DRIVER_PYTHON=ipython pyspark'"
 echo "update your paths manually!"
 echo SPARK_HOME=~/dev/spark-2.4.0-bin-hadoop2.7
+echo export PYTHONPATH=$PYTHOPATH:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip:$SPARK_HOME/python/lib/pyspark.zip
 echo PATH='$PATH:$SPARK_HOME/bin'
