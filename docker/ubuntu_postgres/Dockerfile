@@ -4,5 +4,5 @@ FROM ubuntu:latest
 
 RUN apt-get install postgresql postgresql-contrib
 
-# update-rc.d postgresql enable
-# service postgresql start
+# RUN update-rc.d postgresql enable
+RUN service postgresql start
