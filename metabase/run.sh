@@ -1,7 +1,14 @@
-#!/bin/sh
+#!/bin/bash
+# WHAT WAS THE OUTCOME? WHICH SHOULD BE USED? My notes say kubectl method worked.
+# Ports via docker did not work.
+#
+#
+# https://github.com/metabase/metabase/issues/8190
 # https://discourse.metabase.com/
 # https://metabase.com/docs/latest/troubleshooting-guide/datawarehouse.html
+
 # https://github.com/metabase/metabase/blob/master/docs/operations-guide/running-metabase-on-docker.md
+
 # need to map port on osx (I didn't do anything and it seems to have worked, maybe already have this setup)
 # https://stackoverflow.com/questions/36286305/how-do-i-forward-a-docker-machine-port-to-my-host-port-on-osx
 # localhost:3000
@@ -12,7 +19,7 @@ case $1 in
         # untested:
         metadata=$DIR/metadata
         mkdir -p $metadata
-        docker run -d -p 3000:3000 -v $metadata:/tmp -e "MB_DB_FILE=/tmp/metabase.db" --name metabase metabase/metabase
+        docker run -d -p 3000:3000 --network="host" -v $metadata:/tmp -e "MB_DB_FILE=/tmp/metabase.db" --name metabase metabase/metabase
         ;;
     kubectl)
         # https://kubernetes.io/docs/tutorials/stateless-application/expose-external-ip-address/

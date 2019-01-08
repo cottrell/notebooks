@@ -15,6 +15,12 @@ logfile=$DIR/pg.log
 
 mkdir -p $dbdir
 
+echo dbdir=$dbdir
+echo logfile=$logfile
+
+echo $(type pg_ctl)
+PG=$(type -P pg_ctl)
+
 case $1 in
     init)
         pg_ctl -D $dbdir -l $logfile initdb

@@ -1,4 +1,30 @@
-# .
+# Ports
+
+https://stackoverflow.com/questions/24319662/from-inside-of-a-docker-container-how-do-i-connect-to-the-localhost-of-the-mach
+
+Edit: If you are using Docker-for-mac or Docker-for-Windows 18.03+, just connect to your mysql service using the host host.docker.internal.
+
+As of Docker 18.04, this does not work on Docker-for-Linux. However, using a container as described in qoomon's answer you can get it to work.
+
+TLDR
+Use --network="host" in your docker run command, then 127.0.0.1 in your docker container will point to your docker host.
+
+Note: This mode only works on Docker for Linux, per the documentation.
+
+
+# Build
+
+You always forget.
+
+    docker build -t username/image_name:tag_name .
+
+# Commands
+
+
+    docker run --network="host" ... --name blah image_name cmd
+
+    docker exec -it name_here /bin/bash
+
 
 https://medium.com/travis-on-docker/how-to-version-your-docker-images-1d5c577ebf54
 
@@ -8,10 +34,6 @@ https://markshust.com/2018/01/30/performance-tuning-docker-mac
 
 	cd <somewhere>
 	docker build . -t name_here
-
-	docker run -it name_here /bin/bash
-
-	docker run -it centos:latest /bin/bash
 
 	docker network inspect bridge
 
