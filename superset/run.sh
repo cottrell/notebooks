@@ -1,11 +1,13 @@
-#!/bin/sh
+#!/bin/bash -e
 
 case $1 in
     install)
-        conda create -n superset
+        conda create -n superset || :
         source activate superset
+        sudo apt-get install libsasl2-dev
         pip install superset
         fabmanager create-admin --app superset
+        source activate superset
         superset db upgrade
         superset load_examples
         superset init

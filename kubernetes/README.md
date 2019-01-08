@@ -20,8 +20,34 @@
     curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64   && chmod +x minikube
     sudo cp minikube /usr/local/bin && rm minikube
 
+    minikube start
 
-minikube start
+# dashboard
+
+    # if you get error is bc already there view it with 'minikube dashboard'
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
+
+    minikube dashboard
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # cloud
