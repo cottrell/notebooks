@@ -1,6 +1,11 @@
 #!/bin/sh
-dl *_present.csv > /dev/null 2>&1
 for x in isa chequing saver; do
-    b=$(ls -rt "$x"_*.csv | tail -1)
-    ln -vs $b "$x"_present.csv
+    b=$(ls -rt "$x"_2014*.csv | tail -1)
+    target="$x"_present.csv
+    if [ -e $b ]; then
+        if [ -e $target ]; then
+            dl $target
+        fi
+        ln -vs $b $target
+    fi
 done
