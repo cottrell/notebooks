@@ -5,6 +5,7 @@ case $1 in
         conda create -n superset || :
         source activate superset
         sudo apt-get install libsasl2-dev
+        pip install psycopg2
         pip install superset
         fabmanager create-admin --app superset
         source activate superset
