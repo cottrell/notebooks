@@ -1,6 +1,7 @@
 #!/bin/bash
-# WHAT WAS THE OUTCOME? WHICH SHOULD BE USED? My notes say kubectl method worked.
-# Ports via docker did not work.
+# docker version seems to work as of 2019-01 after the --network="host" was added.
+#
+# kubectl and helm both had issues.
 #
 #
 # https://github.com/metabase/metabase/issues/8190
@@ -19,7 +20,7 @@ case $1 in
         # untested:
         metadata=$DIR/metadata
         mkdir -p $metadata
-        docker run -d -p 15432:5432 -p 3000:3000 --network="host" -v $metadata:/tmp -e "MB_DB_FILE=/tmp/metabase.db" --name metabase metabase/metabase
+        docker run -d -p 3000:3000 --network="host" -v $metadata:/tmp -e "MB_DB_FILE=/tmp/metabase.db" --name metabase metabase/metabase
         ;;
     kubectl)
         # https://kubernetes.io/docs/tutorials/stateless-application/expose-external-ip-address/
