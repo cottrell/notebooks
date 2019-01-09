@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run -it --network="host" --name pgtest cottrell/ubuntu_postgres
