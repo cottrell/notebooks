@@ -19,7 +19,7 @@ case $1 in
         # untested:
         metadata=$DIR/metadata
         mkdir -p $metadata
-        docker run -d -p 3000:3000 --network="host" -v $metadata:/tmp -e "MB_DB_FILE=/tmp/metabase.db" --name metabase metabase/metabase
+        docker run -d -p 15432:5432 -p 3000:3000 --network="host" -v $metadata:/tmp -e "MB_DB_FILE=/tmp/metabase.db" --name metabase metabase/metabase
         ;;
     kubectl)
         # https://kubernetes.io/docs/tutorials/stateless-application/expose-external-ip-address/

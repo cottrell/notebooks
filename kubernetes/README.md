@@ -1,5 +1,17 @@
 # quickstart
 
+    minikube start
+    minikube dashboard
+
+    clean:
+    kubectl delete --all services --namespace=default
+    kubectl delete deployment hello-world
+    kubectl delete services my-service
+
+
+
+# install quickstart
+
     # install virtual box
     sudo apt-get install virtualbox virtualbox-ext-pack
     # install minikube

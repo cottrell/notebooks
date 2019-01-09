@@ -3,6 +3,7 @@
 
 DOCKER_VOLUME=$HOME/docker/volumes/postgres
 mkdir -p $DOCKER_VOLUME
+PORT=15432
 
 case $1 in
     # init)
@@ -10,10 +11,10 @@ case $1 in
     #     ;;
     start)
         echo WARNING: use some external password store. this hard coded password is just for kicks!
-        docker run --rm --name pg-docker -e POSTGRES_PASSWORD=secret -d -p 5432:5432 -v $DOCKER_VOLUME:/var/lib/postgresql/data postgres
+        docker run --rm --name pg-docker -e POSTGRES_PASSWORD=secret -d -p $PORT:5432 -v $DOCKER_VOLUME:/var/lib/postgresql/data postgres
         ;;
     connect)
-        psql -h localhost -U postgres -d postgres
+        psql -p $PORT -h localhost -U postgres -d postgres
         # psql postgres
         ;;
     stop)

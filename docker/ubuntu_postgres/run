@@ -1,0 +1,2 @@
+docker run -it --network="host" --name pgtest cottrell/ubuntu_postgres bash
+# docker run -it --network="host" --name pgtest cottrell/ubuntu_postgres psql -p 15432 -h localhost -U postgres postgres
