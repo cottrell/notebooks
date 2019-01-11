@@ -44,7 +44,7 @@ def _get_all_yahoo(product, period='oneweek'):
         for symbol in _yahoo_product_map:
             try:
                 get_yahoo_price_volume(symbol, start=start, end=end)
-            except Exception as e:
+            except (KeyError, pdr.base.RemoteDataError) as e:
                 _maybe_inactive[symbol] = str(e)
         json.dump(_maybe_inactive, open('yahoo_errors_equities_etfs.json', 'w'))
     elif product == 'fx':
@@ -56,6 +56,8 @@ def _get_all_yahoo(product, period='oneweek'):
                 print('skipping {}: {}'.format(x, e))
                 bad_fx[x] = str(e)
         json.dump(bad_fx, open('yahoo_errors_fx.json', 'w'))
+    else:
+        raise Exception('bad product: {}'.format(product))
 
 
 _usd_pairs = ['EURUSD', 'JPYUSD', 'GBPUSD', 'CHFUSD', 'AUDUSD', 'NZDUSD', 'CADUSD', 'SEKUSD', 'NOKUSD', 'CZKUSD', 'EGPUSD', 'HUFUSD', 'ISKUSD', 'ILSUSD', 'PLNUSD', 'RONUSD', 'RUBUSD', 'ZARUSD', 'TRYUSD', 'UAHUSD', 'KWDUSD', 'SARUSD', 'AEDUSD', 'BHDUSD', 'OMRUSD', 'QARUSD', 'CNYUSD', 'HKDUSD', 'INRUSD', 'IDRUSD', 'KZTUSD', 'KRWUSD', 'MYRUSD', 'PHPUSD', 'SGDUSD', 'TWDUSD', 'THBUSD', 'VNDUSD', 'ARSUSD', 'BRLUSD', 'CLPUSD', 'COPUSD', 'MXNUSD', 'PENUSD']
@@ -76,7 +78,7 @@ def get_yahoo_price_volume(symbol, start=None, end=None):
             'ingress_time': 'datetime64[ns]'
             }
     # not sure about get_actions if we really need them
-    df = pdr.DataReader(symbol, data_source='yahoo', start=start, end=end, get_actions=False).reset_index()
+    df = pdr.DataReader(symbol, data_source='yahoo', start=start, end=end).reset_index()
     lib.apply_schema_to_df_inplace(df, schema)
     yield {'product': product, 'symbol': symbol}, df
 
@@ -114,3 +116,7 @@ def get_yahoo_fx(symbol, start=None, end=None):
 #                 print('bad {}'.format(filename))
 #                 os.system('rm -rf {}'.format(filename))
 
+
+if __name__ == '__main__':
+    get_all_yahoo_fx()
+    get_all_yahoo_equities_etfs()

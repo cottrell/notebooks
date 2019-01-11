@@ -332,6 +332,10 @@ def render_date_arg(start=None, end=None):
         if start == 'oneweek':
             end = datetime.date.today()
             start = end - datetime.timedelta(days=7)
+        elif start.endswith('D'):
+            days = int(start[:-1])
+            end = datetime.date.today()
+            start = end - datetime.timedelta(days=days)
         else:
             start = parse(start)
     return start, end

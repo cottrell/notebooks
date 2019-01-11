@@ -34,16 +34,16 @@ _bulk_downloadable = ['LBMA', 'UGID', 'OECD', 'ECONOMIST', 'FRED', 'OSE', 'SHFE'
 
 
 @lib.extractor(partition_cols=['bucket'])
-def get_fred(start=None, end=None, chunksize=1000000):
-    return _get_bulk('FRED', start=start, end=end, chunksize=chunksize)
+def get_fred(start=None, end=None, force=False, chunksize=1000000):
+    return _get_bulk('FRED', start=start, end=end, chunksize=chunksize, force=force)
 
 @lib.extractor(partition_cols=['bucket'])
 def get_oecd(start=None, end=None, chunksize=10000000):
     return _get_bulk('OECD', start=start, end=end, chunksize=chunksize)
 
-def _get_bulk(db, start=None, end=None, chunksize=1000000):
+def _get_bulk(db, start=None, end=None, force=False, chunksize=1000000):
     assert db in {'FRED', 'OECD'}
-    filename = _get_bulk_zip(db) # should be no op, force to repull
+    filename = _get_bulk_zip(db, force=force) # should be no op, force to repull
     # 43 mm / 32 is about 1-2 mm rows in each bucket
     bucketizer = lambda df: pd.util.hash_pandas_object(df['symbol'], index=False).mod(32)
     # TODO consider bucket by YEAR?
@@ -69,10 +69,10 @@ def _log_bad_symbol(db, symbol):
 @lib.extractor(
         # partition_cols=['symbol'],
         clearable=True)
-def get_ugid(start=None, end=None):
-    # DO NOT DO THIS IT IS TOO CHOPPY NEED TO AGG BEFORE WRITE
+def get_ugid(start=None, end=None, force=False):
+    # DO NOT DO THIS IT IS TOO CHOPPY NEED TO AGG BEFORE WRITE. What did I mean?
     db = 'UGID'
-    filename = _get_bulk_zip(db) # should be no op, force to repull
+    filename = _get_bulk_zip(db, force=force) # should be no op, force to repull
     print('reading {}'.format(filename))
     def read_to_df(a, symbol):
         a.seek(0)
@@ -117,9 +117,9 @@ def get_ugid(start=None, end=None):
     yield {}, df
 
 @lib.extractor(partition_cols=['symbol'], clearable=True)
-def get_lbma(start=None, end=None):
+def get_lbma(start=None, end=None, force=False):
     db = 'LBMA'
-    filename = _get_bulk_zip(db) # should be no op, force to repull
+    filename = _get_bulk_zip(db, force=force) # should be no op, force to repull
     print('reading {}'.format(filename))
     def read_to_df(a, symbol):
         a.seek(0)
@@ -146,18 +146,18 @@ def get_lbma(start=None, end=None):
     yield read_to_df(a, symbol_last)
 
 @lib.extractor(clearable=True)
-def get_shfe(start=None, end=None):
+def get_shfe(start=None, end=None, force=False):
     db = 'SHFE'
-    filename = _get_bulk_zip(db) # should be no op, force to repull
+    filename = _get_bulk_zip(db, force=force) # should be no op, force to repull
     print('reading {}'.format(filename))
     df = pd.read_csv(filename, compression='zip', header=None)
     df.columns = _headers[db]
     yield {}, df
 
 @lib.extractor(clearable=True)
-def get_ose(start=None, end=None):
+def get_ose(start=None, end=None, force=False):
     db = 'OSE'
-    filename = _get_bulk_zip(db) # should be no op, force to repull
+    filename = _get_bulk_zip(db, force=force) # should be no op, force to repull
     columns = _headers[db]
     print('reading {}'.format(filename))
     # no idea why we need usecols, it was erroring with header=None
@@ -166,9 +166,9 @@ def get_ose(start=None, end=None):
     yield {}, df
 
 @lib.extractor(clearable=True)
-def get_economist(start=None, end=None):
+def get_economist(start=None, end=None, force=False):
     db = 'ECONOMIST'
-    filename = _get_bulk_zip(db) # should be no op, force to repull
+    filename = _get_bulk_zip(db, force=force) # should be no op, force to repull
     print('reading {}'.format(filename))
     df = pd.read_csv(filename, compression='zip', header=None)
     df.columns = _headers[db]
@@ -185,7 +185,10 @@ def _get_bulk_zip(dbname, force=False):
     # example bulk, these are bigger 43 mm lines
     filename = _zip_filename(dbname)
     if not os.path.exists(filename) or force:
-        print('{} does not exist'.format(filename))
+        if force:
+            print('{} forced'.format(filename))
+        else:
+            print('{} does not exist'.format(filename))
         db = quandl.Database(dbname)
         lib.mkdir_if_needed(os.path.dirname(filename))
         db.bulk_download_to_file(filename, params=dict(api_key=token))
