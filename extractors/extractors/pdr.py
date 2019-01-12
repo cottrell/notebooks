@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import timeout_decorator
 import time
 import pandas as pd
 import json
@@ -63,6 +64,7 @@ def _get_all_yahoo(product, period='oneweek'):
 _usd_pairs = ['EURUSD', 'JPYUSD', 'GBPUSD', 'CHFUSD', 'AUDUSD', 'NZDUSD', 'CADUSD', 'SEKUSD', 'NOKUSD', 'CZKUSD', 'EGPUSD', 'HUFUSD', 'ISKUSD', 'ILSUSD', 'PLNUSD', 'RONUSD', 'RUBUSD', 'ZARUSD', 'TRYUSD', 'UAHUSD', 'KWDUSD', 'SARUSD', 'AEDUSD', 'BHDUSD', 'OMRUSD', 'QARUSD', 'CNYUSD', 'HKDUSD', 'INRUSD', 'IDRUSD', 'KZTUSD', 'KRWUSD', 'MYRUSD', 'PHPUSD', 'SGDUSD', 'TWDUSD', 'THBUSD', 'VNDUSD', 'ARSUSD', 'BRLUSD', 'CLPUSD', 'COPUSD', 'MXNUSD', 'PENUSD']
 
 @lib.extractor(partition_cols=['product', 'symbol'])
+@timeout_decorator.timeout(10)
 def get_yahoo_price_volume(symbol, start=None, end=None):
     product = _yahoo_product_map[symbol]
     start, end = lib.render_date_arg(start, end)
