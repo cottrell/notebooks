@@ -75,8 +75,8 @@ def discover_feature_hierarchy_in_df(df, cols, thresh=0.9):
     edges = list()
     for x in r:
         edges.append((x[0], x[1], x[2]))
-        edges.append((x[1], x[2], x[3]))
-    edges = [x for x in edges if x[3] >= thresh]
+        edges.append((x[1], x[0], x[3]))
+    edges = [x for x in edges if x[2] >= thresh]
     d = pd.DataFrame(r, columns=['a', 'b', 'ma', 'mb'])
     return edges, d
 
