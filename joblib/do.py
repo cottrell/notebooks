@@ -1,18 +1,18 @@
 from ratelimit import limits, sleep_and_retry
-from joblib import Memory
 import superbasic
 import joblib
 import os
 import pandas as pd
 import numpy as np
 import numpy.random as nr
+from joblib import Memory
 _mydir = os.path.dirname(__file__)
 cachedir = os.path.join(_mydir, 'joblib_cache')
+memory = Memory(cachedir, verbose=10, backend='superbasic')
 
 A = nr.randn(100000, 50)
 df = pd.DataFrame(A)
 
-memory = Memory(cachedir, verbose=10, backend='superbasic')
 
 # @sleep_and_retry
 # @limits(calls=1, period=_period_seconds)

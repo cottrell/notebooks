@@ -36,6 +36,11 @@ def run_command_get_output(cmd, shell=True, splitlines=True):
         err = err.split('\n')
     return dict(out=out, err=err, status=status)
 
+def convert_nan_to_none_inplace(df, na_value='None'):
+    for k in df:
+        if df[k].dtype.name in ('object', 'str'):
+            df[k] = df[k].fillna('None')
+
 def convert_to_categorical_inplace(df, thresh_hold=1000, na_value='None'):
     for k in df:
         if df[k].dtype.name in ('object', 'str'):

@@ -204,14 +204,17 @@ class StandardExtractorAppender():
         res = [x.result() for x in fut]
         # TODO: agg the reports
         return res
-    def load(self, coalesce_to_latest=True, drop_ingress_time=True):
+    def load(self, filters=None, coalesce_to_latest=True, drop_ingress_time=True):
         """
         Load data, attempt a drop by latest.
         """
         filename = self.basedir
         print('read_parquet {}'.format(self.basedir))
         t = time.time()
-        df = pd.read_parquet(filename, engine='pyarrow')
+        if filters:
+            df = pq.ParquetDataset(filename, filters=filters).read_pandas().to_pandas()
+        else:
+            df = pd.read_parquet(filename, engine='pyarrow')
         t = tprint(t)
         if coalesce_to_latest:
             # WARNING: this is not a robust way of detecting whether it is in stacked or basic format
