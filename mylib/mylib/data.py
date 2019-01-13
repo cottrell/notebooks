@@ -85,7 +85,7 @@ def plot_transitive_reduction_of_condensation(edges):
     import networkx as nx
     g = nx.DiGraph()
     for x in edges:
-        g.add_edge(x[0], x[1])
+        g.add_edge(x[0], x[1], weight=x[2])
     gg = nx.condensation(g)
     mapping = {i: '\n'.join(gg.nodes[i]['members']) for i in range(len(gg.nodes))}
     ggg = nx.relabel.relabel_nodes(gg, mapping)
@@ -93,6 +93,9 @@ def plot_transitive_reduction_of_condensation(edges):
     import matplotlib.pyplot as plt
     plt.clf()
     plt.ion()
+    plt.subplot(211)
+    nx.draw_networkx(ggg)
+    plt.subplot(212)
     nx.draw_networkx(gggg)
     plt.tight_layout()
     plt.show()
