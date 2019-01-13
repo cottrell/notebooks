@@ -1,7 +1,10 @@
 import string
+import functools
+import pandas as pd
 import random
 from numpy.random import rand, randint
 import logging
+from . import tools
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -42,3 +45,59 @@ def iris():
     df = df.sort_index(axis=1)
     dfd = pandas.get_dummies(df)
     return df, dfd
+
+def _get_accuracies(df, cola, colb, thresh=0.9):
+    print('check {} {}'.format(cola, colb))
+    s = df.groupby([cola, colb]).size().reset_index()
+    s.columns = [cola, colb, 'size']
+    s = s.sort_values('size')
+    g = s.groupby(cola)['size']
+    a = g.last() / g.sum() # take largest by size as "correct"
+    g = s.groupby(colb)['size']
+    b = g.last() / g.sum() # take largest by size as "correct"
+    # return a, b
+    ma = a.mean()
+    mb = b.mean()
+    if max(ma, mb) < thresh:
+        edge = None
+    elif mb >= ma:
+        # b predicts a more than a predicts b
+        edge = (cola, colb)
+    else:
+        edge = (colb, cola)
+    # consider add mb - ma as edge value or something like that
+    return edge, (cola, colb, ma, mb)
+
+def discover_feature_hierarchy_in_df(df, cols, thresh=0.9):
+    """
+    Try to establish a hierachy between the features. For example, detect that county -> district -> town.
+    """
+    tasks = list()
+    for i in range(len(cols)):
+        for j in range(i+1, len(cols)):
+            task = functools.partial(_get_accuracies, df, cols[i], cols[j], thresh=thresh)
+            tasks.append(task)
+    res = tools.run_tasks_in_parallel(*tasks, max_workers=20) 
+    r = [x['result'] for x in res]
+    edges = [x[0] for x in r if x[0] is not None]
+    d = [x[1] for x in r]
+    d = pd.DataFrame(d, columns=['a', 'b', 'ma', 'mb'])
+    return edges, d
+
+def plot_transitive_reduction_of_condensation(edges):
+    """ plot something from discover_feature_hierarchy_in_df """
+    import networkx as nx
+    g = nx.DiGraph()
+    for x in edges:
+        g.add_edge(x[0], x[1])
+    gg = nx.condensation(g)
+    mapping = {i: '\n'.join(gg.nodes[i]['members']) for i in range(len(gg.nodes))}
+    ggg = nx.relabel.relabel_nodes(gg, mapping)
+    gggg = nx.transitive_reduction(ggg)
+    import matplotlib.pyplot as plt
+    plt.clf()
+    plt.ion()
+    nx.draw_networkx(gggg)
+    plt.tight_layout()
+    plt.show()
+    return gggg
