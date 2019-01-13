@@ -46,7 +46,7 @@ def iris():
     dfd = pandas.get_dummies(df)
     return df, dfd
 
-def _get_accuracies(df, cola, colb, thresh=0.9):
+def _get_accuracies(df, cola, colb):
     print('check {} {}'.format(cola, colb))
     s = df.groupby([cola, colb]).size().reset_index()
     s.columns = [cola, colb, 'size']
@@ -55,33 +55,29 @@ def _get_accuracies(df, cola, colb, thresh=0.9):
     a = g.last() / g.sum() # take largest by size as "correct"
     g = s.groupby(colb)['size']
     b = g.last() / g.sum() # take largest by size as "correct"
-    # return a, b
     ma = a.mean()
     mb = b.mean()
-    if max(ma, mb) < thresh:
-        edge = None
-    elif mb >= ma:
-        # b predicts a more than a predicts b
-        edge = (cola, colb)
-    else:
-        edge = (colb, cola)
-    # consider add mb - ma as edge value or something like that
-    return edge, (cola, colb, ma, mb)
+    return cola, colb, ma, mb
 
 def discover_feature_hierarchy_in_df(df, cols, thresh=0.9):
     """
     Try to establish a hierachy between the features. For example, detect that county -> district -> town.
+
+    TODO: do more with the relative accuracies. This was just a quick hack. Use the dataframe "d" for complete bidirectional edges information.
     """
     tasks = list()
     for i in range(len(cols)):
         for j in range(i+1, len(cols)):
-            task = functools.partial(_get_accuracies, df, cols[i], cols[j], thresh=thresh)
+            task = functools.partial(_get_accuracies, df, cols[i], cols[j])
             tasks.append(task)
     res = tools.run_tasks_in_parallel(*tasks, max_workers=20) 
     r = [x['result'] for x in res]
-    edges = [x[0] for x in r if x[0] is not None]
-    d = [x[1] for x in r]
-    d = pd.DataFrame(d, columns=['a', 'b', 'ma', 'mb'])
+    edges = list()
+    for x in r:
+        edges.append((x[0], x[1], x[2]))
+        edges.append((x[1], x[2], x[3]))
+    edges = [x for x in edges if x[3] >= thresh]
+    d = pd.DataFrame(r, columns=['a', 'b', 'ma', 'mb'])
     return edges, d
 
 def plot_transitive_reduction_of_condensation(edges):
