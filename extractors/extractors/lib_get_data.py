@@ -210,6 +210,7 @@ class StandardExtractor():
 
     def check_local_dirty_clean(self, arg):
         a = self.file_stat(arg)
+        print(a)
         b = self.source_stat(arg)
         dirty = True
         if a.get('status') == 'missing':

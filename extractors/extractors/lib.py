@@ -241,7 +241,7 @@ def tprint(t):
 
 def mangle_cols(df):
     # lowercase
-    cols = [x.lower() for x in df.columns]
+    cols = [str(x).lower() for x in df.columns]
     assert len(set(cols)) == len(cols)
     df.columns = cols
     return df
