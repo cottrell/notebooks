@@ -19,6 +19,8 @@ _url = 'http://www.auction.co.uk/residential/pastresults.asp?A={auction_number}&
 
 @lib.extractor()
 def get_all_data():
+    # REMEMBER to clear the cache if you want to reforce it. This is the memory cache NOT the extractor data!
+    # do everything at once, not too carefully since the memory.cache is being used anyway on each request
     df = list()
     for i in range(_max_n):
         tmp = get_data_from_auction(i)
