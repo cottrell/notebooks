@@ -59,6 +59,48 @@ def _get_accuracies(df, cola, colb):
     mb = b.mean()
     return cola, colb, ma, mb
 
+def _check_hashable(d, cols):
+    dd = d.drop_duplicates(cols).copy()
+    dd['h'] = pd.util.hash_pandas_object(dd, index=False)
+    assert dd.h.value_counts().max() == 1
+
+from itertools import chain, combinations
+
+def powerset(iterable):
+    """powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"""
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+
+def _do_groupby_size(df, cols):
+    # first thing you try before going to GAN, LDA or whatever
+    # TODO: might want laplace smooth etc
+    if len(cols) > 1:
+        _check_hashable(df, cols)
+        h = pd.util.hash_pandas_object(df[cols], index=False)
+        s = df.groupby(h).size()
+        s = s / s.sum()
+        return cols, h.map(s)
+    s = df.groupby(cols).size()
+    s = s / s.sum()
+    return cols, df[cols[0]].map(s)
+
+def basic_multinomial_naive_bayes_counter_across_all_features(df, cols, thresh=0.9, colprefix=None):
+    """ groupby size across all feature subset """
+    tasks = list()
+    for subset in powerset(cols):
+        if len(subset) > 0:
+            print('getting {}'.format(subset))
+            task = functools.partial(_do_groupby_size, df, list(subset))
+            tasks.append(task)
+    res = tools.run_tasks_in_parallel(*tasks, max_workers=40)
+    r = [x['result'] for x in res]
+    d = pd.concat([x[1] for x in r], axis=1)
+    d.columns = ['_'.join(x[0]) for x in r]
+    if colprefix is not None:
+        d.columns = ['{}{}'.format(colprefix, x) for x in d.columns]
+    return d
+
+
 def discover_feature_hierarchy_in_df(df, cols, thresh=0.9):
     """
     Try to establish a hierachy between the features. For example, detect that county -> district -> town.
@@ -70,7 +112,7 @@ def discover_feature_hierarchy_in_df(df, cols, thresh=0.9):
         for j in range(i+1, len(cols)):
             task = functools.partial(_get_accuracies, df, cols[i], cols[j])
             tasks.append(task)
-    res = tools.run_tasks_in_parallel(*tasks, max_workers=20) 
+    res = tools.run_tasks_in_parallel(*tasks, max_workers=20)
     r = [x['result'] for x in res]
     edges = list()
     for x in r:
