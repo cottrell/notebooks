@@ -84,12 +84,12 @@ def get_table_from_tree(tree):
         e = td[0]
         href = e.xpath('./a')[0].attrib['href']
         town = e.xpath('./a/span/span/span[@class="town"]')[0].text
-        address = ''.join(e.xpath('./a/span/span/span/following-sibling::text()')).strip()
-        location = td[2].xpath('./a')[0].text.strip()
+        address = str(''.join(e.xpath('./a/span/span/span/following-sibling::text()'))).strip()
+        location = str(td[2].xpath('./a')[0].text).strip()
         type_ = td[1].text
         result = td[3].text
-        d = {'type': type_, 'location': location, 'town': town, 'address': address, 'result': result, 'href': href}
-        table.append(d)
+        dd = {'type': type_, 'location': location, 'town': town, 'address': address, 'result': result, 'href': href}
+        table.append(dd)
     df = pd.DataFrame(table)
     return df
 
