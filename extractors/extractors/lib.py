@@ -181,8 +181,10 @@ class StandardExtractorAppender():
         """ Call only gen fun directly. Enrich, categorize and group. No write """
         now = datetime.datetime.now() # not sure which time this should be
         for partition_dict, df in self.fun(*args, **kwargs):
-            df[_timecol] = now
             df = generic_converter(df)
+            # WARNING: DROP DUPES, the whole premise is based on this structure of uniqueness.
+            df = df.drop_duplicates()
+            df[_timecol] = now
             yield partition_dict, df
     def __call__(self, *args, **kwargs):
         """Call and write *new entries* to file.
@@ -246,11 +248,32 @@ def mangle_cols(df):
     df.columns = cols
     return df
 
+_slow_checks = False
+
+def check_parquet(filename):
+    if _slow_checks:
+        df = pd.read_parquet(filename, engine='pyarrow')
+        _check_dupes(df, msg='filename {}'.format(filename))
+
+def _check_dupes(df, msg=''):
+    cols = [x for x in df.columns if x != _timecol]
+    tmp = df[cols].drop_duplicates()
+    assert tmp.shape[0] == df.shape[0], 'dupes in df! {}'.format(msg)
+
+def _check_hashable(d, cols):
+    dd = d.drop_duplicates(cols).copy()
+    dd['h'] = pd.util.hash_pandas_object(dd, index=False)
+    assert dd.h.value_counts().max() == 1
+
 def maybe_update(filename, df):
     report = dict(changed=[], unchanged=[])
     if not os.path.exists(filename):
         mkdir_if_needed(filename)
     with dumblock(filename):
+        df_cols = [x for x in df.columns if x != _timecol]
+        if _slow_checks:
+            tmp = df[df_cols].drop_duplicates()
+            assert tmp.shape[0] == df.shape[0], 'dupes in df!'
         if len(glob.glob(os.path.join(filename, '*.parquet'))) == 0:
             write_parquet(df, filename)
             report['changed'].append(filename)
@@ -258,6 +281,11 @@ def maybe_update(filename, df):
             df_orig = pd.read_parquet(filename, engine='pyarrow')
             # TODO: put df through write read cycle if worried
             cols = [x for x in df_orig.columns if x != _timecol]
+            assert set(cols) == set(df_cols), 'column mismatch! schema change or something'
+            assert df[cols].dtypes.equals(df_orig[cols].dtypes), 'dtype mismatch!'
+            if _slow_checks:
+                tmp = df_orig[cols].drop_duplicates()
+                assert tmp.shape[0] == df_orig.shape[0], 'dupes in df_orig!'
             a = pd.util.hash_pandas_object(df_orig[cols], index=False)
             b = pd.util.hash_pandas_object(df[cols], index=False)
             hashes_in_both = set(b).intersection(set(a))
@@ -283,6 +311,8 @@ def maybe_update(filename, df):
                 myprint = lambda x: print('{}: {}'.format(x, filename))
                 if same_hashes_different_values:
                     myprint('found same hashes but diff values. this is unusual.')
+                    if len(same_hashes_different_values) > 1:
+                        raise Exception('something must be wrong ... too unusual!')
                     new_hashes_or_values.update(same_hashes_different_values)
                 if new_hashes_or_values:
                     mask = df.index.isin(new_hashes_or_values)
@@ -347,10 +377,12 @@ def write_parquet(df, filename, partition_cols=None, preserve_index=False):
     """ write parquet dataset. *appends* to existing data. """
     print('writing df.shape = {} to {}'.format(df.shape, filename))
     # TODO: something wrong with parquet pyarrow use_dictionary=True does not work
+    if _slow_checks:
+        _check_dupes(df, msg='before write')
     table = pa.Table.from_pandas(df, preserve_index=False)
     pq.write_to_dataset(table, root_path=filename,
             partition_cols=partition_cols, preserve_index=preserve_index, use_dictionary=True)
-
+    check_parquet(filename)
 
 def move_and_remove_nonblocking(path):
     tempdir = tempfile.mkdtemp()
@@ -358,11 +390,16 @@ def move_and_remove_nonblocking(path):
     shutil.move(path, tempdir)
     threading.Thread(target=shutil.rmtree, args=[tempdir]).start()
 
-def convert_to_categorical_inplace(df, thresh_hold=2000000, na_value='None'):
-    # TODO: not sure what optimal value of thresh_hold should be. Probably should be more based on size of df vs number of entries.
+def convert_na_inplace(df, na_value='None'):
     for k in df:
         if df[k].dtype.name in ('object', 'str'):
             df[k] = df[k].fillna('None')
+
+def convert_to_categorical_inplace(df, thresh_hold=2000000, na_value='None'):
+    # TODO: not sure what optimal value of thresh_hold should be. Probably should be more based on size of df vs number of entries.
+    convert_na_inplace(df, na_value=na_value)
+    for k in df:
+        if df[k].dtype.name in ('object', 'str'):
             if df[k].nunique() < thresh_hold:
                 df[k] = df[k].astype('category')
 
@@ -383,8 +420,9 @@ def generic_converter(df):
     if 'date' in df.columns:
         df['date'] = pd.to_datetime(df['date'])
 
-    # cats
-    convert_to_categorical_inplace(df)
+    # cats, WARNING: THIS IS DANGEROUS IF YOU HAVE CHUNKS THAT ARE OVER/UNDER THRESHOLD
+    # TODO for example sometimes you will get cats and sometimes not. I have set value to extreme for now
+    convert_na_inplace(df)
     # TODO: parquet pandas categoricals are not persisted?
     return df
 

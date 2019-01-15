@@ -1,4 +1,5 @@
 from lxml import html, etree
+import dateutil
 import pandas as pd
 from ratelimit import limits, sleep_and_retry
 import os
@@ -14,19 +15,15 @@ memory = Memory(cachedir, verbose=10)
 # _past_results_url = 'http://www.auction.co.uk/residential/pastAuctions.asp?T=R'
 
 # http://www.auction.co.uk/residential/pastresults.asp?A=1064&S=L&O=A&P=3
+_min_n = 715 # dunno, this is where they seem to start, there are gaps, not sure.
 _max_n = 1065
-_url = 'http://www.auction.co.uk/residential/pastresults.asp?A={auction_number}&S=L&O=A&P={page}'
+_url = 'http://www.auction.co.uk/residential/pastresults.asp?A={auction_number}&S=L&O=A&P={page}' # starts at 1
 
-@lib.extractor()
 def get_all_data():
     # REMEMBER to clear the cache if you want to reforce it. This is the memory cache NOT the extractor data!
     # do everything at once, not too carefully since the memory.cache is being used anyway on each request
-    df = list()
-    for i in range(_max_n):
-        tmp = get_data_from_auction(i)
-        df.append(tmp)
-    df = pd.concat(df)
-    return {}, df
+    for i in range(_min_n, _max_n+1):
+        tmp = get_pastresults(i)
 
 _period_seconds = 1
 @memory.cache
@@ -39,33 +36,55 @@ def make_request(url):
         raise Exception('{} {}'.format(r.status_code, r.content))
     return r.content, r.status_code
 
-def get_data_from_auction(auction_number):
+_not_working = list()
+_empty = list()
+
+
+@lib.extractor()
+def get_pastresults(auction_number):
+    global _not_working, _empty
     pages = get_all_pages(auction_number)
     df = list()
-    date = None
-    for content, status in pages:
-        tree = html.fromstring(content)
-        new_date = get_auction_date_from_tree(tree)
-        if date is not None:
-            assert date == new_date, 'got date mismatch unexpected {} {}'.format(date, new_date)
-        date = new_date
-        tmp = get_table_from_tree(tree)
-        df.append(tmp)
+    old_date = None
+    for content, status, table, auction_date in pages:
+        if old_date is not None:
+            assert old_date == auction_date, 'got date mismatch unexpected {} {}'.format(old_date, auction_date)
+        old_date = auction_date
+        df.append(table)
     df = pd.concat(df)
-    df['date'] = date
-    return df
+    if df.shape[0] == 0:
+        print('skipping auction_number {}. Appears empty'.format(auction_number))
+        _empty.append(auction_number)
+        raise StopIteration
+    if "(NOT WORKING)" in auction_date:
+        print('skipping auction_number {}. is labeled "NOT WORKING"'.format(auction_number))
+        _not_working.append(auction_number)
+        raise StopIteration
+    df['auction_number'] = auction_number
+    df['auction_date_string'] = auction_date
+    if '&' in auction_date:
+        auction_date = auction_date.split('&')[-1]
+    df['auction_date'] = dateutil.parser.parse(auction_date)
+    yield {}, df
 
 def get_all_pages(auction_number):
     pages = list()
     for i in range(10):
-        try:
-            url = _url.format(auction_number=auction_number, page=i)
-            pages.append(make_request(url))
-        except Exception as e:
-            if i == 0:
-                raise Exception('probably on first page! {}'.format(e))
-            print('page {} error to max hit'.format(i))
-            break
+        url = _url.format(auction_number=auction_number, page=i+1)
+        print(url)
+        content, status = make_request(url)
+        # the page changes each time, best to check the data. could use the "Lots" text but that is another dep
+        tree = html.fromstring(content)
+        auction_date = get_auction_date_from_tree(tree)
+        table = get_table_from_tree(tree)
+        if table.shape[0]:
+            print('got empty table on auction_number {} page {}. breaking'.format(auction_number, i))
+        if pages:
+            last_table = pages[-1][2]
+            if table.equals(last_table):
+                print('current page same as last page, stopping at page {}'.format(i+1))
+                break
+        pages.append((content, status, table, auction_date))
     return pages
 
 def get_auction_date_from_tree(tree):
