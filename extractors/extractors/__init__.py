@@ -1,4 +1,4 @@
-from . import pdr, quandl
+from . import pdr, quandl, auction
 from . import lib
 globals().update(lib.all_extractors)
 
