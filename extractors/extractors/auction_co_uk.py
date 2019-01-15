@@ -1,4 +1,5 @@
 from lxml import html, etree
+import numpy as np
 import dateutil
 import pandas as pd
 from ratelimit import limits, sleep_and_retry
@@ -39,6 +40,36 @@ def make_request(url):
 _not_working = list()
 _empty = list()
 
+_manual = {
+        'Lot 212 - £85,000 & Lot 213 - £15,000': (100000, 'Sold'),
+        'Lots 48&49  £230,000 Collectively': (230000, 'Sold')
+        }
+def _handle_result(x):
+    price_patterns = ('£', 'â\x82¬')
+    if x in _manual:
+        price, result = _manual[x]
+        return price, result
+    if x is None:
+        return np.nan, None
+    for k in price_patterns:
+        if k in x:
+            r = x.split(k)
+            assert len(r) == 2
+            #
+            price = r[1].replace(k, '').replace(',', '').replace('+', '')
+            if price.lower().endswith('m'):
+                price = float(price[:-1]) * 1e6
+            else:
+                price = float(price)
+            if 'available' in r[0].lower() or 'avaliable' in r[0].lower() or 'collectiv' in r[0].lower():
+                result = 'Available'
+            elif r[0] == '':
+                result = 'Sold'
+            else:
+                raise Exception('something else with {}'.format(x))
+            return price, result
+    return np.nan, x
+
 
 @lib.extractor()
 def get_pastresults(auction_number):
@@ -65,6 +96,11 @@ def get_pastresults(auction_number):
     if '&' in auction_date:
         auction_date = auction_date.split('&')[-1]
     df['auction_date'] = dateutil.parser.parse(auction_date)
+    # try to enrich a bit
+    s = df.result.apply(_handle_result).values
+    x, y = list(zip(*s))
+    df['price'] = x
+    df['outcome'] = y
     yield {}, df
 
 def get_all_pages(auction_number):
