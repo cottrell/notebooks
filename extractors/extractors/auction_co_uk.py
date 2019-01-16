@@ -20,6 +20,8 @@ _min_n = 715 # dunno, this is where they seem to start, there are gaps, not sure
 _max_n = 1065
 _url = 'http://www.auction.co.uk/residential/pastresults.asp?A={auction_number}&S=L&O=A&P={page}' # starts at 1
 
+# TODO: some issue with http://www.auction.co.uk/residential/pastResults.asp?A=1058 410 Garrat for example London SW18
+
 def get_all_data():
     # REMEMBER to clear the cache if you want to reforce it. This is the memory cache NOT the extractor data!
     # do everything at once, not too carefully since the memory.cache is being used anyway on each request
@@ -95,6 +97,8 @@ def get_pastresults(auction_number):
     df['auction_date_string'] = auction_date
     if '&' in auction_date:
         auction_date = auction_date.split('&')[-1]
+    elif ' and ' in auction_date:
+        auction_date = auction_date.split(' and ')[-1]
     df['auction_date'] = dateutil.parser.parse(auction_date)
     # try to enrich a bit
     s = df.result.apply(_handle_result).values
@@ -113,6 +117,9 @@ def get_all_pages(auction_number):
         tree = html.fromstring(content)
         auction_date = get_auction_date_from_tree(tree)
         table = get_table_from_tree(tree)
+        if table is None:
+            print('skipping table')
+            continue
         if table.shape[0]:
             print('got empty table on auction_number {} page {}. breaking'.format(auction_number, i))
         if pages:
@@ -134,15 +141,31 @@ def get_auction_date_from_tree(tree):
 def get_table_from_tree(tree):
     d = tree.xpath('//descendant-or-self::table[@class="Main"]/tr')
     table = list()
+    # TODO: consider filter on len(d) > 2
     for i, x in enumerate(d[1:]):
         td = x.xpath('./td') # a row?
         e = td[0]
         href = e.xpath('./a')[0].attrib['href']
         town = e.xpath('./a/span/span/span[@class="town"]')[0].text
-        address = str(''.join(e.xpath('./a/span/span/span/following-sibling::text()'))).strip()
+        address = str(' '.join(e.xpath('./a/span/span/span/following-sibling::text()'))).strip()
         location = str(td[2].xpath('./a')[0].text).strip()
-        type_ = td[1].text
-        result = td[3].text
+        type_ = str(td[1].text).strip()
+        result = str(td[3].text).strip()
+        if not result:
+            result = str(td[3].xpath('./a')[0].text).strip()
+        if not result:
+            # from mylib import bok
+            # bok('asdf')
+            raise Exception('asdf')
+        # if (result != 'Withdrawn') & (town != 'Withdrawn'): # withdrawn might have no info
+        #     if not address:
+        #         from mylib import bok
+        #         bok('asdf')
+        #         raise Exception('no address')
+        #     if not town:
+        #         from mylib import bok
+        #         bok('asdf')
+        #         raise Exception('no town')
         dd = {'type': type_, 'location': location, 'town': town, 'address': address, 'result': result, 'href': href}
         table.append(dd)
     df = pd.DataFrame(table)

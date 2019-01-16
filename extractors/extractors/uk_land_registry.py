@@ -1,3 +1,6 @@
+"""
+NOTE: read raw data from extractors.uk_land_registry now instead!
+"""
 from . import lib
 import pandas as pd
 from .lib_get_data import StandardExtractor
