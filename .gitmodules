@@ -46,3 +46,6 @@
 [submodule "data/finance"]
 	path = data/finance
 	url = https://gitlab.com/david-cottrell/finance.git
+[submodule "extractors"]
+	path = extractors
+	url = git@gitlab.com:david-cottrell/extractors.git
