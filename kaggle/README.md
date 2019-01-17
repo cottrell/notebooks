@@ -26,3 +26,5 @@
     4quant/depth-generation-lightfield-imaging                   Computational Imaging                               350MB  2018-07-10 16:58:22            256  
     mirichoi0218/insurance                                        Medical Cost Personal Datasets                      16KB  2018-02-21 00:15:14           4942  
     fernandol/countries-of-the-world                             Countries of the World                               13KB  2018-04-26 08:16:27           3465  
+
+kaggle datasets download -d devorvant/economic-calendar
