@@ -25,7 +25,7 @@ def tempfile_then_atomic_move(filename, dir=None, prefix='.tmp_'):
 # https://fredrikaverpil.github.io/2017/06/20/async-and-await-with-subprocesses/
 # https://docs.python.org/3/library/asyncio-subprocess.html
 
-def run_command_get_output(cmd, shell=True, splitlines=True):
+def run_command_get_output(cmd, shell=True, splitlines=True, raise_exceptions=False):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell)
     out, err = p.communicate()
     status = p.returncode
@@ -34,7 +34,10 @@ def run_command_get_output(cmd, shell=True, splitlines=True):
     if splitlines:
         out = out.split('\n')
         err = err.split('\n')
-    return dict(out=out, err=err, status=status)
+    res = dict(out=out, err=err, status=status, cmd=cmd)
+    if raise_exceptions and status != 0:
+        raise Exception('error running {}'.format(res))
+    return res
 
 def convert_nan_to_none_inplace(df, na_value='None'):
     for k in df:
