@@ -1,6 +1,0 @@
-https://code.jquery.com/jquery-3.3.1.min.js
-https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js
-https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js
-https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css
-https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css
-https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js
