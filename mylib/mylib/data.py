@@ -142,3 +142,6 @@ def plot_transitive_reduction_of_condensation(edges):
     plt.tight_layout()
     plt.show()
     return gggg
+
+def robust_scaler(df):
+    return (df - df.median()) / (df.quantile(0.75) - df.quantile(0.25))
