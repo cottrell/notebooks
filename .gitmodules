@@ -49,3 +49,6 @@
 [submodule "extractors"]
 	path = extractors
 	url = git@gitlab.com:david-cottrell/extractors.git
+[submodule "mylib"]
+	path = mylib
+	url = https://github.com/cottrell/mylib.git
