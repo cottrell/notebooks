@@ -52,3 +52,6 @@
 [submodule "mylib"]
 	path = mylib
 	url = https://github.com/cottrell/mylib.git
+[submodule "my-gym"]
+	path = my-gym
+	url = git@gitlab.com:david-cottrell/my-gym.git
