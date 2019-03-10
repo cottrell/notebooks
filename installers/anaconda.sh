@@ -40,7 +40,10 @@ pip install --upgrade pip
 pip install --upgrade tensorboard tensorflow-probability
 if [[ $(uname) = "Linux" ]]; then
 	# pip install tensorflow-gpu
-        conda install -c anaconda tensorflow-gpu
+	# pip install tensorflow
+	# pip install tf-nightly
+	pip install tf-nightly-gpu
+        # conda install -c anaconda tensorflow-gpu
 
 else
 	pip install tensorflow

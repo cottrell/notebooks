@@ -109,6 +109,8 @@ class A2CAgent:
                     ep_rews.append(0.0)
                     next_obs = env.reset()
 
+            # # TO VIZ
+            # env.render()
             _, next_value = self.model.action_value(next_obs[None, :])
             returns, advs = self._returns_advantages(rewards, dones, values, next_value)
             # a trick to input actions and advantages through same API
