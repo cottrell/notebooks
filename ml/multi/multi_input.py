@@ -9,39 +9,34 @@ import numpy as np
 class Model(km.Model):
     def __init__(self, dim, z_dim=9):
         self._z_grid = np.linspace(-1, 1, z_dim)
-        X_input = kl.Input(shape=(None, dim))
-        Z_input = kl.Input(shape=(None, None, 1))
         super().__init__()
         self.dim = dim
     # def call(self, inputs):
     #     return self.call_with_z([inputs, self._z_grid])
     def call(self, inputs):
         X, Z = inputs
-        X_layer = kl.Dense(16, activation='linear')(X)
-        Z_dense = kl.Dense(16, activation='linear')
-        combined = list()
-        for i in range(Z.shape[-1]):
-            z = Z_dense(Z[:,i])
-            l = X_layer + z
-            l = K.expand_dims(l, axis=1)
-            combined.append(l)
-        combined = kl.concatenate(combined, axis=1)
-        # combined is now shape (batch_size, z_size, 16)
-        l = ka.relu(combined)
-        l = kl.Dense(16, activation='relu')(l)
-        l = kl.Dense(16, activation='relu')(l)
-        main_output = kl.Dense(1, activation='linear')(l)
-        return main_output
+        # X_layer = kl.Dense(16, activation='linear')(X)
+        # Z_dense = kl.Dense(16, input_shape=(Z.shape[-1], None, None), activation='linear')
+        # combined = list()
+        # for i in range(Z.shape[-1]):
+        #     z = Z_dense(Z[None,i])
+        #     l = X_layer + z
+        #     l = K.expand_dims(l, axis=1)
+        #     combined.append(l)
+        # combined = kl.concatenate(combined, axis=1)
+        # # combined is now shape (batch_size, z_size, 16)
+        # l = ka.relu(combined)
+        # l = kl.Dense(16, activation='relu')(l)
+        # l = kl.Dense(16, activation='relu')(l)
+        # main_output = kl.Dense(1, activation='linear')(l)
+        # return main_output
 
 dim = 6
 m = 100
 X = np.random.randn(m, dim)
 Z = np.random.randn(1, 10)
-
 model = Model(dim)
-
 out = model.predict([X, Z])
-# out = model.predict(X.head().values)
 
 
 # 
