@@ -1,4 +1,6 @@
 *.xlsx
+*.parquet
+*.txt.gz
 metastore_db/
 c
 j
