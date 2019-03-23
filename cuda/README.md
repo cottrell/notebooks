@@ -1,28 +1,19 @@
-tensorflow:
+# As of 2019-03
 
-pip and vanilla installs requires manual installs of cuda drivers form nvda.
+Later version of nvidia drivers seem to be ok across the board for tf-nightly-gpu and tf 2.0.
 
+Do a clean install/purge of nvidia and cuda (see ../ubuntu notes one level up).
 
-9.2 for old tf
+Download latest nvidia cuda driver manually and follow the instructions there that usually look something like this:
 
-sudo dpkg -i cuda-repo-ubuntu1710-9-2-local_9.2.148-1_amd64.deb
-sudo apt-key add /var/cuda-repo-9-2-local/7fa2af80.pub
-sudo apt-key add /var/cuda-repo-<version>/7fa2af80.pub
-sudo apt-get update
-sudo apt-get install cuda # 10
-sudo apt-get install cuda-9.2
+    sudo dpkg -i ./cuda-repo-ubuntu1810-10-1-local-10.1.105-418.39_1.0-1_amd64.deb
+    sudo apt-key add /var/cuda-repo-10-1-local-10.1.105-418.39/7fa2af80.pub
+    sudo apt-get update
+    sudo apt-get install cuda
 
-Or can install tf using conda for old tf.
+Then there is some issue with 10-1 needing cusparse from 10-0, seems we need to download that manually and install as well:
 
-For now tf (2.0) install cuda 10 and then via pip
-
-> conda create -n tf2 python=3.6
-> source activate tf2
-> pip install tf-nightly-2.0-preview # tf-nightly-gpu-2.0-preview for GPU version
-
-http://inoryy.com/post/tensorflow2-deep-reinforcement-learning/
-
-but tfp will not work.
-
-READ THIS: https://blog.kovalevskyi.com/multiple-version-of-cuda-libraries-on-the-same-machine-b9502d50ae77
-
+    sudo dpkg -i ./cuda-repo-ubuntu1804-10-0-local-10.0.130-410.48_1.0-1_amd64.deb
+    sudo apt-key add /var/cuda-repo-10-0-local-10.0.130-410.48/7fa2af80.pub
+    sudo apt-get update
+    sudo apt-get install cuda-10-0
