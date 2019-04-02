@@ -6,6 +6,8 @@ purge all and install the correct driver ! 410 see ubuntu/nvidia_purge.sh and cu
 
 # As of 2019-03
 
+    STILL NOT WORKING WAS WRONG
+
     ##########################################
     ##########################################
     ## nvidia-410 and CUDA 10-0 CUDNN 7.4.2 ##
