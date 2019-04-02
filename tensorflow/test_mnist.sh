@@ -1,2 +1,2 @@
 #!/bin/sh
-./run.sh python mnist.py
+./run.sh python ./mnist.py

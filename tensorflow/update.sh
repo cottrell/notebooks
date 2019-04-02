@@ -8,6 +8,9 @@ case $1 in
         # tensorflow-estimator-2.0-preview
         pip install tf-nightly-gpu-2.0-preview tb-nightly -U
         ;;
+    alpha)
+        pip install tensorflow-gpu==2.0.0-alpha0 -u
+        ;;
     *)
         echo prog 1gpu 2gpu
         ;;
