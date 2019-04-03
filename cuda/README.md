@@ -6,7 +6,9 @@ purge all and install the correct driver ! 410 see ubuntu/nvidia_purge.sh and cu
 
 # As of 2019-03
 
-    STILL NOT WORKING WAS WRONG
+See rtx20xx_fix.py for the growth fix for GPU.
+
+Also make sure anaconda/pkgs is clear of cuda and conda uninstall cuda cudann cupti etc!
 
     ##########################################
     ##########################################
