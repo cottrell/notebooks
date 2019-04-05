@@ -20,11 +20,11 @@ else
     wget https://repo.anaconda.com/archive/$filename
 fi
 
-[ -e ~/anaconda3 ] || bash ./$filename -u
+[[ -e ~/anaconda3 ]] || bash ./$filename -u
 
 # continually rerunning this this will not necessarily lead to stable deployment state, just for human setup
 # if you try 37 will just get downgraded by some packages as of 2018-11
-if [ ! $(conda info --envs | grep 37) ]; then
+if [[ ! $(conda info --envs | grep 37) ]]; then
     echo ~/anaconda3/bin/conda create -n 37 python=3.7 pandas
     ~/anaconda3/bin/conda create -y -n 37 python=3.7 pandas
 else

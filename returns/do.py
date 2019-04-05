@@ -4,16 +4,16 @@ import numpy as np
 import scipy.stats
 normdist = scipy.stats.norm()
 m = 1000
-epsilon = 0.5
+epsilon = 0.0 # how much edge
 rho = 1
-mu = 0.00
+mu = 0.02
 sigma = 0.03
 
 def get_samples():
     X = list()
     TH = list()
     Z = list()
-    for i in range(100):
+    for i in range(10):
         zz = np.random.randn(m)
         z = np.sqrt(1 - epsilon ** 2) * np.random.randn(m) + rho * epsilon * zz
         u = normdist.cdf(np.sqrt(1 - epsilon ** 2) * np.random.randn(m) + epsilon * zz)
@@ -33,8 +33,11 @@ x, theta, z = get_samples()
 c = pd.DataFrame(theta * z)
 print('accuracy')
 print((c > 0).stack().sum() / np.prod(c.shape))
+print('returns')
+print(pd.DataFrame(x).describe())
 
 ion()
+
 figure(1)
 clf()
 plot(x, alpha=0.05)
@@ -44,6 +47,7 @@ grid()
 df = pd.DataFrame(x)
 ax = gca()
 df.mean(axis=1).plot(ax=ax)
+grid()
 
 # figure(2)
 # clf()
