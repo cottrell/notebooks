@@ -1,3 +1,8 @@
+"""
+Some example to show tricks for trying to work with inputs that do not have a common "batch_size".
+
+Network is a separable representation h(f(S) * g(X)) where f outputs a scalar and g and h operate element wise across the vectors.
+"""
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import keras
@@ -9,9 +14,8 @@ d = 12
 S = np.random.randn(m, n)
 X = np.arange(d)
 
-# some separable representation f(S) * g(X) where f is a scalar and g is a vector
-S_in = keras.layers.Input(shape=(n,))
-X_in = keras.layers.Input(shape=(d,))
+S_in = keras.layers.Input(shape=(n,), name='S_in')
+X_in = keras.layers.Input(shape=(d,), name='X_in')
 s = S_in
 for k in [16, 16, 1]:
     s = keras.layers.Dense(k, activation='tanh')(s)
@@ -40,7 +44,8 @@ except Exception as e:
 # this works
 XX = np.repeat(np.atleast_2d(X), m, axis=0)
 pred = model.predict([S, XX])
+plt.ion()
 fig = plt.figure(1)
 fig.clf()
-plt.plot(pred)
+plt.plot(pred.T)
 plt.show()
