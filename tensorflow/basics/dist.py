@@ -17,25 +17,29 @@ df = e.e.pdr_yahoo_price_volume.load(filters=[('symbol', '=', 'ibm')])
 r_pct = df.close.pct_change().dropna()
 r = np.log(df.close).diff().dropna()
 
-# class LogNormalLayer(keras.layers.Layer):
-#     def __init__(self, output_dim=1, **kwargs):
-#         self.output_dim = output_dim
-#         super(MyLayer, self).__init__(**kwargs)
-# 
-#     def build(self, input_shape):
-#         self.mu = self.add_weight(name='mu', shape=(1,), initializer='zeros', trainable=True)
-#         self.sigma = self.add_weight(name='sigma', shape=(1,), initializer='ones', trainable=True, constraint=keras.constraints.non_neg())
-#         super(MyLayer, self).build(input_shape)  # Be sure to call this at the end
-# 
-#     def call(self, x):
-#         log_probs = - tf.math.square(tf.math.log(x) - self.mu) / tf.math.square(self.sigma) / 2 - tf.math.log(x * self.sigma * np.sqrt(2 * np.pi))
-#         tf.debugging.assert_all_finite(log_probs, 'log_probs are nan')
-#         loss = -tf.reduce_mean(log_probs)
-#         self.add_loss(loss)
-#         return x
-# 
-#     def compute_output_shape(self, input_shape):
-#         return (input_shape[0], self.output_dim)
+class LogNormalLayer(keras.layers.Layer):
+    def __init__(self, output_dim=1, **kwargs):
+        self.output_dim = output_dim
+        super().__init__(**kwargs)
+
+    def build(self, input_shape):
+        self.mu = self.add_weight(name='mu', shape=(1,), initializer='zeros', trainable=True)
+        self.sigma = self.add_weight(name='sigma', shape=(1,), initializer='ones', trainable=True, constraint=keras.constraints.non_neg())
+        self.params = dict(mu=mu, sigma=sigma)
+        super().build(input_shape)  # Be sure to call this at the end
+
+    def call(self, x):
+        log_probs = - tf.math.square(tf.math.log(x) - self.mu) / tf.math.square(self.sigma) / 2 - tf.math.log(x * self.sigma * np.sqrt(2 * np.pi))
+        tf.debugging.assert_all_finite(log_probs, 'log_probs are nan')
+        loss = -tf.reduce_mean(log_probs)
+        self.add_loss(loss)
+        return x
+
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], self.output_dim)
+
+    def get_params(self):
+        return {k: v.numpy() for k, v in self.params.items()}
 
 def pareto_log_pdf(x, x_m, alpha):
     return tf.math.log(alpha) + alpha * tf.math.log(x_m) - (1 + alpha) * tf.math.log(x)
@@ -82,7 +86,7 @@ class ParetoTail(keras.layers.Layer):
         return {k: v.numpy() for k, v in self.params.items()}
 
 class Estimator(keras.models.Model):
-    def __init__(self, learning_rate=0.000000001):
+    def __init__(self, layer=ParetoTail, learning_rate=0.000000001):
         super().__init__()
         x_in = keras.layers.Input(shape=(1,))
         self.layer = ParetoTail(name='dist')
@@ -107,7 +111,7 @@ n = a.shape[0]
 p = np.linspace(1/n, 1 - 1/n, n)
 
 ss_norm = ss.norm(*ss.norm.fit(a ** 2))
-estimator = Estimator()
+estimator = Estimator(layer=LogNormalLayer)
 s = pd.Series(estimator.model.predict([-1, 0, 1]).squeeze())
 print(estimator.get_params())
 estimator.fit(a)
