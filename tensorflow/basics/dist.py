@@ -1,10 +1,11 @@
-import pandas as pd
-from pylab import *
-ion()
+""" this one is failing. see dist_working """
 import numpy as np
 import tensorflow as tf
 import tensorflow.keras as keras
 import tensorflow.keras.backend as K
+import pandas as pd
+from pylab import *
+ion()
 
 m = 10000
 mu = 0.1
@@ -14,7 +15,7 @@ x = mu + sigma * z
 
 import my.extractors as e
 df = e.e.pdr_yahoo_price_volume.load(filters=[('symbol', '=', 'ibm')])
-r_pct = df.close.pct_change().dropna()
+r = df.close.pct_change().dropna()
 r = np.log(df.close).diff().dropna()
 
 class LogNormalLayer(keras.layers.Layer):
@@ -102,20 +103,26 @@ class Estimator(keras.models.Model):
     def get_params(self):
         return self.model.get_layer('dist').get_params()
 
+m = 10000
+mu = 0.1
+sigma = 0.2
+z = np.random.randn(m)
+x = np.exp(mu + sigma * z)
+
 import scipy.stats as ss
 
-# a = r.values.copy()
-a = x
-a.sort()
-n = a.shape[0]
-p = np.linspace(1/n, 1 - 1/n, n)
+# # a = r.values.copy()
+# a = x
+# a.sort()
+# n = a.shape[0]
+# p = np.linspace(1/n, 1 - 1/n, n)
 
-ss_norm = ss.norm(*ss.norm.fit(a ** 2))
+# ss_norm = ss.norm(*ss.norm.fit(a ** 2))
 estimator = Estimator(layer=LogNormalLayer)
-s = pd.Series(estimator.model.predict([-1, 0, 1]).squeeze())
-print(estimator.get_params())
-estimator.fit(a)
-print(estimator.get_params())
+# s = pd.Series(estimator.model.predict([-1, 0, 1]).squeeze())
+# print(estimator.get_params())
+estimator.fit(x)
+# print(estimator.get_params())
 
 # figure(1)
 # fig = subplot(3, 1, 1)
