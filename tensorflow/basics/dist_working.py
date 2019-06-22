@@ -12,12 +12,12 @@ x = np.exp(mu + sigma * z)
 class MyLayer(keras.layers.Layer):
     def __init__(self, output_dim=1, **kwargs):
         self.output_dim = output_dim
-        super(MyLayer, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def build(self, input_shape):
         self.mu = self.add_weight(name='mu', shape=(1,), initializer='zeros', trainable=True)
         self.sigma = self.add_weight(name='sigma', shape=(1,), initializer='ones', trainable=True, constraint=keras.constraints.non_neg())
-        super(MyLayer, self).build(input_shape)  # Be sure to call this at the end
+        super().build(input_shape)  # Be sure to call this at the end
 
     def call(self, x):
         log_probs = - tf.math.square(tf.math.log(x) - self.mu) / tf.math.square(self.sigma) / 2 - tf.math.log(x * self.sigma * np.sqrt(2 * np.pi))

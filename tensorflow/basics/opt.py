@@ -8,7 +8,7 @@ with tf.GradientTape(persistent=True) as t:
     # y = tf.math.square(log_x)
     y = (x - 1) ** 2
 
-opt = tf.optimizers.Adam(learning_rate=0.001)
+opt = tf.optimizers.Adam(learning_rate=0.1)
 
 def get_gradient_wrong(x0):
     # this does not work, it does not actually update the value of x
@@ -24,8 +24,7 @@ def get_gradient(x0):
 
 #### Option 1
 def a(x0, tol=1e-8, max_iter=10000):
-    # does not appear to work properly
-    x.assign(x0)
+    # seems to work x.assign(x0)
     err = np.Inf # step error (banach), not actual erro
     i = 0
     while err > tol:
