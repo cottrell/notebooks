@@ -1,4 +1,6 @@
 *.xlsx
+build/
+.keras/
 *.parquet
 *.txt.gz
 metastore_db/

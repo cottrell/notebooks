@@ -55,3 +55,6 @@
 [submodule "my-gym"]
 	path = my-gym
 	url = git@gitlab.com:david-cottrell/my-gym.git
+[submodule "mybin"]
+	path = mybin
+	url = https://github.com/cottrell/mybin.git
