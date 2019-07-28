@@ -1,8 +1,10 @@
 import tensorflow as tf
 import tensorflow_probability as tfp
+tfb = tfp.bijectors
+tfd = tfp.distributions
 
 
-class BijectorBase(tfp.bijectors.Bijector):
+class BijectorBase(tfb.Bijector):
 
     def transformed_log_prob(self, log_prob, x):
         return (self.inverse_log_det_jacobian(x, event_ndims=0) + log_prob(tfp.bijector.inverse(x)))
@@ -10,6 +12,27 @@ class BijectorBase(tfp.bijectors.Bijector):
     def transformed_sample(self, x):
         return tfp.bijector.forward(x)
 
+
+# quite easy to interpret - multiplying by alpha causes a contraction in volume.
+class LeakyReLU(BijectorBase):
+
+    def __init__(self, alpha=0.5, validate_args=False, name="leaky_relu"):
+        super().__init__(event_ndims=1, validate_args=validate_args, name=name)
+        self.alpha = alpha
+
+    def _forward(self, x):
+        return tf.where(tf.greater_equal(x, 0), x, self.alpha * x)
+
+    def _inverse(self, y):
+        return tf.where(tf.greater_equal(y, 0), y, 1. / self.alpha * y)
+
+    def _inverse_log_det_jacobian(self, y):
+        event_dims = self._event_dims_tensor(y)
+        I = tf.ones_like(y)
+        J_inv = tf.where(tf.greater_equal(y, 0), I, 1.0 / self.alpha * I)
+        # abs is actually redundant here, since this det Jacobian is > 0
+        log_abs_det_J_inv = tf.math.log(tf.abs(J_inv))
+        return tf.reduce_sum(log_abs_det_J_inv, axis=event_dims)
 
 class Exp(BijectorBase):
 
@@ -63,15 +86,34 @@ class TrainStepper():
         with tf.GradientTape() as tape:
             d = self.model(*data)
         gradients = tape.gradient(d['loss'], self.model.trainable_variables)
-        l = self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
+        _ = self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         return d
 
-model = Exp()
-import numpy as np
-x = np.random.randn(100) * 2.34 + 7.3
-print(model(x))
+    def train(self, data, epochs=1000, log_period=100):
+        for epoch in range(epochs):
+            d = self(*data)
+            if self.step % log_period == 0:
+                print({k: v.numpy() for k, v in d.items()})
+                for k, v in d.items():
+                    tf.summary.scalar(k, v, step=self.step)
 
+import numpy as np
+x = np.random.rand(100, 1) * 2.34 + 7.3
+
+bijectors = list()
+
+bijectors.append(tfb.Affine(shift=[0.], scale_diag=[10.0]))
+bijectors.append(Exp())
+
+# something about reverse order
+bijector = tfb.Chain(bijectors[::-1])
+model = tfd.TransformedDistribution(
+            distribution=tfd.Uniform(),
+            bijector=bijector,
+            event_shape=(1,))
+
+def lossmodel(*x):
+    return dict(loss=model.log_prob(x))
 
 optimizer = tf.optimizers.Adam(learning_rate=0.001)
-lossmodel = model
 stepper = TrainStepper(optimizer=optimizer, model=lossmodel)
