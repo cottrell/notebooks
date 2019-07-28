@@ -85,6 +85,7 @@ class TrainStepper():
     def _call(self, *data):
         with tf.GradientTape() as tape:
             d = self.model(*data)
+        print(self.model.trainable_variables)
         gradients = tape.gradient(d['loss'], self.model.trainable_variables)
         _ = self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         return d
@@ -100,20 +101,32 @@ class TrainStepper():
 import numpy as np
 x = np.random.rand(100, 1) * 2.34 + 7.3
 
-bijectors = list()
+class MyLayer(tf.keras.models.Model):
 
-bijectors.append(tfb.Affine(shift=[0.], scale_diag=[10.0]))
-bijectors.append(Exp())
+    def __init__(self):
+        super().__init__()
+        self.bijectors = list()
+        self.bijectors.append(tfb.Affine(shift=[0.], scale_diag=[10.0]))
+        self.bijectors.append(Exp())
+        self.bijector = tfb.Chain(self.bijectors[::-1])
+        self.model = tfd.TransformedDistribution(
+                        distribution=tfd.Uniform(),
+                        bijector=self.bijector,
+                        event_shape=(1,))
 
-# something about reverse order
-bijector = tfb.Chain(bijectors[::-1])
-model = tfd.TransformedDistribution(
-            distribution=tfd.Uniform(),
-            bijector=bijector,
-            event_shape=(1,))
+    def call(self, *inputs):
+        return self.model(*inputs)
 
-def lossmodel(*x):
-    return dict(loss=model.log_prob(x))
+class LossModel(tf.keras.models.Model):
 
+    def __init__(self, bijector_layer):
+        super().__init__()
+        self.model = bijector_layer
+
+    def call(self, *x):
+        return dict(loss=tf.reduce_mean(self.model.model.log_prob(x)))
+
+mylayer = MyLayer()
+lossmodel = LossModel(mylayer)
 optimizer = tf.optimizers.Adam(learning_rate=0.001)
 stepper = TrainStepper(optimizer=optimizer, model=lossmodel)
