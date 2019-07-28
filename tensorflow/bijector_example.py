@@ -106,7 +106,9 @@ class MyLayer(tf.keras.models.Model):
     def __init__(self):
         super().__init__()
         self.bijectors = list()
-        self.bijectors.append(tfb.Affine(shift=[0.], scale_diag=[10.0]))
+        self.shift = tf.Variable([0.], dtype=tf.float32, name='shift')
+        self.scale_diag = tf.Variable([10.], dtype=tf.float32, name='scale_diag')
+        self.bijectors.append(tfb.Affine(shift=self.shift, scale_diag=self.scale_diag))
         self.bijectors.append(Exp())
         self.bijector = tfb.Chain(self.bijectors[::-1])
         self.model = tfd.TransformedDistribution(
