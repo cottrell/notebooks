@@ -132,3 +132,9 @@ mylayer = MyLayer()
 lossmodel = LossModel(mylayer)
 optimizer = tf.optimizers.Adam(learning_rate=0.001)
 stepper = TrainStepper(optimizer=optimizer, model=lossmodel)
+
+
+with tf.GradientTape() as tape:
+    loss = mylayer.model.log_prob(x)
+gradients = tape.gradient(loss, mylayer.trainable_variables)
+# _ = optimizer.apply_gradients(zip(gradients, mylayer.trainable_variables))
