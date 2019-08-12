@@ -58,3 +58,6 @@
 [submodule "mybin"]
 	path = mybin
 	url = https://github.com/cottrell/mybin.git
+[submodule "djnotes"]
+	path = djnotes
+	url = https://github.com/cottrell/djnotes.git
