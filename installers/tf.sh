@@ -1,10 +1,20 @@
-conda create -n tf2gpu python=3.6
-source activate tf2gpu
 # need to install nvidia 10 driver manually
-pip install tf-nightly-gpu-2.0-preview ipython
+source ./etc/profile.d/conda.sh
+conda activate 37
 
+if [[ $# -ne 1 ]]; then
+    echo usage prog gpu cpu
+fi
 
-# another one tf 1
-conda create -n tf python=3.6
-pip install tf-nightly-gpu tfp-nightly
+if [[ $1 = gpu ]]; then
+    pip install tf-nightly-gpu-2.0-preview
+elif [[ $1 = gpu ]]; then
+    # pip install tf-nightly-2.0-preview
+    pip install tensorflow==2.0.0-beta1
+else
+    echo unkown arg $1
+    exit 1
+fi
+
+pip install -y tf-estimator-nightly tb-nightly tensorflow-estimator-2.0-preview
 
