@@ -5,6 +5,7 @@
 
 source ./etc/profile.d/conda.sh
 conda activate 37
+
 echo installing packages
 conda install -y pip pandas ipython scipy Cython jupyter setuptools ujson
 conda install -y matplotlib seaborn bokeh
@@ -32,8 +33,7 @@ pip install scikit-learn auto-sklearn
 
 pip install lightgbm catboost
 
-# not really but why not
-# pip install dask argh pyarrow bcolz toolz cloudpickle pandas_datareader
+pip install dask argh pyarrow bcolz toolz cloudpickle pandas_datareader
 pip install boto3
 
 hub
@@ -44,14 +44,3 @@ cd tpot && python setup.py develop; cd -
 
 cd ~/dev
 hub clone jhfjhfj1/autokeras && cd autokeras && python setup.py develop; cd -
-
-# NOTES, YOU PROBABLY DON't want to live run this without reading
-source activate 36
-# dev clones
-cd ~/dev
-sudo apt install swig
-hub clone automl/auto-sklearn
-cd ~/dev/tensorflow
-[[ -e tensorflow ]] || hub clone tensorflow/tensorflow
-[[ -e probability ]] || hub clone tensorflow/probability
-[[ -e models ]] || hub clone tensorflow/models
