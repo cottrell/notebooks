@@ -6,11 +6,13 @@
 # consider using miniconda
 # https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
 
+# https://repo.anaconda.com/archive/Anaconda3-2019.07-MacOSX-x86_64.sh
 if [[ $(uname) = "Linux" ]]; then
-    filename=Anaconda3-5.3.1-Linux-x86_64.sh
+    OS=Linux
 else
-    filename=Anaconda3-5.3.1-MacOSX-x86_64.sh
+    OS=MacOSX
 fi
+filename=Anaconda3-2019.07-$OS-x86_64.sh
 echo Will install: $filename
 
 cd /tmp
@@ -25,8 +27,8 @@ fi
 # continually rerunning this this will not necessarily lead to stable deployment state, just for human setup
 # if you try 37 will just get downgraded by some packages as of 2018-11
 if [[ ! $(conda info --envs | grep 37) ]]; then
-    echo ~/anaconda3/bin/conda create -n 37 python=3.7 pandas
-    ~/anaconda3/bin/conda create -y -n 37 python=3.7 pandas
+    echo ~/anaconda3/bin/conda create -n 37 python=3.7.3 pandas
+    ~/anaconda3/bin/conda create -y -n 37 python=3.7.3 pandas
 else
     echo 37 exists
 fi
