@@ -47,3 +47,8 @@ node_modules/
 .*.pid
 *.lock
 *.deb
+*.tgz
+*.xls
+*.7z
+*.tfevents.*
+*.db
