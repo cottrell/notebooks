@@ -18,6 +18,11 @@ You always forget.
 
     docker build -t username/image_name:tag_name .
 
+Debug failed build:
+
+
+     docker run -it --rm 9414288adf15 /bin/bash
+
 # Commands
 
 
