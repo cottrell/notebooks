@@ -1,5 +1,7 @@
 # Ports
 
+NETWORK HOST NETWORK HOST NETWORK HOST!!!! IS IMPORTANT.
+
 https://stackoverflow.com/questions/24319662/from-inside-of-a-docker-container-how-do-i-connect-to-the-localhost-of-the-mach
 
 Edit: If you are using Docker-for-mac or Docker-for-Windows 18.03+, just connect to your mysql service using the host host.docker.internal.

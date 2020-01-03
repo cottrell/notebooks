@@ -9,4 +9,5 @@ RUN --mount=type=bind,source=./cache,target=/tmp/cache tar -xzf /tmp/cache/kafka
 RUN --mount=type=cache,target=/tmp/cache apt install -y default-jdk
 
 CMD cd kafka_2.12-2.4.0 && bin/zookeeper-server-start.sh config/zookeeper.properties & cd kafka_2.12-2.4.0 && bin/kafka-server-start.sh config/server.properties
-EXPOSE 9092
+# probably do not need 2181
+EXPOSE 9092 2181
