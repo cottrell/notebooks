@@ -1,0 +1,14 @@
+version: '0'
+services:
+  zookeeper:
+    image: zookeeper/latest
+    ports:
+      - "2181:2181"
+  zkui:
+    image: qnib/plain-zkui@sha256:30c4aa1236ee90e4274a9059a5fa87de2ee778d9bfa3cb48c4c9aafe7cfa1a13
+    ports:
+      - "9090:9090"
+  broker:
+    image: kafka/latest
+    ports:
+      - "9092:9092"
