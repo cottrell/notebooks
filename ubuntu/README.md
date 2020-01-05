@@ -1,4 +1,5 @@
-    # WIFI
+# WIFI
+
     lshw
     lsusb -vv -d 2357:010e
     ip link
@@ -26,3 +27,7 @@
 
     smtp
     relay.plus.net
+
+# network
+
+    mtr www.google.co.uk
