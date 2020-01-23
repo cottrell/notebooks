@@ -1,22 +1,27 @@
 #!/usr/bin/env python
-import string
-import argh
 import os
+import string
+
+import argh
 import pandas as pd
+
 
 def format_filename(s):
     valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
     filename = ''.join(c for c in s if c in valid_chars)
-    filename = filename.replace(' ','_')
+    filename = filename.replace(' ', '_')
     return filename
+
 
 _mydir = os.path.realpath(os.path.dirname(__file__))
 _default_dir = os.path.join('.', os.path.basename(__file__).rsplit('.', 1)[0])
+
 
 def mangle_df(df):
     for k in df:
         df[k] = df[k].str.strip()
     return df
+
 
 def _run(filename, outputdir=None):
     if outputdir is None:
@@ -37,9 +42,11 @@ def _run(filename, outputdir=None):
         print(s, df.shape, filename)
         df.to_csv(filename, index=False)
 
+
 def run(*filenames, outputdir=None):
     for filename in filenames:
         _run(filename)
+
 
 if __name__ == '__main__':
     argh.dispatch_command(run)
