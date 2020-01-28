@@ -6,7 +6,6 @@ cloudpickle
 Cython
 deribit-api
 dot2tex
--e git+https://github.com/pydata/pandas-datareader.git@b2ee60b6bba08f360e81db65d174fac1c7889375#egg=pandas_datareader
 flake8
 joblib
 jupyter
@@ -14,6 +13,7 @@ jupyterlab
 matplotlib
 numpy
 pandas
+pandas_datareader
 pyarrow
 Quandl
 QuantLib
