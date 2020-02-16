@@ -45,3 +45,8 @@ def counter():
         return counter() + 1
     else:
         return 0
+
+if __name__ == '__main__':
+    f(1)
+    f(1)
+    f(2)
