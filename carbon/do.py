@@ -7,10 +7,18 @@ ion()
 fig = figure(1, figsize=(8, 6))
 clf()
 
-for i in range(df.shape[0]):
+rot = 0
+for i in range(df.shape[0] - 1):
     x = df.iloc[i].values
     plot(x[2], x[1], 'o')
-    text(x[2], x[1], x[0], fontsize=6, alpha=0.75)
+    text(x[2], x[1], x[0], fontsize=6, alpha=0.75, rotation=rot)
+
+i = df.shape[0] - 1
+x = df.iloc[i].values
+plot(x[2], x[1], 'ro', markersize=10, alpha=0.75)
+text(x[2], x[1], x[0], fontsize=6, alpha=0.75, rotation=rot)
+world = x[1]
+plot(xlim(), [world, world], 'r', alpha=0.25, linewidth=5)
 
 ax = gca()
 ax.set_xscale('log')
