@@ -34,7 +34,6 @@ __pycache__/
 *.png
 *.gif
 *.swp
-*.csv
 *.things
 *.blp
 old/
