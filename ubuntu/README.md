@@ -1,5 +1,7 @@
 # WIFI
 
+ALTERNATIVE TO TRACEROUTE mtr
+
     lshw
     lsusb -vv -d 2357:010e
     ip link
