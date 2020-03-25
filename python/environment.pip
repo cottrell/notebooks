@@ -24,7 +24,7 @@ scipy
 seaborn
 statsmodels
 tensorboard
-tensorflow
+tensorflow-gpu==2.1.0
 tensorflow_probability
 tornado
 tqdm
