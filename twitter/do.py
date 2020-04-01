@@ -2,7 +2,7 @@
 import os
 import json
 import twitter
-cred = json.load(open(os.path.expanduser('/Users/davidcottrell/.cred/twitter/cred.json')))
+cred = json.load(open(os.path.expanduser('~/.cred/twitter/cred.json')))
 api = twitter.Api(consumer_key=cred['consumer_key'],
                       consumer_secret=cred['consumer_secret'],
                       access_token_key=cred['access_token_key'],

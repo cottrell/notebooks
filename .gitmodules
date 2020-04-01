@@ -67,3 +67,6 @@
 [submodule "C--WrappingExamples"]
 	path = C--WrappingExamples
 	url = https://github.com/cottrell/C--WrappingExamples.git
+[submodule "fractional-differentiation-time-series"]
+	path = fractional-differentiation-time-series
+	url = https://github.com/cottrell/fractional-differentiation-time-series.git
