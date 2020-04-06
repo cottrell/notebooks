@@ -1,6 +1,7 @@
 """
 pip install tweepy
 """
+import sys
 import os
 import json
 cred = json.load(open(os.path.expanduser('~/.cred/twitter/cred.json')))

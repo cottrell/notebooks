@@ -34,3 +34,5 @@ xgboost
 dtale
 pyfiglet
 s3fs
+cvxpy
+flit
