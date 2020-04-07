@@ -72,3 +72,15 @@ cd rtl8188eu
 make all
 sudo make install
 sudo systemctl reboot
+
+# 2020-04-07
+
+https://askubuntu.com/questions/912498/tl-wn722n-is-not-recognized/912507#912507
+
+sudo apt-get install git dkms
+git clone https://github.com/lwfinger/rtl8188eu.git
+cd rtl8188eu
+make
+sudo dkms add ./rtl8188eu
+sudo dkms install 8188eu/1.0
+sudo modprobe 8188eu
