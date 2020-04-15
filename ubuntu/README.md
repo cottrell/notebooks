@@ -17,4 +17,7 @@ https://askubuntu.com/questions/1224074/no-wifi-adapter-found-in-gnome-control-c
     sudo modprobe 8812au
 
 
+After reboot needed to launch wicd-client to select network. Does not need to stay open apparently.
+
 See `old/` for previous notes.
+
