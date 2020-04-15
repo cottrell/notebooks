@@ -21,3 +21,4 @@ After reboot needed to launch wicd-client to select network. Does not need to st
 
 See `old/` for previous notes.
 
+Remember to keep wifi on in power save mode. Go to settings.
