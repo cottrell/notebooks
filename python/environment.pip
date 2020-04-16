@@ -36,5 +36,6 @@ pyfiglet
 s3fs
 cvxpy
 flit
-uvcorn
+uvicorn
 fastapi
+asv

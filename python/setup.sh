@@ -41,9 +41,10 @@ else
     conda install pip
 fi
 if [[ $(uname) != "Darwin" ]]; then
-    sudo apt-get install libffi-dev
-    sudo apt-get install graphviz
-    sudo apt-get install git-lfs
+    sudo apt-get install -y libffi-dev
+    sudo apt-get install -y graphviz
+    sudo apt-get install -y git-lfs
+    sudo apt-get install -y ccache
 else
     brew install graphviz
     brew install git-lfs
