@@ -39,3 +39,4 @@ flit
 uvicorn
 fastapi
 asv
+lmdb

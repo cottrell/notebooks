@@ -8,4 +8,4 @@ echo "deb https://apt.syncthing.net/ syncthing stable" | sudo tee /etc/apt/sourc
 sudo apt-get update
 sudo apt-get install syncthing
 
-# you might need to tunn like ssh -v -N -f -L localhost:8300:localhost:8384 HOST
+See `./tunnel.sh`

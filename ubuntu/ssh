@@ -1,0 +1,3 @@
+See https://unix.stackexchange.com/questions/200239/how-can-i-keep-my-ssh-sessions-from-freezing
+
+TCPKeepAlive yes in both client and server
