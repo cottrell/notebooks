@@ -1,133 +1,133 @@
-|     | date                | name                    | url                                                    |
-|----:|:--------------------|:------------------------|:-------------------------------------------------------|
-|   0 | nan                 | Backtesting.py          | https://kernc.github.io/backtesting.py/                |
-|   1 | nan                 | DRIP                    | https://lakshmidrip.github.io/DRIP                     |
-|   2 | nan                 | FinancialMarkets.jl     | https://github.com/imanuelcostigan/FinancialMarkets.jl |
-|   3 | nan                 | QuantTools              | https://quanttools.bitbucket.io/_site/index.html       |
-|   4 | 2014-01-14T22:47:45 | QuantScale              | https://github.com/choucrifahed/quantscale             |
-|   5 | 2014-02-19T19:16:52 | r-quant                 | https://github.com/artyyouth/r-quant                   |
-|   6 | 2014-12-03T18:27:48 | pyfin                   | https://github.com/opendoor-labs/pyfin                 |
-|   7 | 2015-01-20T20:35:52 | pybbg                   | https://github.com/bpsmith/pybbg                       |
-|   8 | 2015-03-10T07:48:48 | yfinanceapi             | https://github.com/Karthik005/yfinanceapi              |
-|   9 | 2015-06-10T13:03:23 | visualize-wealth        | https://github.com/benjaminmgross/visualize-wealth     |
-|  10 | 2015-07-07T10:30:45 | exchange                | https://github.com/akarat/exchange                     |
-|  11 | 2015-07-14T15:47:16 | quant                   | https://github.com/paulperry/quant                     |
-|  12 | 2015-08-29T12:41:06 | yql-finance             | https://github.com/slawek87/yql-finance                |
-|  13 | 2015-10-07T19:55:40 | quantcomponents         | https://github.com/lsgro/quantcomponents               |
-|  14 | 2015-10-17T20:45:51 | analyzer                | https://github.com/llazzaro/analyzer                   |
-|  15 | 2015-12-17T02:20:02 | options.studies         | https://github.com/taylorizing/options.studies         |
-|  16 | 2016-01-08T14:31:20 | ticks                   | https://github.com/jamescnowell/ticks                  |
-|  17 | 2016-02-12T01:56:48 | yfi                     | https://github.com/nickelkr/yfi                        |
-|  18 | 2016-02-29T14:58:15 | cn_stock_src            | https://github.com/jealous/cn_stock_src                |
-|  19 | 2016-03-31T13:17:11 | algobroker              | https://github.com/joequant/algobroker                 |
-|  20 | 2016-05-17T16:22:53 | vollib                  | https://github.com/vollib/vollib                       |
-|  21 | 2016-09-10T12:07:34 | stock_extractor         | https://github.com/ZachLiuGIS/stock_extractor          |
-|  22 | 2016-09-23T15:38:55 | pythalesians            | https://github.com/thalesians/pythalesians             |
-|  23 | 2016-10-07T04:54:17 | QuantSoftware Toolkit   | https://github.com/QuantSoftware/QuantSoftwareToolkit  |
-|  24 | 2016-10-07T21:37:35 | pyhoofinance            | https://github.com/innes213/pyhoofinance               |
-|  25 | 2016-11-02T13:02:42 | dynts                   | https://github.com/quantmind/dynts                     |
-|  26 | 2016-12-08T09:31:43 | yahoo-finance           | https://github.com/lukaszbanasiak/yahoo-finance        |
-|  27 | 2017-02-07T23:59:28 | NowTrade                | https://github.com/edouardpoitras/NowTrade             |
-|  28 | 2017-02-28T04:15:50 | VisualPortfolio         | https://github.com/wegamekinglc/VisualPortfolio        |
-|  29 | 2017-03-10T17:28:51 | ystockquote             | https://github.com/cgoldberg/ystockquote               |
-|  30 | 2017-03-21T14:00:36 | Ito.jl                  | https://github.com/aviks/Ito.jl                        |
-|  31 | 2017-04-12T17:12:15 | FinCal                  | https://github.com/felixfan/FinCal                     |
-|  32 | 2017-05-06T15:50:06 | Scala Quant             | https://github.com/frankcash/Scala-Quant               |
-|  33 | 2017-06-05T02:50:47 | tia                     | https://github.com/bpsmith/tia                         |
-|  34 | 2017-07-23T19:34:07 | finsymbols              | https://github.com/skillachie/finsymbols               |
-|  35 | 2017-07-30T13:00:21 | QUANTAXIS_Webkit        | https://github.com/yutiansut/QUANTAXIS_Webkit          |
-|  36 | 2017-08-22T10:17:54 | TALib.jl                | https://github.com/femtotrader/TALib.jl                |
-|  37 | 2017-10-16T10:53:42 | binary-martingale       | https://github.com/metaperl/binary-martingale          |
-|  38 | 2017-10-21T21:42:46 | Derman Papers           | https://github.com/MarcosCarreira/DermanPapers         |
-|  39 | 2017-10-26T12:43:28 | quantdsl                | https://github.com/johnbywater/quantdsl                |
-|  40 | 2017-11-28T13:54:20 | QuantPy                 | https://github.com/jsmidt/QuantPy                      |
-|  41 | 2018-02-15T23:44:06 | after-hours             | https://github.com/datawrestler/after-hours            |
-|  42 | 2018-05-30T13:05:04 | pandas_talib            | https://github.com/femtotrader/pandas_talib            |
-|  43 | 2018-08-21T03:42:52 | pyalgotrade             | https://github.com/gbeced/pyalgotrade                  |
-|  44 | 2018-08-27T22:48:01 | pysabr                  | https://github.com/ynouri/pysabr                       |
-|  45 | 2018-09-17T00:57:42 | xlwt                    | https://github.com/python-excel/xlwt                   |
-|  46 | 2018-09-17T19:09:51 | zipline-extensions      | https://github.com/quantrocket-llc/zipline-extensions  |
-|  47 | 2018-09-23T19:20:07 | googlefinance           | https://github.com/hongtaocai/googlefinance            |
-|  48 | 2018-10-03T01:00:07 | hqfl                    | https://github.com/co-category/hqfl                    |
-|  49 | 2018-11-11T19:19:00 | catalyst                | https://github.com/enigmampc/catalyst                  |
-|  50 | 2018-11-30T16:34:05 | tulipindicators         | https://github.com/TulipCharts/tulipindicators         |
-|  51 | 2018-12-03T16:30:28 | fecon235                | https://github.com/rsvp/fecon235                       |
-|  52 | 2018-12-03T16:30:28 | fecon235                | https://github.com/rsvp/fecon235                       |
-|  53 | 2018-12-16T15:30:13 | PyFlux                  | https://github.com/RJT1990/pyflux                      |
-|  54 | 2018-12-22T15:14:38 | sparseEigen             | https://github.com/dppalomar/sparseEigen               |
-|  55 | 2018-12-22T18:21:16 | FRB                     | https://github.com/avelkoski/FRB                       |
-|  56 | 2019-01-22T03:43:58 | Jiji                    | https://github.com/unageanu/jiji2                      |
-|  57 | 2019-02-16T11:48:24 | TimeFrames.jl           | https://github.com/femtotrader/TimeFrames.jl           |
-|  58 | 2019-03-03T21:55:50 | quantitative            | https://github.com/jeffrey-liang/quantitative          |
-|  59 | 2019-03-12T10:48:55 | Quantdom                | https://github.com/constverum/Quantdom                 |
-|  60 | 2019-03-25T05:15:05 | covFactorModel          | https://github.com/dppalomar/covFactorModel            |
-|  61 | 2019-04-06T11:30:30 | quantfin                | https://github.com/boundedvariation/quantfin           |
-|  62 | 2019-04-16T07:39:20 | volatility-trading      | https://github.com/jasonstrimpel/volatility-trading    |
-|  63 | 2019-05-23T09:42:30 | coinmarketcap           | https://github.com/barnumbirr/coinmarketcap            |
-|  64 | 2019-06-05T18:41:01 | QLNet                   | https://github.com/amaggiulli/qlnet                    |
-|  65 | 2019-06-07T03:11:30 | trade                   | https://github.com/rochars/trade                       |
-|  66 | 2019-06-09T09:13:28 | MarketTechnicals.jl     | https://github.com/JuliaQuant/MarketTechnicals.jl      |
-|  67 | 2019-06-13T07:59:22 | sparseIndexTracking     | https://github.com/dppalomar/sparseIndexTracking       |
-|  68 | 2019-08-04T11:11:42 | ccy                     | https://github.com/lsbardel/ccy                        |
-|  69 | 2019-08-10T00:14:52 | wallstreet              | https://github.com/mcdallas/wallstreet                 |
-|  70 | 2019-09-09T09:28:11 | pybacktest              | https://github.com/ematvey/pybacktest                  |
-|  71 | 2019-09-12T14:31:48 | pipeline-live           | https://github.com/alpacahq/pipeline-live              |
-|  72 | 2019-09-23T17:22:57 | tibbletime              | https://github.com/business-science/tibbletime         |
-|  73 | 2019-09-23T21:22:59 | moonshot                | https://github.com/quantrocket-llc/moonshot            |
-|  74 | 2019-09-30T17:16:00 | empyrical               | https://github.com/quantopian/empyrical                |
-|  75 | 2019-10-07T01:49:14 | ffn                     | https://github.com/pmorissette/ffn                     |
-|  76 | 2019-10-10T23:15:51 | inquisitor              | https://github.com/econdb/inquisitor                   |
-|  77 | 2019-10-12T14:54:10 | bt                      | https://github.com/pmorissette/bt                      |
-|  78 | 2019-10-21T10:12:35 | pdblp                   | https://github.com/matthewgilbert/pdblp                |
-|  79 | 2019-11-05T01:30:22 | pandas_market_calendars | https://github.com/rsheftel/pandas_market_calendars    |
-|  80 | 2019-12-17T17:33:29 | pandas-finance          | https://github.com/davidastephens/pandas-finance       |
-|  81 | 2019-12-17T18:07:46 | finmarketpy             | https://github.com/cuemacro/finmarketpy                |
-|  82 | 2019-12-29T09:43:50 | quantstats              | https://github.com/ranaroussi/quantstats               |
-|  83 | 2019-12-29T09:48:24 | qtpylib                 | https://github.com/ranaroussi/qtpylib                  |
-|  84 | 2020-01-07T14:03:00 | backtrader              | https://github.com/backtrader/backtrader               |
-|  85 | 2020-02-10T15:46:35 | tidypredict             | https://github.com/edgararuiz/tidypredict              |
-|  86 | 2020-02-12T23:10:37 | pandas-datareader       | https://github.com/pydata/pandas-datareader            |
-|  87 | 2020-02-18T21:13:35 | QuantLib.jl             | https://github.com/pazzo83/QuantLib.jl                 |
-|  88 | 2020-02-18T21:13:35 | QuantLib.jl             | https://github.com/pazzo83/QuantLib.jl                 |
-|  89 | 2020-02-20T16:04:17 | PyQL                    | https://github.com/enthought/pyql                      |
-|  90 | 2020-02-20T16:04:17 | PyQL                    | https://github.com/enthought/pyql                      |
-|  91 | 2020-02-20T21:05:04 | aat                     | https://github.com/timkpaine/aat                       |
-|  92 | 2020-02-22T14:03:05 | xlrd                    | https://github.com/python-excel/xlrd                   |
-|  93 | 2020-02-27T07:55:39 | pyfolio                 | https://github.com/quantopian/pyfolio                  |
-|  94 | 2020-03-02T19:31:06 | pytdx                   | https://github.com/rainx/pytdx                         |
-|  95 | 2020-03-07T10:25:12 | fooltrader              | https://github.com/foolcage/fooltrader                 |
-|  96 | 2020-03-10T22:44:11 | alphalens               | https://github.com/quantopian/alphalens                |
-|  97 | 2020-03-11T03:03:32 | pinkfish                | https://github.com/fja05680/pinkfish                   |
-|  98 | 2020-03-12T08:18:18 | Finance-Python          | https://github.com/alpha-miner/Finance-Python          |
-|  99 | 2020-03-28T18:49:39 | freqtrade               | https://github.com/freqtrade/freqtrade                 |
-| 100 | 2020-03-31T16:10:18 | trading_calendars       | https://github.com/quantopian/trading_calendars        |
-| 101 | 2020-03-31T16:48:23 | zvt                     | https://github.com/zvtvz/zvt                           |
-| 102 | 2020-04-04T18:33:55 | Stockex                 | https://github.com/cttn/Stockex                        |
-| 103 | 2020-04-08T03:31:41 | TimeSeries.jl           | https://github.com/JuliaStats/TimeSeries.jl            |
-| 104 | 2020-04-08T04:28:49 | MarketData.jl           | https://github.com/JuliaQuant/MarketData.jl            |
-| 105 | 2020-04-09T02:56:12 | pyqstrat                | https://github.com/abbass2/pyqstrat                    |
-| 106 | 2020-04-09T03:03:16 | QUANTAXIS               | https://github.com/yutiansut/quantaxis                 |
-| 107 | 2020-04-10T17:14:25 | tidyquant               | https://github.com/business-science/tidyquant          |
-| 108 | 2020-04-11T17:23:01 | bizdays                 | https://github.com/wilsonfreitas/python-bizdays        |
-| 109 | 2020-04-16T05:38:06 | riskParityPortfolio     | https://github.com/dppalomar/riskParityPortfolio       |
-| 110 | 2020-04-16T05:53:06 | riskparity.py           | https://github.com/dppalomar/riskparity.py             |
-| 111 | 2020-04-16T16:25:38 | findatapy               | https://github.com/cuemacro/findatapy                  |
-| 112 | 2020-04-16T18:36:22 | tiingo                  | https://github.com/hydrosquall/tiingo-python           |
-| 113 | 2020-04-18T15:35:25 | mlfinlab                | https://github.com/hudson-and-thames/mlfinlab          |
-| 114 | 2020-04-19T02:22:04 | IEX                     | https://github.com/addisonlynch/iexfinance             |
-| 115 | 2020-04-19T08:08:28 | Tai                     | https://github.com/fremantle-capital/tai               |
-| 116 | 2020-04-20T15:12:01 | yahooquery              | https://github.com/dpguthrie/yahooquery                |
-| 117 | 2020-04-20T20:32:19 | tsfresh                 | https://github.com/blue-yonder/tsfresh                 |
-| 118 | 2020-04-20T21:50:14 | pandas-ta               | https://github.com/twopirllc/pandas-ta                 |
-| 119 | 2020-04-21T12:34:26 | ARCH                    | https://github.com/bashtage/arch                       |
-| 120 | 2020-04-21T15:02:16 | ta                      | https://github.com/bukosabino/ta                       |
-| 121 | 2020-04-21T15:05:12 | Indicators.jl           | https://github.com/dysonance/Indicators.jl             |
-| 122 | 2020-04-21T15:06:19 | Strategems.jl           | https://github.com/dysonance/Strategems.jl             |
-| 123 | 2020-04-21T15:07:56 | Temporal.jl             | https://github.com/dysonance/Temporal.jl               |
-| 124 | 2020-04-21T16:45:48 | PyPortfolioOpt          | https://github.com/robertmartin8/PyPortfolioOpt        |
-| 125 | 2020-04-21T17:28:57 | timetk                  | https://github.com/business-science/timetk             |
-| 126 | 2020-04-21T18:08:44 | pylivetrader            | https://github.com/alpacahq/pylivetrader               |
-| 127 | 2020-04-21T23:50:50 | QuantConnect            | https://github.com/QuantConnect/Lean                   |
-| 128 | 2020-04-22T00:25:54 | Quantitative-Notebooks  | https://github.com/LongOnly/Quantitative-Notebooks     |
-| 129 | 2020-04-22T05:46:18 | alpaca-trade-api        | https://github.com/alpacahq/alpaca-trade-api-python    |
-| 130 | 2020-04-22T09:23:19 | akshare                 | https://github.com/jindaxiang/akshare                  |
+| date                | name                    | url                                                    |
+|:--------------------|:------------------------|:-------------------------------------------------------|
+| 2020-04-22T09:23:19 | akshare                 | https://github.com/jindaxiang/akshare                  |
+| 2020-04-22T05:46:18 | alpaca-trade-api        | https://github.com/alpacahq/alpaca-trade-api-python    |
+| 2020-04-22T00:25:54 | Quantitative-Notebooks  | https://github.com/LongOnly/Quantitative-Notebooks     |
+| 2020-04-21T23:50:50 | QuantConnect            | https://github.com/QuantConnect/Lean                   |
+| 2020-04-21T18:08:44 | pylivetrader            | https://github.com/alpacahq/pylivetrader               |
+| 2020-04-21T17:28:57 | timetk                  | https://github.com/business-science/timetk             |
+| 2020-04-21T16:45:48 | PyPortfolioOpt          | https://github.com/robertmartin8/PyPortfolioOpt        |
+| 2020-04-21T15:07:56 | Temporal.jl             | https://github.com/dysonance/Temporal.jl               |
+| 2020-04-21T15:06:19 | Strategems.jl           | https://github.com/dysonance/Strategems.jl             |
+| 2020-04-21T15:05:12 | Indicators.jl           | https://github.com/dysonance/Indicators.jl             |
+| 2020-04-21T15:02:16 | ta                      | https://github.com/bukosabino/ta                       |
+| 2020-04-21T12:34:26 | ARCH                    | https://github.com/bashtage/arch                       |
+| 2020-04-20T21:50:14 | pandas-ta               | https://github.com/twopirllc/pandas-ta                 |
+| 2020-04-20T20:32:19 | tsfresh                 | https://github.com/blue-yonder/tsfresh                 |
+| 2020-04-20T15:12:01 | yahooquery              | https://github.com/dpguthrie/yahooquery                |
+| 2020-04-19T08:08:28 | Tai                     | https://github.com/fremantle-capital/tai               |
+| 2020-04-19T02:22:04 | IEX                     | https://github.com/addisonlynch/iexfinance             |
+| 2020-04-18T15:35:25 | mlfinlab                | https://github.com/hudson-and-thames/mlfinlab          |
+| 2020-04-16T18:36:22 | tiingo                  | https://github.com/hydrosquall/tiingo-python           |
+| 2020-04-16T16:25:38 | findatapy               | https://github.com/cuemacro/findatapy                  |
+| 2020-04-16T05:53:06 | riskparity.py           | https://github.com/dppalomar/riskparity.py             |
+| 2020-04-16T05:38:06 | riskParityPortfolio     | https://github.com/dppalomar/riskParityPortfolio       |
+| 2020-04-11T17:23:01 | bizdays                 | https://github.com/wilsonfreitas/python-bizdays        |
+| 2020-04-10T17:14:25 | tidyquant               | https://github.com/business-science/tidyquant          |
+| 2020-04-09T03:03:16 | QUANTAXIS               | https://github.com/yutiansut/quantaxis                 |
+| 2020-04-09T02:56:12 | pyqstrat                | https://github.com/abbass2/pyqstrat                    |
+| 2020-04-08T04:28:49 | MarketData.jl           | https://github.com/JuliaQuant/MarketData.jl            |
+| 2020-04-08T03:31:41 | TimeSeries.jl           | https://github.com/JuliaStats/TimeSeries.jl            |
+| 2020-04-04T18:33:55 | Stockex                 | https://github.com/cttn/Stockex                        |
+| 2020-03-31T16:48:23 | zvt                     | https://github.com/zvtvz/zvt                           |
+| 2020-03-31T16:10:18 | trading_calendars       | https://github.com/quantopian/trading_calendars        |
+| 2020-03-28T18:49:39 | freqtrade               | https://github.com/freqtrade/freqtrade                 |
+| 2020-03-12T08:18:18 | Finance-Python          | https://github.com/alpha-miner/Finance-Python          |
+| 2020-03-11T03:03:32 | pinkfish                | https://github.com/fja05680/pinkfish                   |
+| 2020-03-10T22:44:11 | alphalens               | https://github.com/quantopian/alphalens                |
+| 2020-03-07T10:25:12 | fooltrader              | https://github.com/foolcage/fooltrader                 |
+| 2020-03-02T19:31:06 | pytdx                   | https://github.com/rainx/pytdx                         |
+| 2020-02-27T07:55:39 | pyfolio                 | https://github.com/quantopian/pyfolio                  |
+| 2020-02-22T14:03:05 | xlrd                    | https://github.com/python-excel/xlrd                   |
+| 2020-02-20T21:05:04 | aat                     | https://github.com/timkpaine/aat                       |
+| 2020-02-20T16:04:17 | PyQL                    | https://github.com/enthought/pyql                      |
+| 2020-02-20T16:04:17 | PyQL                    | https://github.com/enthought/pyql                      |
+| 2020-02-18T21:13:35 | QuantLib.jl             | https://github.com/pazzo83/QuantLib.jl                 |
+| 2020-02-18T21:13:35 | QuantLib.jl             | https://github.com/pazzo83/QuantLib.jl                 |
+| 2020-02-12T23:10:37 | pandas-datareader       | https://github.com/pydata/pandas-datareader            |
+| 2020-02-10T15:46:35 | tidypredict             | https://github.com/edgararuiz/tidypredict              |
+| 2020-01-07T14:03:00 | backtrader              | https://github.com/backtrader/backtrader               |
+| 2019-12-29T09:48:24 | qtpylib                 | https://github.com/ranaroussi/qtpylib                  |
+| 2019-12-29T09:43:50 | quantstats              | https://github.com/ranaroussi/quantstats               |
+| 2019-12-17T18:07:46 | finmarketpy             | https://github.com/cuemacro/finmarketpy                |
+| 2019-12-17T17:33:29 | pandas-finance          | https://github.com/davidastephens/pandas-finance       |
+| 2019-11-05T01:30:22 | pandas_market_calendars | https://github.com/rsheftel/pandas_market_calendars    |
+| 2019-10-21T10:12:35 | pdblp                   | https://github.com/matthewgilbert/pdblp                |
+| 2019-10-12T14:54:10 | bt                      | https://github.com/pmorissette/bt                      |
+| 2019-10-10T23:15:51 | inquisitor              | https://github.com/econdb/inquisitor                   |
+| 2019-10-07T01:49:14 | ffn                     | https://github.com/pmorissette/ffn                     |
+| 2019-09-30T17:16:00 | empyrical               | https://github.com/quantopian/empyrical                |
+| 2019-09-23T21:22:59 | moonshot                | https://github.com/quantrocket-llc/moonshot            |
+| 2019-09-23T17:22:57 | tibbletime              | https://github.com/business-science/tibbletime         |
+| 2019-09-12T14:31:48 | pipeline-live           | https://github.com/alpacahq/pipeline-live              |
+| 2019-09-09T09:28:11 | pybacktest              | https://github.com/ematvey/pybacktest                  |
+| 2019-08-10T00:14:52 | wallstreet              | https://github.com/mcdallas/wallstreet                 |
+| 2019-08-04T11:11:42 | ccy                     | https://github.com/lsbardel/ccy                        |
+| 2019-06-13T07:59:22 | sparseIndexTracking     | https://github.com/dppalomar/sparseIndexTracking       |
+| 2019-06-09T09:13:28 | MarketTechnicals.jl     | https://github.com/JuliaQuant/MarketTechnicals.jl      |
+| 2019-06-07T03:11:30 | trade                   | https://github.com/rochars/trade                       |
+| 2019-06-05T18:41:01 | QLNet                   | https://github.com/amaggiulli/qlnet                    |
+| 2019-05-23T09:42:30 | coinmarketcap           | https://github.com/barnumbirr/coinmarketcap            |
+| 2019-04-16T07:39:20 | volatility-trading      | https://github.com/jasonstrimpel/volatility-trading    |
+| 2019-04-06T11:30:30 | quantfin                | https://github.com/boundedvariation/quantfin           |
+| 2019-03-25T05:15:05 | covFactorModel          | https://github.com/dppalomar/covFactorModel            |
+| 2019-03-12T10:48:55 | Quantdom                | https://github.com/constverum/Quantdom                 |
+| 2019-03-03T21:55:50 | quantitative            | https://github.com/jeffrey-liang/quantitative          |
+| 2019-02-16T11:48:24 | TimeFrames.jl           | https://github.com/femtotrader/TimeFrames.jl           |
+| 2019-01-22T03:43:58 | Jiji                    | https://github.com/unageanu/jiji2                      |
+| 2018-12-22T18:21:16 | FRB                     | https://github.com/avelkoski/FRB                       |
+| 2018-12-22T15:14:38 | sparseEigen             | https://github.com/dppalomar/sparseEigen               |
+| 2018-12-16T15:30:13 | PyFlux                  | https://github.com/RJT1990/pyflux                      |
+| 2018-12-03T16:30:28 | fecon235                | https://github.com/rsvp/fecon235                       |
+| 2018-12-03T16:30:28 | fecon235                | https://github.com/rsvp/fecon235                       |
+| 2018-11-30T16:34:05 | tulipindicators         | https://github.com/TulipCharts/tulipindicators         |
+| 2018-11-11T19:19:00 | catalyst                | https://github.com/enigmampc/catalyst                  |
+| 2018-10-03T01:00:07 | hqfl                    | https://github.com/co-category/hqfl                    |
+| 2018-09-23T19:20:07 | googlefinance           | https://github.com/hongtaocai/googlefinance            |
+| 2018-09-17T19:09:51 | zipline-extensions      | https://github.com/quantrocket-llc/zipline-extensions  |
+| 2018-09-17T00:57:42 | xlwt                    | https://github.com/python-excel/xlwt                   |
+| 2018-08-27T22:48:01 | pysabr                  | https://github.com/ynouri/pysabr                       |
+| 2018-08-21T03:42:52 | pyalgotrade             | https://github.com/gbeced/pyalgotrade                  |
+| 2018-05-30T13:05:04 | pandas_talib            | https://github.com/femtotrader/pandas_talib            |
+| 2018-02-15T23:44:06 | after-hours             | https://github.com/datawrestler/after-hours            |
+| 2017-11-28T13:54:20 | QuantPy                 | https://github.com/jsmidt/QuantPy                      |
+| 2017-10-26T12:43:28 | quantdsl                | https://github.com/johnbywater/quantdsl                |
+| 2017-10-21T21:42:46 | Derman Papers           | https://github.com/MarcosCarreira/DermanPapers         |
+| 2017-10-16T10:53:42 | binary-martingale       | https://github.com/metaperl/binary-martingale          |
+| 2017-08-22T10:17:54 | TALib.jl                | https://github.com/femtotrader/TALib.jl                |
+| 2017-07-30T13:00:21 | QUANTAXIS_Webkit        | https://github.com/yutiansut/QUANTAXIS_Webkit          |
+| 2017-07-23T19:34:07 | finsymbols              | https://github.com/skillachie/finsymbols               |
+| 2017-06-05T02:50:47 | tia                     | https://github.com/bpsmith/tia                         |
+| 2017-05-06T15:50:06 | Scala Quant             | https://github.com/frankcash/Scala-Quant               |
+| 2017-04-12T17:12:15 | FinCal                  | https://github.com/felixfan/FinCal                     |
+| 2017-03-21T14:00:36 | Ito.jl                  | https://github.com/aviks/Ito.jl                        |
+| 2017-03-10T17:28:51 | ystockquote             | https://github.com/cgoldberg/ystockquote               |
+| 2017-02-28T04:15:50 | VisualPortfolio         | https://github.com/wegamekinglc/VisualPortfolio        |
+| 2017-02-07T23:59:28 | NowTrade                | https://github.com/edouardpoitras/NowTrade             |
+| 2016-12-08T09:31:43 | yahoo-finance           | https://github.com/lukaszbanasiak/yahoo-finance        |
+| 2016-11-02T13:02:42 | dynts                   | https://github.com/quantmind/dynts                     |
+| 2016-10-07T21:37:35 | pyhoofinance            | https://github.com/innes213/pyhoofinance               |
+| 2016-10-07T04:54:17 | QuantSoftware Toolkit   | https://github.com/QuantSoftware/QuantSoftwareToolkit  |
+| 2016-09-23T15:38:55 | pythalesians            | https://github.com/thalesians/pythalesians             |
+| 2016-09-10T12:07:34 | stock_extractor         | https://github.com/ZachLiuGIS/stock_extractor          |
+| 2016-05-17T16:22:53 | vollib                  | https://github.com/vollib/vollib                       |
+| 2016-03-31T13:17:11 | algobroker              | https://github.com/joequant/algobroker                 |
+| 2016-02-29T14:58:15 | cn_stock_src            | https://github.com/jealous/cn_stock_src                |
+| 2016-02-12T01:56:48 | yfi                     | https://github.com/nickelkr/yfi                        |
+| 2016-01-08T14:31:20 | ticks                   | https://github.com/jamescnowell/ticks                  |
+| 2015-12-17T02:20:02 | options.studies         | https://github.com/taylorizing/options.studies         |
+| 2015-10-17T20:45:51 | analyzer                | https://github.com/llazzaro/analyzer                   |
+| 2015-10-07T19:55:40 | quantcomponents         | https://github.com/lsgro/quantcomponents               |
+| 2015-08-29T12:41:06 | yql-finance             | https://github.com/slawek87/yql-finance                |
+| 2015-07-14T15:47:16 | quant                   | https://github.com/paulperry/quant                     |
+| 2015-07-07T10:30:45 | exchange                | https://github.com/akarat/exchange                     |
+| 2015-06-10T13:03:23 | visualize-wealth        | https://github.com/benjaminmgross/visualize-wealth     |
+| 2015-03-10T07:48:48 | yfinanceapi             | https://github.com/Karthik005/yfinanceapi              |
+| 2015-01-20T20:35:52 | pybbg                   | https://github.com/bpsmith/pybbg                       |
+| 2014-12-03T18:27:48 | pyfin                   | https://github.com/opendoor-labs/pyfin                 |
+| 2014-02-19T19:16:52 | r-quant                 | https://github.com/artyyouth/r-quant                   |
+| 2014-01-14T22:47:45 | QuantScale              | https://github.com/choucrifahed/quantscale             |
+| nan                 | Backtesting.py          | https://kernc.github.io/backtesting.py/                |
+| nan                 | QuantTools              | https://quanttools.bitbucket.io/_site/index.html       |
+| nan                 | FinancialMarkets.jl     | https://github.com/imanuelcostigan/FinancialMarkets.jl |
+| nan                 | DRIP                    | https://lakshmidrip.github.io/DRIP                     |
