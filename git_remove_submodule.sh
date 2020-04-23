@@ -9,7 +9,7 @@ submodule=$1
 
 git rm -r "$submodule"
 git add .gitmodules
-git rm -r --cached $submodule
+# git rm -r --cached $submodule
 rm -rf ".git/modules/$submodule"
 git config -f ".git/config" --remove-section "submodule.$submodule" 2> /dev/null
 
