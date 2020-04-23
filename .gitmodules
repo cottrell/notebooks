@@ -7,9 +7,6 @@
 [submodule "consul_examples"]
 	path = consul_examples
 	url = https://github.com/cottrell/consul_examples.git
-[submodule "ml/cloudml-dist-mnist-example"]
-	path = ml/cloudml-dist-mnist-example
-	url = https://github.com/GoogleCloudPlatform/cloudml-dist-mnist-example
 [submodule "uk_land_registry"]
 	path = uk_land_registry
 	url = https://github.com/cottrell/uk_land_registry.git
@@ -46,9 +43,6 @@
 [submodule "djnotes"]
 	path = djnotes
 	url = https://github.com/cottrell/djnotes.git
-[submodule "nonpublic"]
-	path = nonpublic
-	url = git@gitlab.com:david-cottrell/nonpublic.git
 [submodule "C--WrappingExamples"]
 	path = C--WrappingExamples
 	url = https://github.com/cottrell/C--WrappingExamples.git
