@@ -2,4 +2,4 @@ all:
 	cat ./Makefile
 
 clean:
-	./clean.sh
+	./clean.sh yes
