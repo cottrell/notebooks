@@ -3,10 +3,10 @@ build/
 .keras/
 .ipynb_checkpoints/
 __pycache__/
-*.egg-info/
 nogit/
 node_modules/
 *.pyc
 jupyterhub.sqlite
 jupyterhub_cookie_secret
 *nogit*
+history.sqlite

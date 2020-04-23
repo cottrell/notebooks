@@ -8,6 +8,7 @@ find . \
 -type d -name "node_modules" -o \
 -type d -name "build" -o \
 -type d -name ".ipynb_checkpoints" -o \
+-type d -name "*.egg-info" -o \
 -type d -name "joblib_cache*"
 }
 
