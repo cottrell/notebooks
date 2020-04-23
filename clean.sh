@@ -1,17 +1,30 @@
 #!/bin/bash
 
 function list_cleanable() {
-find . -type d \
--name "__pycache__" -o \
--name "node_modules" -o \
--name "build" -o \
--name ".ipynb_checkpoints" -o \
--name "joblib_cache*"
+find . \
+-type f -name "*.swp" -o \
+-type f -name "*.pyc" -o \
+-type d -name "__pycache__" -o \
+-type d -name "node_modules" -o \
+-type d -name "build" -o \
+-type d -name ".ipynb_checkpoints" -o \
+-type d -name "joblib_cache*"
 }
 
-echo $1
 if [[ "$1" = yes ]]; then
-    list_cleanable > /dev/null
+    files=$(list_cleanable)
+    for f in $files; do echo $f; done
+    echo
+    echo WILL MOVE THESE FILES TO .Trash!
+    echo
+    read -p "Are you sure (y for yes)? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        echo MOVING TO TRASH!
+        echo dl $files
+        dl $files
+    fi
 else
     list_cleanable
 fi
