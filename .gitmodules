@@ -37,9 +37,6 @@
 [submodule "naf/naf_examples"]
 	path = naf/naf_examples
 	url = https://github.com/CW-Huang/naf_examples.git
-[submodule "nodepython/node-python-roulette"]
-	path = nodepython/node-python-roulette
-	url = https://github.com/laholmes/node-python-roulette.git
 [submodule "asdf/superbasic"]
 	path = superbasic
 	url = https://github.com/cottrell/superbasic.git
