@@ -43,3 +43,5 @@ lmdb
 dill
 pytest
 hypothesis
+alpaca-trade-api
+sqlalchemy

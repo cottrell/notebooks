@@ -6,7 +6,8 @@
 https://askubuntu.com/questions/1224074/no-wifi-adapter-found-in-gnome-control-center/1225019#1225019
 
     dkms status
-    sudo dkms remove modname/version # do this for all present
+    # sudo dkms remove modname/version # do this for all present
+    sudo dkms remove 8812au/4.2.2 --all
 
     git clone https://github.com/gnab/rtl8812au.git
     cd rtl8812au
