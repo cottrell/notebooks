@@ -1,1 +1,1 @@
-git submodule foreach 'git checkout master; git push; :'
+git submodule foreach --recursive 'git checkout master; git push; :'
