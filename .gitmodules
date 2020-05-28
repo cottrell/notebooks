@@ -10,12 +10,6 @@
 [submodule "uk_land_registry"]
 	path = uk_land_registry
 	url = https://github.com/cottrell/uk_land_registry.git
-[submodule "hugo/themes/ananke"]
-	path = hugo/themes/ananke
-	url = https://github.com/budparr/gohugo-theme-ananke.git
-[submodule "hugo/hugoblog"]
-	path = hugo/hugoblog
-	url = git@gitlab.com:david-cottrell/hugoblog.git
 [submodule "asdf/superbasic"]
 	path = superbasic
 	url = https://github.com/cottrell/superbasic.git
