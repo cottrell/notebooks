@@ -16,7 +16,7 @@ function install_conda() {
     fi
     echo Will install: $filename
 
-    cd /tmp
+    cd /var/tmp
     if [[ -e $filename ]]; then
         echo $filename exists
     else
