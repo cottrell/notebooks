@@ -44,3 +44,7 @@ pytest
 hypothesis
 alpaca-trade-api
 sqlalchemy
+timeout_decorator
+numba
+pandasgui
+qgrid
