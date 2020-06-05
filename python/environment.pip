@@ -45,3 +45,4 @@ pytest
 hypothesis
 alpaca-trade-api
 sqlalchemy
+vaex
