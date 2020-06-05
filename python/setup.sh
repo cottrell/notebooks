@@ -5,18 +5,17 @@ DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 
 type gcc || echo no gcc installed!
 
-# https://repo.anaconda.com/archive/Anaconda3-2019.07-Linux-x86_64.sh
+# https://repo.anaconda.com/archive
 function install_conda() {
     if [[ $(uname) = "Linux" ]]; then
-        # filename=Anaconda3-5.3.1-Linux-x86_64.sh
-        # filename=Anaconda3-2019.07-Linux-x86_64.sh
-        filename=Anaconda3-2019.10-Linux-x86_64.sh
+        # filename=Anaconda3-2019.10-Linux-x86_64.sh
+        filename=Anaconda3-2020.02-Linux-x86_64.sh
     else
-        filename=Anaconda3-2019.10-MacOSX-x86_64.sh
+        filename=Anaconda3-2020.02-MacOSX-x86_64.sh
     fi
     echo Will install: $filename
 
-    cd /tmp
+    cd /var/tmp
     if [[ -e $filename ]]; then
         echo $filename exists
     else
@@ -30,15 +29,17 @@ type conda || install_conda
 
 source ~/anaconda3/etc/profile.d/conda.sh
 
-conda update -n base -c defaults conda
+conda update -y -n base -c defaults conda
 
-if [[ $(conda env list | grep 37) ]]; then
-    echo env probably exists
+MY_CONDA_ENV=37
+
+if [[ $(conda env list | grep $MY_CONDA_ENV"\s") ]]; then
+    echo CONDA ENV $MY_CONDA_ENV exists
 else
-    echo env does not exist
-    conda create -n 37 python=3.7
-    conda activate 37
-    conda install pip
+    echo CONDA ENV $MY_CONDA_ENV does not exist
+    conda create -y -n $MY_CONDA_ENV python=3.7
+    conda activate $MY_CONDA_ENV
+    conda install -y pip
 fi
 if [[ $(uname) != "Darwin" ]]; then
     sudo apt-get install -y libffi-dev
@@ -49,7 +50,7 @@ else
     brew install graphviz
     brew install git-lfs
 fi
-conda activate 37
+conda activate $MY_CONDA_ENV
 pip install -U pip
 
 if [[ $(uname) = "Darwin" ]]; then
