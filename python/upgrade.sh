@@ -14,4 +14,5 @@ jupyter nbextension enable --py --sys-prefix qgrid
 # # only required if you have not enabled the ipywidgets nbextension yet
 # jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
-conda install -c conda-forge nodejs
+# maybe just rely on primary node, npm
+# conda install -c conda-forge nodejs
