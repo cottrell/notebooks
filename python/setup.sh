@@ -47,14 +47,14 @@ if [[ $(uname) != "Darwin" ]]; then
     sudo apt-get install -y git-lfs
     sudo apt-get install -y ccache
 else
-    brew install graphviz
-    brew install git-lfs
+    brew upgrade graphviz
+    brew upgrade git-lfs
 fi
 conda activate $MY_CONDA_ENV
 pip install -U pip
 
 if [[ $(uname) = "Darwin" ]]; then
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     brew update && brew upgrade
     brew install openssl
 fi
