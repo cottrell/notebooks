@@ -25,7 +25,6 @@ matplotlib
 numba
 numpy
 pandas
-pandas_datareader
 pandasgui
 pip
 pyarrow
