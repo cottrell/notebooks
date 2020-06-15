@@ -1,5 +1,7 @@
 # tsapp
 
+See this https://habr.com/en/post/438354/
+
 ## Project setup
 ```
 npm install
