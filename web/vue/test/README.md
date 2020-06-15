@@ -1,3 +1,7 @@
+# extra
+
+npm install vega vega-lite vega-embed -s
+
 # test
 
 ## Project setup
