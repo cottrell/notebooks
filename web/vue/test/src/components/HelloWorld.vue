@@ -1,16 +1,14 @@
 <template>
   <div class="hello">
-    <div id="vis"></div>
     <h1>{{ msg }}</h1>
-    <h2>{{ a }}</h2>
-    <h2>{{ name }}</h2>
-    <h2>{{ stuff }}</h2>
+    <my-chart v-bind:spec="first_spec"></my-chart>
   </div>
 </template>
 
 <script>
-import embed from 'vega-embed';
-var spec = {
+import MyChart from './MyChart.vue';
+
+var spec_a = {
   "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
   "description": "asdfasdf",
   data: {
@@ -27,7 +25,6 @@ var spec = {
     {'symbol': 'MSFT', 'date': 'Oct 1 2000', 'price': 28.02},
     ]
   },
-  // "data": {"url": "data/stocks.csv"},
   // "transform": [{"filter": "datum.symbol==='MSFT'"}],
   "mark": "line",
   "encoding": {
@@ -36,18 +33,17 @@ var spec = {
   }
 }
 
-embed('#vis', spec);
-
 export default {
   name: 'HelloWorld',
+  components: {
+    MyChart
+  },
   props: {
     msg: String,
   },
   data: function() {
     return {
-            a: 2,
-            stuff: '',
-            name: ''
+            first_spec: spec_a,
             };
         },
   methods: {
@@ -56,8 +52,8 @@ export default {
     }
   },
   mounted() {
-    this.stuff = this.getData();
-  }
+    // this.stuff = this.getData();
+  },
 }
 </script>
 
