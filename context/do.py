@@ -19,5 +19,6 @@ def h():
 
 
 ctx.run(f)
-ctx.run(f)
+ctx.run(h)
 ctx2.run(h)
+ctx.run(h)
