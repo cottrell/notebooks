@@ -5,14 +5,7 @@ pip install tweepy
 import sys
 import os
 import json
-cred = json.load(open(os.path.expanduser('~/.cred/twitter/cred.json')))
 import tweepy
-
-# authorization tokens
-consumer_key = cred['consumer_key']
-consumer_secret = cred['consumer_secret']
-access_key = cred['access_token_key']
-access_secret = cred['access_token_secret']
 
 # StreamListener class inherits from tweepy.StreamListener and overrides on_status/on_error methods.
 
@@ -59,14 +52,41 @@ class StreamListener(tweepy.StreamListener):
         print("Encountered streaming error (", status_code, ")")
         sys.exit()
 
+def get_api():
+    cred = json.load(open(os.path.expanduser('~/.cred/twitter/cred.json')))
+    # authorization tokens
+    consumer_key = cred['consumer_key']
+    consumer_secret = cred['consumer_secret']
+    access_key = cred['access_token_key']
+    access_secret = cred['access_token_secret']
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_key, access_secret)
+    return tweepy.API(auth)
+
+from ratelimit import limits, sleep_and_retry
+
+_period_seconds = 15 * 60 # 15 minutes
+@sleep_and_retry
+@limits(calls=15, period=_period_seconds)
+def api_following(api, username, cursor, count):
+    return api.friends(username, cursor=cursor, count=count)
+
+def get_all_following(username):
+    # following is called friends: api.friend_ids() then iterate.
+    # see api.rate_limit_status() # I think
+    api = get_api()
+    d = list()
+    cursor = -1
+    while cursor != 0:
+        print(f'calling {cursor} count is {len(d)}')
+        page, (prev, cursor) = api_following(api, username, cursor, 100)
+        d.extend([x._json for x in page])
+    return d
+
 
 def main(tags="coronavirus,hospital,turning away,died,dead,death,covid,covid-19", filename_prefix='out'):
     tags = tags.split(',')
-    # tags = ["coronavirus", "hospital", "turning away", "died", "dead", "death", "covid", "covid-19"]
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_key, access_secret)
-    api = tweepy.API(auth)
-
+    api = get_api()
     # initialize stream
     streamListener = StreamListener()
     stream = tweepy.Stream(auth=api.auth, listener=streamListener, tweet_mode="extended")
