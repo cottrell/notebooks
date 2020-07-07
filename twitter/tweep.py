@@ -11,6 +11,11 @@ import tweepy
 
 
 class StreamListener(tweepy.StreamListener):
+    def __init__(self, filename):
+        super().__init__()
+        self.filename = filename
+        with open(self.filename, "w", encoding="utf-8") as f:
+            f.write("date,location,user,is_retweet,is_quote,text,quoted_text,tweet_url\n")
     def on_status(self, status):
         print(status.id_str)
         # if "retweeted_status" attribute exists, flag this tweet as a retweet.
@@ -45,7 +50,7 @@ class StreamListener(tweepy.StreamListener):
         # # debug
         # import pdb
         # pdb.set_trace()
-        with open("out.csv", "a", encoding="utf-8") as f:
+        with open(self.filename, "a", encoding="utf-8") as f:
             f.write("%s,%s,%s,%s,%s,%s,%s, %s\n" % (status.created_at, status.user.location, status.user.screen_name, is_retweet, is_quote, text, quoted_text, tweet_url))
 
     def on_error(self, status_code):
@@ -84,15 +89,15 @@ def get_all_following(username):
     return d
 
 
-def main(tags="coronavirus,hospital,turning away,died,dead,death,covid,covid-19", filename_prefix='out'):
+def main(tags="coronavirus,hospital,turning away,died,dead,death,covid,covid-19", filename_prefix=None):
+    if filename_prefix is None:
+        filename_prefix = tags
     tags = tags.split(',')
     api = get_api()
     # initialize stream
-    streamListener = StreamListener()
-    stream = tweepy.Stream(auth=api.auth, listener=streamListener, tweet_mode="extended")
     filename = filename_prefix + '.csv'
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write("date,location,user,is_retweet,is_quote,text,quoted_text,tweet_url\n")
+    streamListener = StreamListener(filename)
+    stream = tweepy.Stream(auth=api.auth, listener=streamListener, tweet_mode="extended")
     stream.filter(track=tags)
 
 import argh
