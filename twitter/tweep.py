@@ -95,7 +95,7 @@ def main(tags="coronavirus,hospital,turning away,died,dead,death,covid,covid-19"
     tags = tags.split(',')
     api = get_api()
     # initialize stream
-    filename = filename_prefix + '.csv'
+    filename = 'tweep_' + filename_prefix + '.csv'
     streamListener = StreamListener(filename)
     stream = tweepy.Stream(auth=api.auth, listener=streamListener, tweet_mode="extended")
     stream.filter(track=tags)
