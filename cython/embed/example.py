@@ -1,4 +1,5 @@
 import numpy as np
+import csv
 
 def main():
     x = np.random.randn(10000, 3)
