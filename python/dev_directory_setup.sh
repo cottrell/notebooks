@@ -2,6 +2,7 @@
 # ~/dev or ~/code
 cd ~/dev
 hub clone automl/auto-sklearn
+mkdir -p ~/dev/tensorflow
 cd ~/dev/tensorflow
 [[ -e tensorflow ]] || hub clone tensorflow/tensorflow
 [[ -e probability ]] || hub clone tensorflow/probability

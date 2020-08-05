@@ -50,3 +50,5 @@ xarray
 xgboost
 isort
 autoflake
+git+https://github.com/hootnot/saxo_openapi.git
+git+https://github.com/pydata/pandas-datareader.git
