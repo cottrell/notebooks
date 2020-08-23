@@ -8,7 +8,7 @@ asv
 autopep8
 black
 boto3
-cloudpickle
+cloudpickle==1.3
 deribit-api
 dill
 dot2tex
@@ -48,3 +48,8 @@ uvicorn
 vaex
 xarray
 xgboost
+isort
+autoflake
+git+https://github.com/hootnot/saxo_openapi.git
+git+https://github.com/pydata/pandas-datareader.git
+sympy
