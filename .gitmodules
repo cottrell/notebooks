@@ -37,3 +37,6 @@
 [submodule "kaggle"]
 	path = kaggle
 	url = git@gitlab.com:david-cottrell/kaggle.git
+[submodule "my-gym"]
+	path = my-gym
+	url = git@gitlab.com:david-cottrell/my-gym.git
