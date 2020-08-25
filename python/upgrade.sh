@@ -11,8 +11,8 @@ pip install cvxpy
 jupyter labextension install @jupyterlab/vega3-extension
 
 jupyter nbextension enable --py --sys-prefix qgrid
-# # only required if you have not enabled the ipywidgets nbextension yet
-# jupyter nbextension enable --py --sys-prefix widgetsnbextension
+# only required if you have not enabled the ipywidgets nbextension yet
+jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
 # maybe just rely on primary node, npm
 # conda install -c conda-forge nodejs

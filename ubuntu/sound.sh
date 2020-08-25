@@ -1,7 +1,8 @@
 #!/bin/sh
 # pavucontrol
 
-# pulseaudio -k
-# sudo alsa force-reload
-
-pulseaudio -k && pulseaudio --start
+echo "remember to restart chrome and firefox probably after this."
+pulseaudio -k
+# not sure which one is needed
+pulseaudio --start
+sudo alsa force-reload
