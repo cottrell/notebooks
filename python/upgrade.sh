@@ -16,3 +16,7 @@ jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
 # maybe just rely on primary node, npm
 # conda install -c conda-forge nodejs
+
+# see https://plotly.com/python/getting-started/ for plotly
+jupyter labextension install jupyterlab-plotly
+jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget
