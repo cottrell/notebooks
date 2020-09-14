@@ -1,7 +1,7 @@
 #!/bin/sh -e
-DIR="$( cd "$( dirname $(realpath "${BASH_SOURCE[0]}") )" && pwd )"
+DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 cd $DIR
-if [ $(uname) = 'Darwwin' ]; then
+if [ $(uname) = 'Darwin' ]; then
     ip=$(ipconfig getifaddr en1)
 else
     ip=$(hostname -I | cut -d' ' -f1)
