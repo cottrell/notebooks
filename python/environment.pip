@@ -56,3 +56,4 @@ sympy
 dash
 jupyter-dash
 ipywidgets
+xlrd
