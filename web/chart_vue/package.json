@@ -10,13 +10,13 @@
   },
   "dependencies": {
     "chart.js": "^2.7.3",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.1",
     "vue": "^2.5.17"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.1",
+    "@vue/cli-plugin-babel": "^4.5.6",
     "@vue/cli-plugin-eslint": "^3.0.1",
-    "@vue/cli-service": "^3.0.1",
+    "@vue/cli-service": "^4.5.6",
     "vue-template-compiler": "^2.5.17"
   },
   "eslintConfig": {
