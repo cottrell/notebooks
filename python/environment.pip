@@ -57,3 +57,4 @@ dash
 jupyter-dash
 ipywidgets
 pylint
+xlrd
