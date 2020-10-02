@@ -40,3 +40,6 @@
 [submodule "my-gym"]
 	path = my-gym
 	url = git@gitlab.com:david-cottrell/my-gym.git
+[submodule "saxo_example"]
+	path = saxo_example
+	url = https://github.com/cottrell/saxo_example.git
