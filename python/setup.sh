@@ -5,6 +5,19 @@ DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 
 type gcc || echo no gcc installed!
 
+if [[ $(uname) != "Darwin" ]]; then
+    sudo apt-get install -y libffi-dev
+    sudo apt-get install -y graphviz
+    sudo apt-get install -y git-lfs
+    sudo apt-get install -y ccache
+else
+    type wget || brew install wget
+    type graphviz || brew install graphviz
+    type git-lfs || brew install git-lfs
+    brew upgrade graphviz
+    brew upgrade git-lfs
+fi
+
 # https://repo.anaconda.com/archive
 function install_conda() {
     if [[ $(uname) = "Linux" ]]; then
@@ -40,15 +53,6 @@ else
     conda create -y -n $MY_CONDA_ENV python=3.8
     conda activate $MY_CONDA_ENV
     conda install -y pip
-fi
-if [[ $(uname) != "Darwin" ]]; then
-    sudo apt-get install -y libffi-dev
-    sudo apt-get install -y graphviz
-    sudo apt-get install -y git-lfs
-    sudo apt-get install -y ccache
-else
-    brew upgrade graphviz
-    brew upgrade git-lfs
 fi
 conda activate $MY_CONDA_ENV
 pip install -U pip
