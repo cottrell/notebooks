@@ -1,3 +1,5 @@
+# DO NOT INSTALL VIA NPM!
+
 # Can you have dats of dats?
 
 
