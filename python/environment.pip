@@ -2,7 +2,6 @@ Cython
 Quandl
 QuantLib
 QuantLib-Python
-alpaca-trade-api
 argh
 asv
 autopep8
