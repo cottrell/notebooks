@@ -1,4 +1,5 @@
 #!/bin/bash
+pip install --upgrade pip
 if [[ $(uname) = Darwin ]]; then
     cat ./environment.pip | sed -e 's/tensorflow-gpu/tensorflow/' > /tmp/environment.pip
     pip install -r /tmp/environment.pip -U
