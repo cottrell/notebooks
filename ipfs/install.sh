@@ -1,4 +1,5 @@
 #!/bin/bash
+# REMINDER: do not use snap or brew ... too stale.
 
 base=https://dist.ipfs.io/go-ipfs
 vfile=$base/versions

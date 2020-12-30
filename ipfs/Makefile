@@ -1,5 +1,9 @@
-install_ipfs:
+install:
 	./install_latest.sh
+
+feset:
+	rm -rvf $HOME/.ipfs
+	ipfs init
 
 pip_install:
 	pip install ipfshttpclient

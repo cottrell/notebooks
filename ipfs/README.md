@@ -1,8 +1,14 @@
 # IPFS Notes
 
+tldr; say simple and just use `ipfs add -Q filename`.
+
+Remember ipns of dnslink (faster but requires a domain you own ... uses dns) for naming and updates.
+
 See the Makefile.
 
-https://docs.ipfs.io/introduction/usage/
+Remember `ipfs files` to interact with objects as if they were a unix filesytem. Probably not that useful to begin with.
+
+# Misc
 
 https://github.com/ipfs/py-ipfs-http-client
 
