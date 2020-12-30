@@ -1,0 +1,2 @@
+all:
+	dat share ./crimes

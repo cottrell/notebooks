@@ -11,3 +11,4 @@ jupyterhub_cookie_secret
 *nogit*
 history.sqlite
 .vscode/
+.dat
