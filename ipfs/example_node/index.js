@@ -5,6 +5,7 @@ async function main() {
     const { cid } = await ipfs.add('Hello world')
     console.info(cid)
     // QmXXY5ZxbtuYj6DnfApLiGstzPN7fvSyigrRee3hDWPCaf
+    process.exit()
 }
 
 main()
