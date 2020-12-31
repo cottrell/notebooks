@@ -1,5 +1,5 @@
 install:
-	./install_latest.sh
+	./install.sh
 
 feset:
 	rm -rvf $HOME/.ipfs
