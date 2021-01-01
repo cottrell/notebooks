@@ -5,9 +5,19 @@ base=https://dist.ipfs.io/go-ipfs
 vfile=$base/versions
 curl $vfile | tail -1 > version.txt
 version=$(cat version.txt)
-echo Will run with version $version
 
-filename=https://dist.ipfs.io/go-ipfs/$version/go-ipfs_"$version"_linux-amd64.tar.gz
+if [[ $(uname) = "Darwin" ]]; then
+    platform=darwin
+elif [[ $(uname) = "Linux" ]]; then
+    platform=linux
+else
+    echo bad platform $(uname)
+    exit 1
+fi
+
+echo Will run with version $version platform $platform
+
+filename=https://dist.ipfs.io/go-ipfs/$version/go-ipfs_"$version"_"$platform"-amd64.tar.gz
 localfile=$(basename $filename)
 if [[ -e $localfile ]]; then
     echo $localfile found will not download again

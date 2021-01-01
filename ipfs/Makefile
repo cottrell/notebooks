@@ -1,7 +1,7 @@
 install:
 	./install.sh
 
-feset:
+reset:
 	rm -rvf $HOME/.ipfs
 	ipfs init
 
