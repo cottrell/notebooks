@@ -2,6 +2,8 @@
 
 tldr; say simple and just use `ipfs add -Q filename`.
 
+tldr; remember you need to run `ipfs daemon` on both machines it seems (if you are using the cli at least, not sure about the js core lib).
+
 Remember ipns of dnslink (faster but requires a domain you own ... uses dns) for naming and updates.
 
 See the Makefile.
