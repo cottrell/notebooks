@@ -1,9 +1,8 @@
 #!/bin/bash
 # REMINDER: do not use snap or brew ... too stale.
+DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 
-base=https://dist.ipfs.io/go-ipfs
-vfile=$base/versions
-curl $vfile | tail -1 > version.txt
+$DIR/check_latest_version.sh
 version=$(cat version.txt)
 
 if [[ $(uname) = "Darwin" ]]; then
