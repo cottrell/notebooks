@@ -1,3 +1,5 @@
 #!/bin/bash
 type http-server || npm i -g http-server
-http-server -S -C localhost+3.pem -K localhost+3-key.pem
+base=$HOME/syncthing/cred/mkcert/$(hostname)/$(hostname)+3
+echo http-server -S -C $base.pem -K $base-key.pem
+http-server -S -C $base.pem -K $base-key.pem
