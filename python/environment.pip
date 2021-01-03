@@ -58,3 +58,4 @@ ipywidgets
 pylint
 xlrd
 yahooquery
+openpyxl
