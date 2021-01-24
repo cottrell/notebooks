@@ -1,5 +1,7 @@
 # 2021
 
+Maybe just https://www.kubeflow.org/docs/started/getting-started/ ?
+
 Trying to understand best devflow for dockerless approach.
 
 Seems microk8s is central choice for k8s.  `sudo snap install microk8s --classic`
