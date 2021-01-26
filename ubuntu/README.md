@@ -1,3 +1,37 @@
+# WIFI PROBLEMS
+
+# 2021-01
+
+    lsusb | grep TP
+    Bus 001 Device 006: ID 2357:010e TP-Link TL-WN722N v2
+
+    # but iwconfig shows no wireless connection
+    # uninstall all dkms ... manually get versions
+    dkms status
+    sudo dkms remove 8812au/4.2.3 --all
+    sudo dkms remove rtl8812au/4.3.8.12175.20140902+dfsg --all
+
+    # then rebuild
+    git clone https://github.com/gnab/rtl8812au.git
+    cd rtl8812au
+    # I HAVE NO IDEA HOW TO PICK THE VERSION, see the readme for dev setup installs
+    sudo make dkms_install
+
+    # THEN REBOOT?
+
+    Yes this worked.
+
+    # NOT THIS?
+    # sudo rsync -rvhP ./ /usr/src/8812au-$VERSION
+    # sudo dkms add -m 8812au -v $VERSION
+    # sudo dkms build -m 8812au -v $VERSION
+    # sudo dkms install -m 8812au -v $VERSION
+    # sudo dkms status
+    # # auto load at boot
+    # echo 8812au | sudo tee -a /etc/modules
+    # sudo modprobe 8812au
+
+
 # 2020-04-07
 
     lsusb # this should appear TP-Link or something like that
