@@ -21,3 +21,5 @@ Remember this:
     cert: false
 
     sudo systemctl restart code-server@$USER.service
+
+Remember the vscode-pdf plugin to make pdfs work.

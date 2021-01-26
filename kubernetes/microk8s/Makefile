@@ -1,5 +1,9 @@
 all:
 	cat Makefile
+
+install:
+	sudo snap install microk8s --classic
+
 start:
 	sudo microk8s start
 
@@ -10,20 +14,29 @@ status:
 	microk8s status --wait-ready
 
 enable:
-	microk8s enable dashboard dns registry istio
+	microk8s enable dashboard # dns registry istio
+
+cert:
+	openssl req -nodes -newkey rsa:2048 -keyout dashboard.key -out dashboard.csr -subj "/C=/ST=/L=/O=/OU=/CN=*"
+	openssl x509 -req -sha256 -days 3650 -in dashboard.csr -signkey dashboard.key -out dashboard.crt
+
+	microk8s kubectl -n kube-system delete secret kubernetes-dashboard-certs
+	microk8s kubectl -n kube-system create secret generic kubernetes-dashboard-certs --from-file=dashboard.crt --from-file=dashboard.key
+	microk8s kubectl -n kube-system edit deploy kubernetes-dashboard -o yaml
+
+	# then edit the yaml to look like this:
+	#           args:
+	#             - --tls-cert-file=dashboard.crt
+	#             - --tls-key-file=dashboard.key
+	#             #- --auto-generate-certificates
+
+dashboard:
+	microk8s dashboard-proxy
 
 ns:
 	microk8s kubectl get all --all-namespaces
 
 dash:
-	echo you will probably need to ssh tunnel if you are on another computer
-	echo tunnel.sh bleepblop 10443
+	# this should be avail on the LAN
 	sudo microk8s dashboard-proxy --address 0.0.0.0 --tls-cert-file=dashboard.crt --tls-key-file=dashboard.key
 
-cert:
-	mkdir -p certs
-	openssl req -nodes -newkey rsa:2048 -keyout certs/dashboard.key -out certs/dashboard.csr -subj "/C=/ST=/L=/O=/OU=/CN=*"
-	openssl x509 -req -sha256 -days 3650 -in certs/dashboard.csr -signkey certs/dashboard.key -out certs/dashboard.crt
-	kubectl -n kube-system delete secret kubernetes-dashboard-certs
-	kubectl -n kube-system create secret generic kubernetes-dashboard-certs --from-file=dashboard.crt --from-file=dashboard.key
-	kubectl -n kube-system edit deploy kubernetes-dashboard -o yaml
