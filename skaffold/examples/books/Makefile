@@ -1,3 +1,6 @@
+all:
+	cat Makefile
+
 build:
 	docker build . -t books:latest
 

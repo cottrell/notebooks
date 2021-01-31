@@ -1,3 +1,6 @@
+all:
+	cat Makefile
+
 serve:
 	docsify serve docs
 

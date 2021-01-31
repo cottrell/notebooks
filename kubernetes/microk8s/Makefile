@@ -14,7 +14,12 @@ status:
 	microk8s status --wait-ready
 
 enable:
-	microk8s enable dashboard # dns registry istio
+	microk8s enable dashboard # dns
+	microk8s enable dns # you need this probably all the time
+	# microk8s enable registry # this is for docker, I am trying the manual tar include:
+	# 	docker save our/docs:local > our_docs_local.tar
+	# 	microk8s ctr image import our_docs_local.tar
+	# microk8s enable istio # dunno if needed generally
 
 cert:
 	openssl req -nodes -newkey rsa:2048 -keyout dashboard.key -out dashboard.csr -subj "/C=/ST=/L=/O=/OU=/CN=*"
@@ -30,9 +35,6 @@ cert:
 	#             - --tls-key-file=dashboard.key
 	#             #- --auto-generate-certificates
 
-dashboard:
-	microk8s dashboard-proxy
-
 ns:
 	microk8s kubectl get all --all-namespaces
 
@@ -40,3 +42,8 @@ dash:
 	# this should be avail on the LAN
 	sudo microk8s dashboard-proxy --address 0.0.0.0 --tls-cert-file=dashboard.crt --tls-key-file=dashboard.key
 
+example_yaml:
+	microk8s kubectl run nginx --image=nginx --dry-run -o yaml
+
+help_yaml:
+	microk8s kubectl explain pod.spec
