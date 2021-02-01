@@ -1,7 +1,6 @@
 all:
 	cat Makefile
 
-
 KEY = /tmp/nginx.key
 CERT = /tmp/nginx.crt
 SECRET = /tmp/secret.json
@@ -21,8 +20,5 @@ delete:
 	microk8s kubectl delete configmap nginxconfigmap
 	microk8s kubectl get configmaps
 
-get_ip:
-	mk describe svc
-	# then curl what shows up
-	# microk8s kubectl get svc my-nginx -o yaml | grep nodePort -C 5
-	# microk8s kubectl get nodes -o yaml | grep ExternalIP -C 1
+test:
+	url=$$(microk8s kubectl describe svc my-nginx | grep Endpoints | head -1 | cut -d: -f2-) && curl $$url
