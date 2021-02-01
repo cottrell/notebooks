@@ -20,6 +20,8 @@ enable:
 	# 	docker save our/docs:local > our_docs_local.tar
 	# 	microk8s ctr image import our_docs_local.tar
 	# microk8s enable istio # dunno if needed generally
+	microk8s enable metallb  # need this for ExternalIP https://stackoverflow.com/questions/65985098/no-externalip-showing-in-kubernetes-nodes/65991935#65991935
+	microk8s enable ingress  # not sure if needed for above
 
 cert:
 	openssl req -nodes -newkey rsa:2048 -keyout dashboard.key -out dashboard.csr -subj "/C=/ST=/L=/O=/OU=/CN=*"
