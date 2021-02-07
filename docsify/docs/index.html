@@ -7,8 +7,18 @@
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+
+<link
+           rel="stylesheet"
+             href="//cdn.jsdelivr.net/npm/docsify-changelog-plugin@latest/dist/style.css"
+             />
+<link
+           rel="stylesheet"
+             href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"
+             />
 </head>
 <body>
+  <nav></nav>
   <div data-app id="app">Please wait...</div>
   <script>
     window.$docsify = {
@@ -23,7 +33,23 @@
             twitter: true,
             whatsapp: true,
             telegram: true,
-        }
+        },
+        loadNavbar : false, // IMPORTANT
+        changelog : 'CHANGELOG.md', // path of your changelog, it can be remote as well
+        plugins: [
+            function(hook) {
+                  var footer = [
+                              '<hr/>',
+                              '<footer>',
+                              '<span>Something footer here</span>',
+                              '</footer>'
+                            ].join('');
+
+                  hook.afterEach(function(html) {
+                              return html + footer;
+                            });
+                }
+      ]
     }
   </script>
   <!-- Docsify v4 -->
@@ -48,5 +74,7 @@
   <script>mermaid.initialize({ startOnLoad: true });</script>
 
   <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/docsify-changelog-plugin@latest/dist/index.js"></script>
 </body>
 </html>
