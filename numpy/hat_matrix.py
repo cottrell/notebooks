@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import inv, solve
-m = 1000
-n = 10
+m = 100
+n = 30
 
 X = np.random.randn(m, n)
 
