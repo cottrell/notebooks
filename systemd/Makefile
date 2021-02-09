@@ -8,5 +8,8 @@ list-all:
 list-units:
 	systemctl list-units --type=service
 
+reset-failed:
+	systemctl reset-failed
+
 # disable via: systemctl disable SERVICE
 # stop/start via: service SERVICE start/stop
