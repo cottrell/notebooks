@@ -23,4 +23,13 @@ See previous [releases](https://code.visualstudio.com/updates/v1_52) here.
     sudo snap install --classic code --channel=latest/beta
     snap info code # list versions
 
+Also remember settings `~/.local/share/code-server/User/settings.json`:
 
+```json
+{
+    "remote.extensionKind": {
+        "vscodevim.vim": ["workspace"]
+      },
+      "workbench.colorTheme": "Visual Studio Dark",
+}
+```
