@@ -8,14 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
 
-<link
-           rel="stylesheet"
-             href="//cdn.jsdelivr.net/npm/docsify-changelog-plugin@latest/dist/style.css"
-             />
-<link
-           rel="stylesheet"
-             href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"
-             />
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-changelog-plugin@latest/dist/style.css" />
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
 </head>
 <body>
   <nav></nav>
@@ -34,8 +28,11 @@
             whatsapp: true,
             telegram: true,
         },
+
+        // for changelog
         loadNavbar : false, // IMPORTANT
         changelog : 'CHANGELOG.md', // path of your changelog, it can be remote as well
+
         plugins: [
             function(hook) {
                   var footer = [
