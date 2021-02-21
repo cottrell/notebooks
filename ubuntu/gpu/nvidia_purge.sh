@@ -32,8 +32,7 @@ sudo add-apt-repository --remove ppa:graphics-drivers/ppa
 sudo add-apt-repository ppa:graphics-drivers/ppa
 sudo apt update
 
-echo then follow tensorflow site instruction ... see ./cude/from_tf_site_2
-
+# echo then follow tensorflow site instruction ... see ./cude/from_tf_site_2
 # sudo apt install nvidia-driver-410
 # shoot me
 # # generally you don't want to just run this, it times out and you don't need to repurge all the time
