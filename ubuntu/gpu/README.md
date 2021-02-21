@@ -1,20 +1,90 @@
-# 2021
+# 2021-02
 
-On Ubuntu 20.04.
+Awful.
 
-Run purge between any attempts:
+    uname -sr
+    Linux 5.4.0-65-generic
+
+    lsb_release -a
+    No LSB modules are available.
+    Distributor ID:	Ubuntu
+    Description:	Ubuntu 20.04.2 LTS
+    Release:	20.04
+    Codename:	focal
+
+After many attempts this finally seemed to work to at least bring back the monitor resolution etc: https://askubuntu.com/questions/1310433/nvidia-driver-460-does-not-work-with-5-4-0-64-kernel-in-ubuntu-18-04
+
+Tensorflow is not yet detecting the GPU but that is probably because I haven't done CUDA yet. See below for when I try that again.
+
+Always check the dpkg command below. I think the issue is something to do with the kernel headers or the nvidia-settings version always being 460.
+
+The steps are precisely:
+
+    ./nvidia_purge.sh
+    sudo apt install gcc-8
+    sudo update-alternatives --remove-all gcc
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 10
+    sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-8 10
+    sudo apt-get install --reinstall linux-headers-$(uname -r)
+    sudo apt-get install nvidia-driver-460
+    # reboot
+
+    dpkg --list | grep nvidia
+    ii  libnvidia-cfg1-460:amd64                      460.32.03-0ubuntu1                          amd64        NVIDIA binary OpenGL/GLX configuration library
+    ii  libnvidia-common-460                          460.32.03-0ubuntu1                          all          Shared files used by the NVIDIA libraries
+    ii  libnvidia-compute-460:amd64                   460.32.03-0ubuntu1                          amd64        NVIDIA libcompute package
+    ii  libnvidia-decode-460:amd64                    460.32.03-0ubuntu1                          amd64        NVIDIA Video Decoding runtime libraries
+    ii  libnvidia-encode-460:amd64                    460.32.03-0ubuntu1                          amd64        NVENC Video Encoding runtime library
+    ii  libnvidia-extra-460:amd64                     460.32.03-0ubuntu1                          amd64        Extra libraries for the NVIDIA driver
+    ii  libnvidia-fbc1-460:amd64                      460.32.03-0ubuntu1                          amd64        NVIDIA OpenGL-based Framebuffer Capture runtime library
+    ii  libnvidia-gl-460:amd64                        460.32.03-0ubuntu1                          amd64        NVIDIA OpenGL/GLX/EGL/GLES GLVND libraries and Vulkan ICD
+    ii  libnvidia-ifr1-460:amd64                      460.32.03-0ubuntu1                          amd64        NVIDIA OpenGL-based Inband Frame Readback runtime library
+    ii  nvidia-compute-utils-460                      460.32.03-0ubuntu1                          amd64        NVIDIA compute utilities
+    ii  nvidia-dkms-460                               460.32.03-0ubuntu1                          amd64        NVIDIA DKMS package
+    ii  nvidia-driver-460                             460.32.03-0ubuntu1                          amd64        NVIDIA driver metapackage
+    ii  nvidia-kernel-common-460                      460.32.03-0ubuntu1                          amd64        Shared files used with the kernel module
+    ii  nvidia-kernel-source-460                      460.32.03-0ubuntu1                          amd64        NVIDIA kernel source package
+    ii  nvidia-prime                                  0.8.15.3~0.20.04.1                          all          Tools to enable NVIDIA's Prime
+    ii  nvidia-settings                               460.32.03-0ubuntu1                          amd64        Tool for configuring the NVIDIA graphics driver
+    ii  nvidia-utils-460                              460.32.03-0ubuntu1                          amd64        NVIDIA driver support binaries
+    ii  screen-resolution-extra                       0.18build1                                  all          Extension for the nvidia-settings control panel
+    ii  xserver-xorg-video-nvidia-460                 460.32.03-0ubuntu1                          amd64        NVIDIA binary Xorg driver
+
+    nvidia-smi
+    Sun Feb 21 12:56:51 2021
+    +-----------------------------------------------------------------------------+
+    | NVIDIA-SMI 460.32.03    Driver Version: 460.32.03    CUDA Version: 11.2     |
+    |-------------------------------+----------------------+----------------------+
+    | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+    | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+    |                               |                      |               MIG M. |
+    |===============================+======================+======================|
+    |   0  GeForce RTX 2070    On   | 00000000:01:00.0  On |                  N/A |
+    | 36%   44C    P8     9W / 175W |    373MiB /  7979MiB |      2%      Default |
+    |                               |                      |                  N/A |
+    +-------------------------------+----------------------+----------------------+
+
+    +-----------------------------------------------------------------------------+
+    | Processes:                                                                  |
+    |  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+    |        ID   ID                                                   Usage      |
+    |=============================================================================|
+    |    0   N/A  N/A      1930      G   /usr/lib/xorg/Xorg                 35MiB |
+    |    0   N/A  N/A      3595      G   /usr/lib/xorg/Xorg                176MiB |
+    |    0   N/A  N/A      3724      G   /usr/bin/gnome-shell               82MiB |
+    |    0   N/A  N/A      4421      G   ...AAAAAAAA== --shared-files       67MiB |
+    +-----------------------------------------------------------------------------+
+
+Remember the following:
+
+Run purge between any attempts
+
     ./nvidia_purge.sh
     ./cuda_purge.sh
 
-https://www.tensorflow.org/install/gpu
+Always check this, something to do with secure boot?
 
-This guy blacklists nouveau: https://medium.com/@sargupta/fix-nvidia-smi-not-working-3c040ac426b3#:~:text=NVIDIA%2DSMI%20has%20failed%20because,driver%20is%20installed%20and%20running.&text=Then%20re%2Dadd%20the%20PPA%20and%20install%20the%20driver. But I tried that and it doesn't work.
-
-There is this one but nothing there is new and it doesn't work https://linoxide.com/linux-how-to/how-to-install-nvidia-driver-on-ubuntu/
-They do mention the desktop thing and nouveau: sudo apt install ubuntu-desktop
-
-See issue on askubuntu.
-
+    dpkg --list | grep ii.*nvidia
 
 ## Checks and tests
 
@@ -54,14 +124,13 @@ See issue on askubuntu.
     driver   : nvidia-driver-418-server - distro non-free
     driver   : xserver-xorg-video-nouveau - distro free builtin
 
-## Install nvidia drivers
 
-    sudo ubuntu-drivers autoinstall
+## Tensorflow
 
-    sudo reboot
+https://www.tensorflow.org/install/gpu
 
-I think that the location might have changed on 20.04.
-Old one is this
+I think that the location might have changed on 20.04.  Old one is this
+
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64
 
 
