@@ -1,6 +1,7 @@
-# 2021-02
+# 2021-02-21 nvidia driver reinstall
 
 Awful.
+
 
     uname -sr
     Linux 5.4.0-65-generic
@@ -18,7 +19,7 @@ Tensorflow is not yet detecting the GPU but that is probably because I haven't d
 
 Always check the dpkg command below. I think the issue is something to do with the kernel headers or the nvidia-settings version always being 460.
 
-The steps are precisely:
+The steps are precisely (I am not sure if downgrading gcc is strictly necessary):
 
     ./nvidia_purge.sh
     sudo apt install gcc-8
@@ -125,110 +126,42 @@ Always check this, something to do with secure boot?
     driver   : xserver-xorg-video-nouveau - distro free builtin
 
 
-## Tensorflow
+## 2021-02-21 Cuda and Tensorflow
 
-https://www.tensorflow.org/install/gpu
+See requirements at https://www.tensorflow.org/install/gpu but basically you can just go the nvidia and use their install scripts. Then test and see.
 
-I think that the location might have changed on 20.04.  Old one is this
+See https://linuxconfig.org/how-to-install-cuda-on-ubuntu-20-04-focal-fossa-linux
 
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64
+See https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ for list of debs
 
+    wget -O /etc/apt/preferences.d/cuda-repository-pin-600 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+    sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
+    sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
 
+    sudo apt install cuda libcudnn8 libcudnn8-dev
 
+    # add to your path in .bashrc or whatever, you might already have /usr/local/cuda linked to this anyway
+    export PATH=/usr/local/cuda-11.2/bin${PATH:+:${PATH}}
+    export LD_LIBRARY_PATH=/usr/local/cuda-11.2/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
-
-
-
-
-https://linuxconfig.org/how-to-install-the-nvidia-drivers-on-ubuntu-20-04-focal-fossa-linux
-
-
-Detect:
-    ubuntu-drivers devices
-    == /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0 ==
-    modalias : pci:v000010DEd00001F02sv000019DAsd00002516bc03sc00i00
-    vendor   : NVIDIA Corporation
-    model    : TU106 [GeForce RTX 2070]
-    driver   : nvidia-driver-418-server - distro non-free
-    driver   : nvidia-driver-450-server - distro non-free
-    driver   : nvidia-driver-450 - distro non-free
-    driver   : nvidia-driver-460 - third-party non-free recommended
-    driver   : xserver-xorg-video-nouveau - distro free builtin
-
-    ubuntu-drivers devices
-    sudo add-apt-repository ppa:graphics-drivers/ppa
-    == /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0 ==
-    modalias : pci:v000010DEd00001F02sv000019DAsd00002516bc03sc00i00
-    vendor   : NVIDIA Corporation
-    model    : TU106 [GeForce RTX 2070]
-    driver   : nvidia-driver-460 - third-party non-free recommended
-    driver   : nvidia-driver-418-server - distro non-free
-    driver   : nvidia-driver-450-server - distro non-free
-    driver   : nvidia-driver-450 - distro non-free
-    driver   : xserver-xorg-video-nouveau - distro free builtin
-
-Have tried:
-    sudo apt install nvidia-driver-460
-    sudo apt install nvidia-driver-455
-    sudo apt install nvidia-driver-450
-    sudo ubuntu-drivers autoinstall
+    # rebash and check
+    nvcc --version
+    nvcc: NVIDIA (R) Cuda compiler driver
+    Copyright (c) 2005-2021 NVIDIA Corporation
+    Built on Thu_Jan_28_19:32:09_PST_2021
+    Cuda compilation tools, release 11.2, V11.2.142
+    Build cuda_11.2.r11.2/compiler.29558016_0
 
 
-## Ongoing from tensorflow docs
-## Add NVIDIA package repositories
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
-sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
-sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
-sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
-sudo apt-get update
+    # test with something
+    tensorfow/check_gpu.py
 
-wget http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu2004/x86_64/nvidia-machine-learning-repo-ubuntu2004_1.0.0-1_amd64.deb
+    # still not yet working but this dodgy symlink, could also downgrade
+    sudo ln -s /usr/local/cuda-11.2/targets/x86_64-linux/lib/libcusolver.so.11 /usr/local/cuda-11.2/targets/x86_64-linux/lib/libcusolver.so.10
 
-sudo apt install ./nvidia-machine-learning-repo-ubuntu2004_1.0.0-1_amd64.deb
-sudo apt-get update
+    If you are trying the nvcc compile test from that site
 
-## Install NVIDIA driver
-THIS PART FAILS CAN NOT INSTALL
-E: Unable to correct problems, you have held broken packages.
-sudo apt-get install --no-install-recommends nvidia-driver-450
-## Reboot. Check that GPUs are visible using the command: nvidia-smi
+    nvcc -o hello hello.cu
 
-wget https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu2004/x86_64/libnvinfer7_7.1.3-1+cuda11.0_amd64.deb
-sudo apt install ./libnvinfer7_7.1.3-1+cuda11.0_amd64.deb
-sudo apt-get update
+    You will need to install the right version of g++, probably sudo apt install g++-8 and then see.
 
-## Install development and runtime libraries (~4GB)
-sudo apt-get install --no-install-recommends \
-    cuda-11-0 \
-    libcudnn8=8.0.4.30-1+cuda11.0  \
-    libcudnn8-dev=8.0.4.30-1+cuda11.0
-
-
-## Install TensorRT. Requires that libcudnn8 is installed above.
-sudo apt-get install -y --no-install-recommends libnvinfer7=7.1.3-1+cuda11.0 \
-    libnvinfer-dev=7.1.3-1+cuda11.0 \
-    libnvinfer-plugin7=7.1.3-1+cuda11.0
-
-
-
-
-
-Test:
-    nvidia-smi
-
-
-
-
-Not working:
-
-    # REBOOT
-    nvidia-detector # outputs nvidia-driver-460
-    sudo apt install nvidia-driver-460
-    # REBOOT
-    nvidia-smi
-    fails
-    sudo apt install nvidia-driver-455
-    ...
-
-https://www.cyberciti.biz/faq/ubuntu-linux-install-nvidia-driver-latest-proprietary-driver/
-https://askubuntu.com/questions/1307160/nvidia-drivers-reset-after-update-and-now-monitor-is-unknown-and-stuck-in-640x
