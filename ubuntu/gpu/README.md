@@ -2,12 +2,77 @@
 
 On Ubuntu 20.04.
 
-https://linuxconfig.org/how-to-install-the-nvidia-drivers-on-ubuntu-20-04-focal-fossa-linux
-
-
 Run purge between any attempts:
     ./nvidia_purge.sh
     ./cuda_purge.sh
+
+https://www.tensorflow.org/install/gpu
+
+This guy blacklists nouveau: https://medium.com/@sargupta/fix-nvidia-smi-not-working-3c040ac426b3#:~:text=NVIDIA%2DSMI%20has%20failed%20because,driver%20is%20installed%20and%20running.&text=Then%20re%2Dadd%20the%20PPA%20and%20install%20the%20driver. But I tried that and it doesn't work.
+
+There is this one but nothing there is new and it doesn't work https://linoxide.com/linux-how-to/how-to-install-nvidia-driver-on-ubuntu/
+They do mention the desktop thing and nouveau: sudo apt install ubuntu-desktop
+
+See issue on askubuntu.
+
+
+## Checks and tests
+
+	sudo lspci -v
+	01:00.0 VGA compatible controller: NVIDIA Corporation TU106 [GeForce RTX 2070] (rev a1) (prog-if 00 [VGA controller])
+    Subsystem: ZOTAC International (MCO) Ltd. TU106 [GeForce RTX 2070]
+    Flags: bus master, fast devsel, latency 0, IRQ 11
+    Memory at de000000 (32-bit, non-prefetchable) [size=16M]
+    Memory at c0000000 (64-bit, prefetchable) [size=256M]
+    Memory at d0000000 (64-bit, prefetchable) [size=32M]
+    I/O ports at e000 [size=128]
+    Expansion ROM at 000c0000 [disabled] [size=128K]
+    Capabilities: [60] Power Management version 3
+    Capabilities: [68] MSI: Enable- Count=1/1 Maskable- 64bit+
+    Capabilities: [78] Express Legacy Endpoint, MSI 00
+    Capabilities: [100] Virtual Channel
+    Capabilities: [250] Latency Tolerance Reporting
+    Capabilities: [258] L1 PM Substates
+    Capabilities: [128] Power Budgeting <?>
+    Capabilities: [420] Advanced Error Reporting
+    Capabilities: [600] Vendor Specific Information: ID=0001 Rev=1 Len=024 <?>
+    Capabilities: [900] Secondary PCI Express
+    Capabilities: [bb0] Resizable BAR <?>
+    Kernel modules: nvidiafb, nouveau
+
+	nvidia-smi -a
+	NVIDIA-SMI has failed because it couldn't communicate with the NVIDIA driver. Make sure that the latest NVIDIA driver is installed and running.
+
+    sudo ubuntu-drivers devices
+    == /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0 ==
+    modalias : pci:v000010DEd00001F02sv000019DAsd00002516bc03sc00i00
+    vendor   : NVIDIA Corporation
+    model    : TU106 [GeForce RTX 2070]
+    driver   : nvidia-driver-450 - third-party non-free
+    driver   : nvidia-driver-450-server - distro non-free
+    driver   : nvidia-driver-460 - third-party non-free recommended
+    driver   : nvidia-driver-418-server - distro non-free
+    driver   : xserver-xorg-video-nouveau - distro free builtin
+
+## Install nvidia drivers
+
+    sudo ubuntu-drivers autoinstall
+
+    sudo reboot
+
+I think that the location might have changed on 20.04.
+Old one is this
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64
+
+
+
+
+
+
+
+
+https://linuxconfig.org/how-to-install-the-nvidia-drivers-on-ubuntu-20-04-focal-fossa-linux
+
 
 Detect:
     ubuntu-drivers devices

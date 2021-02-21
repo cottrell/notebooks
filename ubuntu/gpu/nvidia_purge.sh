@@ -22,15 +22,18 @@
 # |    0      2665      G   /usr/bin/gnome-shell                         117MiB |
 # +-----------------------------------------------------------------------------+
 
+sudo apt-get purge '*nvidia*' -y
+sudo apt-get autoremove -y
+sudo apt list --installed | grep nvidia
+sudo ppa-purge ppa:graphics-drivers/ppa
+sudo apt auto-clean
 
-# NOT SURE NOT SURE MAYBE ONLY cuda 10.0 supported and nvidia driver 410?
-
-sudo apt purge ^nvidia
-sudo apt purge '*cuda*'
-sudo apt autoremove
-sudo add-apt-repository --remove ppa:graphics-drivers/ppa
-sudo add-apt-repository ppa:graphics-drivers/ppa
-sudo apt update
+# sudo apt purge ^nvidia
+# sudo apt purge '*cuda*'
+# sudo apt autoremove
+# sudo add-apt-repository --remove ppa:graphics-drivers/ppa
+# sudo add-apt-repository ppa:graphics-drivers/ppa
+# sudo apt update
 
 # echo then follow tensorflow site instruction ... see ./cude/from_tf_site_2
 # sudo apt install nvidia-driver-410
