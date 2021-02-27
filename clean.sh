@@ -23,8 +23,10 @@ if [[ "$1" = yes ]]; then
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
         echo MOVING TO TRASH!
+        echo before: $(du -sh)
         echo dl $files
         dl $files
+        echo after: $(du -sh)
     fi
 else
     list_cleanable
