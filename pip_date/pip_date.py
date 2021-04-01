@@ -111,4 +111,6 @@ def get_info():
 
 if __name__ == '__main__':
     df = get_info()
+    df.columns = pd.MultiIndex.from_tuples([x.split('_') for x in df.columns])
+    df = df.sort_index(axis=1)
     print(df.to_string())
