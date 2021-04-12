@@ -1,5 +1,14 @@
 # WIFI PROBLEMS
 
+## 2021-04
+
+    * lsusb was ok
+    * iwconfig showed WIFI entry
+    * nothing was showing in wifi app, dongle light was not blinking
+    * ran ./bounce_wifi.sh and it started working
+
+Had issues with network, could not sudo apt-get update for instance. Unplugging and plugging in wifi adapter *maybe* suddently improved things. Not sure.
+
 ## 2021-01
 
     lsusb | grep TP
