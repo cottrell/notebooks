@@ -58,3 +58,4 @@ pylint
 xlrd
 yahooquery
 openpyxl
+jupyter_kernel_gateway
