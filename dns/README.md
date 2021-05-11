@@ -12,3 +12,11 @@ Check things with this:
     systemd-resolve --status
 
     dig +trace www.google.co.uk
+
+
+Also run:
+
+    sudo tcpdump
+
+
+and the try ping in another terminal to see what happens.
