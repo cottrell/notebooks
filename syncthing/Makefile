@@ -11,3 +11,7 @@ install_using_system_packager:
 
 clean:
 	dl syncthing*
+
+restart:
+	pkill syncthing || :
+	syncthing > $(HOME)/logs/syncthing_`/bin/date +\%Y-\%m-\%dT\%H:\%M:\%S`.log 2>&1 &
