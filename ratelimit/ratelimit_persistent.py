@@ -30,10 +30,14 @@ class RateLimitPersistMixin:
                 setattr(self, k, v)
 
     def _set_persist_func(self, func):
+        # we need these levels to avoid clashing when chaining decorators
+        level = getattr(func, '_ratelimit_persist_level', -1) + 1
+        setattr(func, '_ratelimit_persist_level', level)
         if self.persist_base_dir is None:
-            self.persist_dir = os.path.join(os.path.dirname(func.__code__.co_filename), 'ratelimit_state', func.__name__)
+            self.persist_dir = os.path.join(os.path.dirname(func.__code__.co_filename), 'ratelimit_state', f'{func.__name__}_{level}')
         else:
             self.persist_dir = os.path.join(self.persist_base_dir, _build_func_identifier(func))
+        logging.debug(f'persist_dir={self.persist_dir}')
         os.makedirs(self.persist_dir, exist_ok=True)
         self.persist_filename = os.path.join(self.persist_dir, 'data.json')
 
@@ -78,6 +82,12 @@ limits = RateLimitDecorator
 
 @limits(calls=4, period=100)
 def _test():
+    print('hello')
+
+# chaining example
+@limits(calls=4, period=3)
+@limits(calls=104, period=30)
+def _test3():
     print('hello')
 
 
@@ -138,3 +148,4 @@ limits_exact = RateLimitDecoratorExact
 @limits_exact(calls=4, period=3)
 def _test2():
     print('hello')
+
