@@ -1,3 +1,6 @@
+"""
+Likely buggy. Just a sketch.
+"""
 import json
 import logging
 import os
