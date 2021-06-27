@@ -1,10 +1,13 @@
 #!/bin/bash
 pip install --upgrade pip
 if [[ $(uname) = Darwin ]]; then
+    # don't use GPU on Darwin
     cat ./environment.pip | sed -e 's/tensorflow-gpu/tensorflow/' > /tmp/environment.pip
+    echo jax >> /tmp/environment.pip
     pip install -r /tmp/environment.pip -U
 else
     pip install -r ./environment.pip -U
+    pip install --upgrade jax[cuda111] -f https://storage.googleapis.com/jax-releases/jax_releases.html
 fi
 # for some reason this fails in upgrade mode as of 2020-06-04
 pip install cvxpy
