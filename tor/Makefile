@@ -37,3 +37,12 @@ test_python:
 
 test_stem:
 	python ./test_stem.py
+
+make_torfiles:
+	sudo /home/cottrell/anaconda3/envs/38/bin/python ./make_torfiles.py -n 5
+
+start_many:
+	sudo ./start_many.sh
+
+stop_many:
+	sudo ./stop_many.sh
