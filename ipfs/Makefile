@@ -17,3 +17,6 @@ daemon:
 	ipfs daemon
 	# see localhost:5001/webui
 	# see localhost:8080/ipfs/hash
+
+stop:
+	pkill ipfs
