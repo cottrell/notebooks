@@ -85,7 +85,6 @@ def get_times(m=25498, n=2369, seed=0):
     res['loss'][key] = loss_(uu[key], A, b)
     print(res)
 
-
     uu = {k: v.squeeze() for k, v in uu.items()}
     df = pd.DataFrame(uu)
     return res, df
@@ -135,6 +134,7 @@ def run_np_gd(A, b, seed=1, n=100, step_size=1e-6, doplot=False):
 
 def run(A, b, n=100, seed=0, step_size=1e-6, doplot=False, backend='gpu', *, u0):
     assert np.ndim(b) == 1
+
     def loss(u, A, b):
         return jnp.sum((A @ u - b) ** 2)
 
@@ -176,6 +176,7 @@ def run(A, b, n=100, seed=0, step_size=1e-6, doplot=False, backend='gpu', *, u0)
         ax.set_ylabel('dlog(loss)')
         fig.show()
     return T, losses, u
+
 
 if __name__ == '__main__':
     res, df = get_times()
