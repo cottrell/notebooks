@@ -1,3 +1,11 @@
+# 2021-08-04 minor update failure event
+
+nvidia-smi was failing after some auto-update
+
+reboot fixed it
+
+check_gpu.py passing again.
+
 # 2021-02-21 nvidia driver reinstall
 
 Awful.

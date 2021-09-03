@@ -6,8 +6,17 @@ import pandas as pd
 
 import jax
 import jax.numpy as jnp
+import jax.experimental.optimizers
 
-alpha = 1e-2
+alpha = 1e-1
+
+DEFAULT_SEED = 0
+DEFAULT_M = 100
+
+def get_data(m=DEFAULT_M, seed=DEFAULT_SEED):
+    np.random.seed(seed)
+    y = np.random.randn(m, 1).astype(np.float32)
+    return y
 
 
 @jax.jit
@@ -26,14 +35,11 @@ def loss_fn_no_aux(theta, y):
     return loss
 
 
-m = 100
-y = np.random.randn(m, 1).astype(np.float32)
-
-# test
-(value, aux), grad = jax.value_and_grad(loss_fn_with_aux, has_aux=True)(theta, y)
-
 
 def basic_loop(fig=1, step_size=1e-2, n_plot=100, n_steps=1000):
+
+    y = get_data()
+    m = y.shape[0]
 
     key = jax.random.PRNGKey(0)
     theta = jax.random.normal(key, (m, 1))
@@ -60,10 +66,15 @@ def basic_loop(fig=1, step_size=1e-2, n_plot=100, n_steps=1000):
     ax.set_title('basic_loop')
 
 
-def adam_loop(fig=2, learning_rate=1e-5, n_plot=10000, n_steps=10000):
+def adam_loop(fig=2, init_sigma=1e-4, learning_rate=1e-2, n_plot=10000, n_steps=10000, seed=DEFAULT_SEED):
 
-    key = jax.random.PRNGKey(0)
-    theta = jax.random.normal(key, (m, 1))
+    y = get_data()
+    m = y.shape[0]
+
+    np.random.seed(seed)
+
+    key = jax.random.PRNGKey(seed)
+    theta = jax.random.uniform(key, (m, 1)) * init_sigma
     opt_init, opt_update, opt_get_params = jax.experimental.optimizers.sgd(learning_rate)
     opt_state = opt_init(theta)
 

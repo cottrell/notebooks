@@ -44,13 +44,13 @@ source ~/anaconda3/etc/profile.d/conda.sh
 
 conda update -y -n base -c defaults conda
 
-MY_CONDA_ENV=38
+MY_CONDA_ENV=39
 
 if [[ $(conda env list | grep $MY_CONDA_ENV"\s") ]]; then
     echo CONDA ENV $MY_CONDA_ENV exists
 else
     echo CONDA ENV $MY_CONDA_ENV does not exist
-    conda create -y -n $MY_CONDA_ENV python=3.8
+    conda create -y -n $MY_CONDA_ENV python=3.9
     conda activate $MY_CONDA_ENV
     conda install -y pip
 fi
@@ -64,3 +64,5 @@ if [[ $(uname) = "Darwin" ]]; then
 fi
 
 $DIR/upgrade.sh
+
+$DIR/local_setup.sh

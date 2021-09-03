@@ -1,16 +1,26 @@
 #!/bin/bash
 pip install --upgrade pip
+
+# ENV_FILE=environment.pip
+ENV_FILE=environment_minimal.pip
+
 if [[ $(uname) = Darwin ]]; then
     # don't use GPU on Darwin
-    cat ./environment.pip | sed -e 's/tensorflow-gpu/tensorflow/' > /tmp/environment.pip
+    cat $ENV_FILE | sed -e 's/tensorflow-gpu/tensorflow/' > /tmp/environment.pip
     echo jax >> /tmp/environment.pip
-    pip install -r /tmp/environment.pip -U
+    # pip install -r /tmp/environment.pip -U  # some conflicts causing issues
+    for x in $(cat /tmp/environment.pip); do
+        pip install -U $x
+    done
 else
-    pip install -r ./environment.pip -U
+    # pip install -r $ENV_FILE -U  # some conflicts causing issues
+    for x in $(cat $ENV_FILE); do
+        pip install -U $x
+    done
     pip install --upgrade jax[cuda111] -f https://storage.googleapis.com/jax-releases/jax_releases.html
 fi
-# for some reason this fails in upgrade mode as of 2020-06-04
-pip install cvxpy
+# # for some reason this fails in upgrade mode as of 2020-06-04
+# pip install cvxpy
 
 jupyter labextension install @jupyterlab/vega3-extension
 

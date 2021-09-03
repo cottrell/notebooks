@@ -10,8 +10,8 @@ cloudpickle==1.3
 deribit-api
 dill
 dot2tex
-dtale
-fastapi
+# dtale
+# fastapi
 flake8
 flit
 hypothesis
@@ -33,8 +33,6 @@ s3fs
 scikit-learn
 scipy
 seaborn
-sqlalchemy
-statsmodels
 tensorboard
 tensorflow-gpu
 tensorflow_probability
@@ -43,7 +41,7 @@ tornado
 tqdm
 ujson
 uvicorn
-vaex
+# vaex
 xarray
 xgboost
 isort
@@ -60,4 +58,6 @@ yahooquery
 openpyxl
 jupyter_kernel_gateway
 plotly
-jax
+# these cause resolution issues
+# sqlalchemy
+# statsmodel
