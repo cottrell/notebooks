@@ -1,39 +1,39 @@
 [submodule "commoncrawlscraper"]
 	path = commoncrawlscraper
-	url = https://github.com/cottrell/commoncrawlscraper.git
+	url = git@github.com:cottrell/commoncrawlscraper.git
 [submodule "dbit"]
 	path = dbit
-	url = https://github.com/cottrell/dbit.git
+	url = git@github.com:cottrell/dbit.git
 [submodule "consul_examples"]
 	path = consul_examples
-	url = https://github.com/cottrell/consul_examples.git
+	url = git@github.com:cottrell/consul_examples.git
 [submodule "uk_land_registry"]
 	path = uk_land_registry
-	url = https://github.com/cottrell/uk_land_registry.git
+	url = git@github.com:cottrell/uk_land_registry.git
 [submodule "asdf/superbasic"]
 	path = superbasic
-	url = https://github.com/cottrell/superbasic.git
+	url = git@github.com:cottrell/superbasic.git
 [submodule "extractors"]
 	path = extractors
 	url = git@gitlab.com:david-cottrell/extractors.git
 [submodule "mylib"]
 	path = mylib
-	url = https://github.com/cottrell/mylib.git
+	url = git@github.com:cottrell/mylib.git
 [submodule "mybin"]
 	path = mybin
-	url = https://github.com/cottrell/mybin.git
+	url = git@github.com:cottrell/mybin.git
 [submodule "djnotes"]
 	path = djnotes
-	url = https://github.com/cottrell/djnotes.git
+	url = git@github.com:cottrell/djnotes.git
 [submodule "C--WrappingExamples"]
 	path = C--WrappingExamples
-	url = https://github.com/cottrell/C--WrappingExamples.git
+	url = git@github.com:cottrell/C--WrappingExamples.git
 [submodule "fractional-differentiation-time-series"]
 	path = fractional-differentiation-time-series
-	url = https://github.com/cottrell/fractional-differentiation-time-series.git
+	url = git@github.com:cottrell/fractional-differentiation-time-series.git
 [submodule "awesome_markdown_enrich"]
 	path = awesome_markdown_enrich
-	url = https://github.com/cottrell/awesome_markdown_enrich.git
+	url = git@github.com:cottrell/awesome_markdown_enrich.git
 [submodule "kaggle"]
 	path = kaggle
 	url = git@gitlab.com:david-cottrell/kaggle.git
@@ -42,4 +42,4 @@
 	url = git@gitlab.com:david-cottrell/my-gym.git
 [submodule "saxo_example"]
 	path = saxo_example
-	url = https://github.com/cottrell/saxo_example.git
+	url = git@github.com:cottrell/saxo_example.git
