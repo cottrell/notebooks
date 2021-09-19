@@ -12,3 +12,4 @@ history.sqlite
 .vscode/
 .dat
 *.pyc
+dist
