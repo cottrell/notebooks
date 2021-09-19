@@ -5,10 +5,10 @@ build/
 __pycache__/
 nogit/
 node_modules/
-*.pyc
 jupyterhub.sqlite
 jupyterhub_cookie_secret
 *nogit*
 history.sqlite
 .vscode/
 .dat
+*.pyc

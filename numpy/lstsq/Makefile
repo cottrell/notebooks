@@ -13,4 +13,4 @@ scipy_gelsd:
 	mprof plot -o scipy_gelsd.png scipy.gelsd.day
 
 clean:
-	rm mprofile_*.dat
+	rm -f *.dat *.png

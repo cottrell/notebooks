@@ -2,6 +2,7 @@ all:
 	cat Makefile
 
 install_code:
+	# I mean vscode here
 	echo DOWNLOAD DEB AND INSTALL MANUALLY
 
 install_code_server:
