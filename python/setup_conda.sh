@@ -1,27 +1,14 @@
 #!/bin/bash -e
 # use this to build AMI or local machine state
 # extremely fragile, likely doesn't complete, baby it along
+# see setup_darwin.sh and setup_debian.sh
 DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 
 type gcc || echo no gcc installed!
 
-if [[ $(uname) != "Darwin" ]]; then
-    sudo apt-get install -y libffi-dev
-    sudo apt-get install -y graphviz
-    sudo apt-get install -y git-lfs
-    sudo apt-get install -y ccache
-else
-    type wget || brew install wget
-    type graphviz || brew install graphviz
-    type git-lfs || brew install git-lfs
-    brew upgrade graphviz
-    brew upgrade git-lfs
-fi
-
 # https://repo.anaconda.com/archive
 function install_conda() {
     if [[ $(uname) = "Linux" ]]; then
-        # filename=Anaconda3-2019.10-Linux-x86_64.sh
         filename=Anaconda3-2020.02-Linux-x86_64.sh
     else
         filename=Anaconda3-2020.02-MacOSX-x86_64.sh
@@ -56,12 +43,6 @@ else
 fi
 conda activate $MY_CONDA_ENV
 pip install -U pip
-
-if [[ $(uname) = "Darwin" ]]; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-    brew update && brew upgrade
-    brew install openssl
-fi
 
 $DIR/upgrade.sh
 

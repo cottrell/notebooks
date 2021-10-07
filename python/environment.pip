@@ -28,7 +28,6 @@ pip
 pyarrow
 pyfiglet
 pytest
-qgrid
 s3fs
 scikit-learn
 scipy

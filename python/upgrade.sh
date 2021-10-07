@@ -22,15 +22,13 @@ fi
 # # for some reason this fails in upgrade mode as of 2020-06-04
 # pip install cvxpy
 
-jupyter labextension install @jupyterlab/vega3-extension
-
-jupyter nbextension enable --py --sys-prefix qgrid
+# jupyter labextension install @jupyterlab/vega3-extension
 # only required if you have not enabled the ipywidgets nbextension yet
-jupyter nbextension enable --py --sys-prefix widgetsnbextension
+# jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
 # maybe just rely on primary node, npm
 # conda install -c conda-forge nodejs
 
 # see https://plotly.com/python/getting-started/ for plotly
-jupyter labextension install jupyterlab-plotly
-jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget
+# jupyter labextension install jupyterlab-plotly
+# jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget
