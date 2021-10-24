@@ -1,8 +1,12 @@
 # Examples
 
     # to convert swagger.json to code
-    curl -X POST -H "content-type:application/json" -d '{"swaggerUrl":"https://finnhub.io/static/swagger.json"}' https://generator.swagger.io/api/gen/clients/python
+    # see curl.sh
     # copy the link from the json echoed back
     wget $link
     unzip $file
 
+See options
+
+    https://generator3.swagger.io/api/options?language={language}&version={codegenVersion}
+    https://generator3.swagger.io/api/options?language=python&version=V3
