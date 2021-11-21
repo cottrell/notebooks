@@ -79,14 +79,14 @@ def adam_loop(fig=2, init_sigma=1e-4, learning_rate=1e-2, n_plot=10000, n_steps=
     opt_state = opt_init(theta)
 
     @jax.jit
-    def step(step, opt_state):
+    def step(t, opt_state):
         (value, aux), grads = jax.value_and_grad(loss_fn_with_aux, has_aux=True)(opt_get_params(opt_state), y)
         # value, grads = jax.value_and_grad(loss_fn_no_aux, has_aux=False)(opt_get_params(opt_state), y)
-        opt_state = opt_update(step, grads, opt_state)
+        opt_state = opt_update(t, grads, opt_state)
         return aux, opt_state
 
-    for i in range(n_steps):
-        value, opt_state = step(i, opt_state)
+    # for i in range(n_steps):
+    #     value, opt_state = step(i, opt_state)
 
     ldata = list()
     plot_period = n_steps // n_plot
