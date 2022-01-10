@@ -60,3 +60,4 @@ plotly
 # these cause resolution issues
 # sqlalchemy
 # statsmodel
+polars
