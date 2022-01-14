@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "chart.js": "^2.7.3",
-    "node-forge": "^0.10.0",
+    "node-forge": "^1.0.0",
     "vue": "^2.5.11"
   },
   "browserslist": [
