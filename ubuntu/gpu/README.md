@@ -1,3 +1,16 @@
+# 2022-01-14
+
+After upgrade. Jax check_gpu.py failing. nvidia-smi ok.
+
+
+This fixed it:
+
+    sudo apt install nvidia-cuda-toolkit
+
+
+tf gpu check passing.
+
+
 # 2021-08-04 minor update failure event
 
 nvidia-smi was failing after some auto-update

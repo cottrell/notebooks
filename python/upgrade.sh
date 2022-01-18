@@ -17,7 +17,9 @@ else
     for x in $(cat $ENV_FILE); do
         pip install -U $x
     done
-    pip install --upgrade jax[cuda111] -f https://storage.googleapis.com/jax-releases/jax_releases.html
+    # pip install --upgrade jax[cuda111] -f https://storage.googleapis.com/jax-releases/jax_releases.html
+    pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_releases.html  # Note: wheels only available on linux.
+
 fi
 # # for some reason this fails in upgrade mode as of 2020-06-04
 # pip install cvxpy
