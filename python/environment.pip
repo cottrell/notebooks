@@ -21,7 +21,7 @@ jupyterlab
 lmdb
 matplotlib
 numba
-numpy
+# numpy  # numba freaks out
 pandas
 pandasgui
 pip
