@@ -47,4 +47,3 @@ p1 = {
 p1 = hk.data_structures.to_immutable_dict(p1)
 
 yp1 = f.apply(p1, x)
-
