@@ -1,3 +1,85 @@
+# 2022-05-26
+
+Noticed jax not working. Made the check_gpu.py script repro the error now.
+
+Error says something about "Couldn't invoke ptxas --version"
+
+Trying:
+
+    sudo apt install nvidia-cuda-toolkit
+
+Ok, now check_gpu.py runs but CPU only.
+
+Going to try reboot.
+
+Still only cpu.
+
+    $ uname -sr
+    Linux 5.15.0-33-generic
+
+    $ lsb_release -a
+    No LSB modules are available.
+    Distributor ID:	Ubuntu
+    Description:	Ubuntu 22.04 LTS
+    Release:	22.04
+    Codename:	jammy
+
+Jax check shows: CUDA_ERROR_COMPAT_NOT_SUPPORTED_ON_DEVICE
+
+huh ... nvidia-smi not found.
+
+Following: https://www.linuxcapable.com/how-to-install-nvidia-drivers-on-ubuntu-22-04-lts/
+
+    ubuntu-drivers devices
+    == /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0 ==
+    modalias : pci:v000010DEd00001F02sv000019DAsd00002516bc03sc00i00
+    vendor   : NVIDIA Corporation
+    model    : TU106 [GeForce RTX 2070]
+    driver   : nvidia-driver-470 - distro non-free
+    driver   : nvidia-driver-510 - distro non-free recommended
+    driver   : nvidia-driver-418-server - distro non-free
+    driver   : nvidia-driver-510-server - distro non-free
+    driver   : nvidia-driver-470-server - distro non-free
+    driver   : nvidia-driver-450-server - distro non-free
+    driver   : xserver-xorg-video-nouveau - distro free builtin
+
+
+Ok ... let's go with recommended:
+
+
+    sudo ubuntu-drivers autoinstall
+
+
+Reboot.
+
+    nvidia-smi
+    Thu May 26 19:20:26 2022
+    +-----------------------------------------------------------------------------+
+    | NVIDIA-SMI 510.73.05    Driver Version: 510.73.05    CUDA Version: 11.6     |
+    |-------------------------------+----------------------+----------------------+
+    | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+    | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+    |                               |                      |               MIG M. |
+    |===============================+======================+======================|
+    |   0  NVIDIA GeForce ...  Off  | 00000000:01:00.0  On |                  N/A |
+    | 30%   40C    P8    18W / 175W |    169MiB /  8192MiB |      4%      Default |
+    |                               |                      |                  N/A |
+    +-------------------------------+----------------------+----------------------+
+
+    +-----------------------------------------------------------------------------+
+    | Processes:                                                                  |
+    |  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+    |        ID   ID                                                   Usage      |
+    |=============================================================================|
+    |    0   N/A  N/A      3268      G   /usr/lib/xorg/Xorg                 86MiB |
+    |    0   N/A  N/A      3381      G   ...ome-remote-desktop-daemon        1MiB |
+    |    0   N/A  N/A      3417      G   /usr/bin/gnome-shell               78MiB |
+    +-----------------------------------------------------------------------------+
+
+
+jax/check_gpu.py now passes.
+
+
 # 2022-01-14
 
 After upgrade. Jax check_gpu.py failing. nvidia-smi ok.

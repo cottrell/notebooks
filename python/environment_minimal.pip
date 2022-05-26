@@ -1,13 +1,13 @@
 Cython
 autopep8
 black
+dill
 flake8
 flit
 joblib
 jupyter
 jupyterlab
 matplotlib
-numba
 numpy
 pandas
 pip
@@ -30,3 +30,4 @@ sympy
 plotly
 dm-haiku
 tqdm
+numba

@@ -9,9 +9,9 @@ type gcc || echo no gcc installed!
 # https://repo.anaconda.com/archive
 function install_conda() {
     if [[ $(uname) = "Linux" ]]; then
-        filename=Anaconda3-2020.02-Linux-x86_64.sh
+        filename=Anaconda3-2021.11-Linux-x86_64.sh
     else
-        filename=Anaconda3-2020.02-MacOSX-x86_64.sh
+        filename=Anaconda3-2021.11-MacOSX-x86_64.sh
     fi
     echo Will install: $filename
 
@@ -31,13 +31,15 @@ source ~/anaconda3/etc/profile.d/conda.sh
 
 conda update -y -n base -c defaults conda
 
-MY_CONDA_ENV=39
+# MY_CONDA_ENV=39
+MY_CONDA_ENV=3.10.4
 
 if [[ $(conda env list | grep $MY_CONDA_ENV"\s") ]]; then
     echo CONDA ENV $MY_CONDA_ENV exists
 else
     echo CONDA ENV $MY_CONDA_ENV does not exist
-    conda create -y -n $MY_CONDA_ENV python=3.9
+    # conda create -y -n $MY_CONDA_ENV python=3.9
+    conda create -y -n $MY_CONDA_ENV python=3.10.4
     conda activate $MY_CONDA_ENV
     conda install -y pip
 fi
