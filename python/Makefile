@@ -2,7 +2,7 @@ all:
 	cat Makefile
 
 setup:
-	./setup.sh
+	./setup_conda.sh
 
 upgrade:
 	./upgrade.sh
