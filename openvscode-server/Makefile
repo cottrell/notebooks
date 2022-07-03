@@ -8,4 +8,4 @@ download:
 	tar xzf openvscode-server-v1.68.1-linux-x64.tar.gz
 
 run:
-	./openvscode-server-v1.68.1-linux-x64/bin/openvscode-server --port 8778
+	./openvscode-server-v1.68.1-linux-x64/bin/openvscode-server --port 8778 --host=0.0.0.0 --connection-toke-file ./token.txt
