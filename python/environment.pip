@@ -61,3 +61,4 @@ plotly
 # sqlalchemy
 # statsmodel
 polars
+toolz
