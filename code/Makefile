@@ -8,6 +8,8 @@ install_code:
 install_code_server:
 	curl -fsSL https://code-server.dev/install.sh | sh
 	echo remember to see README for enable etc for first time setup
+	# you need to run this usually
+	sudo systemctl daemon-reload
 
 status:
 	systemctl status code-server@$$USER
