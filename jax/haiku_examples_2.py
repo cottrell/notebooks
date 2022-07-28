@@ -1,11 +1,18 @@
 """
 A reminder of rough setup.
 
+1. define the build_forward_fn. I think you only need to inherit from hk.Module if you want to define some new kind of block (not 100% sure yet)
+2. you can partition the parameters into differentiable/not-differentiable later in the loss function
+3. create the loss function, use the merge to combine parameters if needed.
+
 See https://github.com/deepmind/dm-haiku/blob/main/examples/transformer/train.py
 
 https://theaisummer.com/jax-transformer/
 
 I think can use my usual vanilla training loop for now.
+
+Training subset of params
+https://dm-haiku.readthedocs.io/en/latest/notebooks/non_trainable.html
 """
 
 # I think this is the standard flow

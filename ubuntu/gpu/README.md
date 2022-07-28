@@ -1,3 +1,161 @@
+# 2022-07-13
+
+When I run jax/check_gpu.py:
+
+    kernel version 515.48.7 does not match DSO version 510.73.5 -- cannot find working devices in this configuration
+
+
+Going to try to purge nvidia and cudo and reinstall and reboot https://forums.developer.nvidia.com/t/kernel-version-440-31-0-does-not-match-dso-version-440-33-1-mdash-cannot-find-working-devices-in-this-configuration/107975:
+
+    ./cuda_purge.sh
+    ./nvidia_purge.sh
+    sudo apt-get update
+    $ ubuntu-drivers devices
+    == /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0 ==
+    modalias : pci:v000010DEd00001F02sv000019DAsd00002516bc03sc00i00
+    vendor   : NVIDIA Corporation
+    model    : TU106 [GeForce RTX 2070]
+    driver   : nvidia-driver-470-server - distro non-free
+    driver   : nvidia-driver-510-server - distro non-free
+    driver   : nvidia-driver-515 - distro non-free recommended
+    driver   : nvidia-driver-470 - distro non-free
+    driver   : nvidia-driver-510 - distro non-free
+    driver   : nvidia-driver-418-server - distro non-free
+    driver   : nvidia-driver-515-server - distro non-free
+    driver   : nvidia-driver-450-server - distro non-free
+    driver   : xserver-xorg-video-nouveau - distro free builtin
+
+    sudo ubuntu-drivers autoinstall
+    sudo apt install nvidia-cuda-toolkit
+    sudo apt-get update
+    reboot
+    still same thing not working
+
+    ./nvidia_purge.sh
+    sudo apt-get install nvidia-utils-510
+
+    reboot
+    still does not work
+    now screen res is not correct
+
+    Arg ... should have done: sudo apt install nvidia-driver-510 ... (not utils)
+    ./nvidia_purge.sh
+    sudo apt install nvidia-driver-510
+    reboot
+
+    now get core dump on check_gpu.py
+    sudo apt-get update
+    ./cuda_purge.sh
+    sudo apt install nvidia-cuda-toolkit
+    NOW WORKS! Without reboot. Going to reboot to make sure nothing else is busted.
+    reboot
+    works!
+
+
+
+
+
+
+# 2022-07-12
+
+Noticed jax not working again.
+
+nvidia-smi works but ./check_gpu.py fails.
+
+    $ TF_CPP_MIN_LOG_LEVEL=0 ./check_gpu.py
+    2022-07-12 15:43:36.311703: I external/org_tensorflow/tensorflow/compiler/xla/service/service.cc:172] XLA service 0x562cb9ff4800 initialized for platform Interpreter (this does not guarantee that XLA will be used). Devices:
+    2022-07-12 15:43:36.311723: I external/org_tensorflow/tensorflow/compiler/xla/service/service.cc:180]   StreamExecutor device (0): Interpreter, <undefined>
+    2022-07-12 15:43:36.313854: I external/org_tensorflow/tensorflow/compiler/xla/pjrt/tfrt_cpu_pjrt_client.cc:181] TfrtCpuClient created.
+    2022-07-12 15:43:36.314173: I external/org_tensorflow/tensorflow/core/tpu/tpu_initializer_helper.cc:262] Libtpu path is: libtpu.so
+    2022-07-12 15:43:36.314403: I external/org_tensorflow/tensorflow/stream_executor/tpu/tpu_platform_interface.cc:74] No TPU platform found.
+    WARNING:absl:No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
+    cpu
+
+
+    $ nvidia-smi
+    Tue Jul 12 15:41:40 2022
+    +-----------------------------------------------------------------------------+
+    | NVIDIA-SMI 510.73.05    Driver Version: 510.73.05    CUDA Version: 11.6     |
+    |-------------------------------+----------------------+----------------------+
+    | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+    | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+    |                               |                      |               MIG M. |
+    |===============================+======================+======================|
+    |   0  NVIDIA GeForce ...  Off  | 00000000:01:00.0  On |                  N/A |
+    | 30%   43C    P8    17W / 175W |    827MiB /  8192MiB |     11%      Default |
+    |                               |                      |                  N/A |
+    +-------------------------------+----------------------+----------------------+
+
+    +-----------------------------------------------------------------------------+
+    | Processes:                                                                  |
+    |  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+    |        ID   ID                                                   Usage      |
+    |=============================================================================|
+    |    0   N/A  N/A      3384      G   /usr/lib/xorg/Xorg                297MiB |
+    |    0   N/A  N/A      3533      G   /usr/bin/gnome-shell              119MiB |
+    |    0   N/A  N/A      4361      G   ...RendererForSitePerProcess       11MiB |
+    |    0   N/A  N/A   2629083      G   ...861081016357593163,131072      395MiB |
+    +-----------------------------------------------------------------------------+
+
+Trying:
+
+    sudo ubuntu-drivers autoinstall
+
+
+Does not work.
+
+... various problems. resolved.
+
+gpu still not work.
+
+    nvidia-smi
+    Tue Jul 12 17:30:54 2022
+    +-----------------------------------------------------------------------------+
+    | NVIDIA-SMI 515.48.07    Driver Version: 515.48.07    CUDA Version: 11.7     |
+    |-------------------------------+----------------------+----------------------+
+    | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+    | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+    |                               |                      |               MIG M. |
+    |===============================+======================+======================|
+    |   0  NVIDIA GeForce ...  Off  | 00000000:01:00.0  On |                  N/A |
+    | 30%   44C    P8    16W / 175W |   1936MiB /  8192MiB |      4%      Default |
+    |                               |                      |                  N/A |
+    +-------------------------------+----------------------+----------------------+
+
+    +-----------------------------------------------------------------------------+
+    | Processes:                                                                  |
+    |  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+    |        ID   ID                                                   Usage      |
+    |=============================================================================|
+    |    0   N/A  N/A      3160      G   /usr/lib/xorg/Xorg                183MiB |
+    |    0   N/A  N/A      3307      G   /usr/bin/gnome-shell               63MiB |
+    |    0   N/A  N/A      3956      G   ...364554119117281805,131072     1686MiB |
+    +-----------------------------------------------------------------------------+
+
+
+Now try:
+
+        sudo apt install nvidia-cuda-toolkit
+
+
+Still fails. Also tensorflow fails.
+
+Reboot.
+
+Reinstall jax as per README
+
+    sudo ubuntu-drivers autoinstall
+
+
+Now have: Couldn't get ptxas version string: INTERNAL: Couldn't invoke ptxas --version
+
+
+    sudo apt install nvidia-cuda-toolkit
+
+
+I maybe need to downgarde to 510?
+
+
 # 2022-05-26
 
 Noticed jax not working. Made the check_gpu.py script repro the error now.

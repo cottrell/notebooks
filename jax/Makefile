@@ -10,4 +10,4 @@ install:
 
 
 test:
-	./check_gpu.py
+	TF_CPP_MIN_LOG_LEVEL=0 ./check_gpu.py
