@@ -67,6 +67,8 @@ connect_pachyderm:
 	pachctl config import-kube local --overwrite
 	pachctl config set active-context local
 	pachctl port-forward # this blocks, background this process in a new tab of your terminal
+	# to connect do something like
+	# ssh -v -N -f -L localhost:4000:localhost:4000 remote_host
 
 verify_pachyderm:
 	pachctl version
@@ -77,3 +79,10 @@ verify_pachyderm:
 # uninstall:
 # helm uninstall pachd
 # kubectl delete pvc -l suite=pachyderm
+
+listing_things:
+	pachctl list repo
+	pachctl list file images_delightful-peccary@master
+	# delete demo
+	# pachctl delete pipeline montage_delightful-peccary && pachctl delete pipeline edges_delightful-peccary && pachctl delete repo images_delightful-peccary
+

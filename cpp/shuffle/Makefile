@@ -5,3 +5,6 @@ shuffle_one:
 
 shuffle_many:
 	g++ shuffle_many.cpp -o shuffle_many
+
+clean:
+	rm shuffle_one shuffle_many
