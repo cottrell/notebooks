@@ -2,7 +2,7 @@ all:
 	cat Makefile
 
 
-build:
+build: hello.pyx
 	python setup.py build_ext --inplace
 
 test:

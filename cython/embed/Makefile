@@ -26,3 +26,7 @@ test2:
 test:
 	# this one runs
 	PYTHONHOME=~/anaconda3/envs/3.10.4/ ./example
+
+
+build_pyinstaller:
+	pyinstaller example.py
