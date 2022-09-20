@@ -2,7 +2,9 @@ all:
 	cat Makefile
 
 install:
-	sudo npm install -g @vue/cli
+	# sudo npm install -g @vue/cli  # I think no longer used
+	# do this to init a new project
+	# npm init vue@latest
 
 setup-hello-world:
 	vue create hello-world
