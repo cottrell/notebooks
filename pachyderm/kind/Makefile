@@ -86,3 +86,13 @@ listing_things:
 	# delete demo
 	# pachctl delete pipeline montage_delightful-peccary && pachctl delete pipeline edges_delightful-peccary && pachctl delete repo images_delightful-peccary
 
+
+pause:
+	docker ps -a
+	docker pause kind-control-plane
+	docker ps -a
+
+unpause:
+	docker ps -a
+	docker unpause kind-control-plane
+	docker ps -a
