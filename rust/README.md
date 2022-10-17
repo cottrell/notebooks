@@ -22,3 +22,6 @@ https://www.udemy.com/course/rust-lang
     cp target/release/libmymod_pyo3.so mymod_pyo3.so
     ipython
     >>> import mymod_pyo3
+
+
+rustc to just compile a file

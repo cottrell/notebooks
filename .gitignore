@@ -9,7 +9,6 @@ jupyterhub.sqlite
 jupyterhub_cookie_secret
 *nogit*
 history.sqlite
-.vscode/
 .dat
 *.pyc
 dist/
