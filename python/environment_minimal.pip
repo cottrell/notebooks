@@ -1,5 +1,4 @@
-Cython
-autopep8
+Cython autopep8
 black
 dill
 flake8
@@ -16,13 +15,8 @@ pyfiglet
 pytest
 scikit-learn
 scipy
-tensorboard
-tensorflow-gpu
-tensorflow_probability
 tqdm
 ujson
-xarray
-xgboost
 isort
 autoflake
 git+https://github.com/pydata/pandas-datareader.git

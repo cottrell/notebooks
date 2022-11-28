@@ -33,13 +33,16 @@ conda update -y -n base -c defaults conda
 
 # MY_CONDA_ENV=39
 MY_CONDA_ENV=3.10.4
+# MY_CONDA_ENV=3.11.0
 
 if [[ $(conda env list | grep $MY_CONDA_ENV"\s") ]]; then
     echo CONDA ENV $MY_CONDA_ENV exists
 else
     echo CONDA ENV $MY_CONDA_ENV does not exist
     # conda create -y -n $MY_CONDA_ENV python=3.9
-    conda create -y -n $MY_CONDA_ENV python=3.10.4
+    # conda create -y -n $MY_CONDA_ENV python=$MY_CONDA_ENV
+    # NOTE: needed conda forge for 3.11
+    conda create -c conda-forge -y -n $MY_CONDA_ENV python=$MY_CONDA_ENV
     conda activate $MY_CONDA_ENV
     conda install -y pip
 fi
