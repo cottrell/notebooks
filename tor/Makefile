@@ -30,7 +30,7 @@ fix_bug:
 
 test:
 	curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.torproject.org/ | cat | grep -m 1 Congratulations | xargs
-	# success looks like: Congratulations. This browser is configured to use Tor.
+	# THIS LINE IS JUST AN EXAMPLE NOT A RESULT (the result is above, missing means failure): success looks like: Congratulations. This browser is configured to use Tor.
 
 test_python:
 	python ./test.py

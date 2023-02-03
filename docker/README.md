@@ -1,3 +1,14 @@
+# 2023-01-30
+
+Reminders.
+
+    Docker build .  # fails
+    docker run -it --rm id /bin/bash  # debug
+    etc
+
+
+    docker exec for running containers
+
 # Ports
 
 NETWORK HOST NETWORK HOST NETWORK HOST!!!! IS IMPORTANT.
