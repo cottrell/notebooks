@@ -9,9 +9,9 @@ type gcc || echo no gcc installed!
 # https://repo.anaconda.com/archive
 function install_conda() {
     if [[ $(uname) = "Linux" ]]; then
-        filename=Anaconda3-2021.11-Linux-x86_64.sh
+        filename=Anaconda3-2022.10-Linux-x86_64.sh
     else
-        filename=Anaconda3-2021.11-MacOSX-x86_64.sh
+        filename=Anaconda3-2022.10-MacOSX-x86_64.sh
     fi
     echo Will install: $filename
 

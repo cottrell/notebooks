@@ -1,4 +1,5 @@
 Cython autopep8
+ipython
 black
 dill
 flake8
