@@ -26,6 +26,8 @@ def train_step(grad_fun, params, opt_state, data):
     ...
 ```
 
+See `jax_util`.
+
 # old
 
 https://blog.evjang.com/2019/02/maml-jax.html
