@@ -54,6 +54,42 @@ Had to do this fix https://askubuntu.com/questions/1436601/ubuntu-drivers-unboun
     sudo dpkg -i cuda-keyring_1.0-1_all.deb
     sudo apt-get update
     sudo apt-get -y install cuda
+    $ nvidia-detector
+    nvidia-driver-530
+    $ nvidia-smi
+    Wed Mar 22 20:43:03 2023
+    +---------------------------------------------------------------------------------------+
+    | NVIDIA-SMI 530.30.02              Driver Version: 530.30.02    CUDA Version: 12.1     |
+    |-----------------------------------------+----------------------+----------------------+
+    | GPU  Name                  Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+    | Fan  Temp  Perf            Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+    |                                         |                      |               MIG M. |
+    |=========================================+======================+======================|
+    |   0  NVIDIA GeForce RTX 2070         Off| 00000000:01:00.0 Off |                  N/A |
+    | 33%   66C    P0               49W / 175W|      0MiB /  8192MiB |      0%      Default |
+    |                                         |                      |                  N/A |
+    +-----------------------------------------+----------------------+----------------------+
+
+    +---------------------------------------------------------------------------------------+
+    | Processes:                                                                            |
+    |  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+    |        ID   ID                                                             Usage      |
+    |=======================================================================================|
+    |  No running processes found                                                           |
+    +---------------------------------------------------------------------------------------+
+    both jax versions python failing with errors
+    sudo apt-get update
+    reboot
+    nvidia-smi ok still
+
+    # try 12.1
+    pip install --upgrade jax[cuda121] -f https://storage.googleapis.com/jax-releases/jax_releases.html
+    pip install -U jaxlib
+
+    both python versions pass but only cpu found
+
+    ugh ... seems like 12.1 is actually not working yet https://github.com/google/jax/issues/13637 ... but should be shortly. Might just leave it on cpu for now and check back later.
+
 
 
 
