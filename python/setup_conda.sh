@@ -32,8 +32,8 @@ source ~/anaconda3/etc/profile.d/conda.sh
 conda update -y -n base -c defaults conda
 
 # MY_CONDA_ENV=39
-MY_CONDA_ENV=3.10.4
-# MY_CONDA_ENV=3.11.0
+# MY_CONDA_ENV=3.10.4
+MY_CONDA_ENV=3.11.0
 
 if [[ $(conda env list | grep $MY_CONDA_ENV"\s") ]]; then
     echo CONDA ENV $MY_CONDA_ENV exists

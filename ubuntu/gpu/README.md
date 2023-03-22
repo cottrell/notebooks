@@ -1,3 +1,63 @@
+# 2023-03-22
+
+python 3.11 ... jax seems to require later version of nvidia.  https://github.com/google/jax/issues/14480 ... cuda 11.8 nvidia 520.61 ... will take some time. Do this later.
+
+Going to run through the procedure below purging first.
+
+Had to do this fix https://askubuntu.com/questions/1436601/ubuntu-drivers-unboundlocalerror-local-variable-version-referenced-before-as
+
+    ./cuda_purge.sh
+    ./nvidia_purge.sh
+    sudo apt-get update
+    $ ubuntu-drivers devices
+    ...
+    sudo ubuntu-drivers autoinstall
+    sudo apt install nvidia-cuda-toolkit
+    sudo apt-get update
+    reboot
+
+    $ ubuntu-drivers devices
+    == /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0 ==
+    modalias : pci:v000010DEd00001F02sv000019DAsd00002516bc03sc00i00
+    vendor   : NVIDIA Corporation
+    model    : TU106 [GeForce RTX 2070]
+    manual_install: True
+    driver   : nvidia-driver-525-server - distro non-free
+    driver   : nvidia-driver-510 - distro non-free
+    driver   : nvidia-driver-470-server - distro non-free
+    driver   : nvidia-driver-515 - distro non-free
+    driver   : nvidia-driver-470 - distro non-free
+    driver   : nvidia-driver-525 - distro non-free
+    driver   : nvidia-driver-418-server - distro non-free
+    driver   : nvidia-driver-515-open - distro non-free
+    driver   : nvidia-driver-450-server - distro non-free
+    driver   : nvidia-driver-515-server - distro non-free
+    driver   : nvidia-driver-525-open - distro non-free recommended
+    driver   : xserver-xorg-video-nouveau - distro free builtin
+
+    jax test in 3.10.4 now fails to find GPU
+    nvidia-smi does not exist
+
+    sudo apt install nvidia-cuda-toolkit
+    ... still nope ... I need to do this I think
+    ./nvidia_purge.sh
+    sudo apt install nvidia-utils-525
+    reboot
+    $ nvidia-smi
+    NVIDIA-SMI has failed because it couldn't communicate with the NVIDIA driver. Make sure that the latest NVIDIA driver is installed and running.
+    sudo apt install nvidia-cuda-toolkit
+    nvidia-smi no longer found
+    jax passes but on cpu on both versions now
+
+    ./cuda_purge.sh
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb
+    sudo dpkg -i cuda-keyring_1.0-1_all.deb
+    sudo apt-get update
+    sudo apt-get -y install cuda
+
+
+
+
 # 2022-07-13
 
 When I run jax/check_gpu.py:
