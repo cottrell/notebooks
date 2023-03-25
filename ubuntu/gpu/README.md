@@ -107,6 +107,12 @@ Had to do this fix https://askubuntu.com/questions/1436601/ubuntu-drivers-unboun
     # had to manually symlink in a bunch of .h and .so.8 files to /etc/alternatives because the build script only takes one path per argument.
     python build/build.py --enable_cuda --cuda_version 12.1 --cuda_path /usr/local/cuda-12.1 --cudnn_path /etc/alternatives/ --cudnn_version 8
     ... slow waiting
+    pip install dist/*.whl  # installs jaxlib (includes XLA) (3.11.0) ...
+    # seems to have worked
+    # remove old jax version
+    pip install .  # in jax dev
+    # gpu works now
+
 
 
 # 2022-07-13
