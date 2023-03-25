@@ -90,8 +90,23 @@ Had to do this fix https://askubuntu.com/questions/1436601/ubuntu-drivers-unboun
 
     ugh ... seems like 12.1 is actually not working yet https://github.com/google/jax/issues/13637 ... but should be shortly. Might just leave it on cpu for now and check back later.
 
+    will try to build from source: https://jax.readthedocs.io/en/latest/developer.html#building-from-source
 
+    python build/build.py --enable_cuda --cuda_version 12.1 --cuda_path /usr/local/cuda-12.1
 
+    # cudnn missing
+    sudo apt install libcudnn8 libcudnn8-dev
+
+    /usr/local/cuda-12.1/bin/nvcc -V
+    nvcc: NVIDIA (R) Cuda compiler driver
+    Copyright (c) 2005-2023 NVIDIA Corporation
+    Built on Tue_Feb__7_19:32:13_PST_2023
+    Cuda compilation tools, release 12.1, V12.1.66
+    Build cuda_12.1.r12.1/compiler.32415258_0
+
+    # had to manually symlink in a bunch of .h and .so.8 files to /etc/alternatives because the build script only takes one path per argument.
+    python build/build.py --enable_cuda --cuda_version 12.1 --cuda_path /usr/local/cuda-12.1 --cudnn_path /etc/alternatives/ --cudnn_version 8
+    ... slow waiting
 
 
 # 2022-07-13
