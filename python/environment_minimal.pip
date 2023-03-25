@@ -30,3 +30,4 @@ tqdm
 numba
 duckdb
 prql-python
+jaxlib
