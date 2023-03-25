@@ -4,8 +4,9 @@ pip install --upgrade pip
 # ENV_FILE=environment.pip
 ENV_FILE=environment_minimal.pip
 
-if [[ $(uname) = Darwin ]]; then
-    # don't use GPU on Darwin
+# if [[ $(uname) = Darwin ]]; then
+if [[ $(hostname) != bleepblop ]]; then
+    echo do not use GPU on this machine
     cat $ENV_FILE | sed -e 's/tensorflow-gpu/tensorflow/' > /tmp/environment.pip
     echo jax >> /tmp/environment.pip
     # pip install -r /tmp/environment.pip -U  # some conflicts causing issues
@@ -13,6 +14,7 @@ if [[ $(uname) = Darwin ]]; then
         pip install -U $x
     done
 else
+    echo use GPU on this machine
     # pip install -r $ENV_FILE -U  # some conflicts causing issues
     for x in $(cat $ENV_FILE); do
         pip install -U $x
