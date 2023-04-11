@@ -1,6 +1,6 @@
+ipython==8.7.0
 Cython
 autopep8
-ipython
 black
 dill
 flake8
