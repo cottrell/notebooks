@@ -1,4 +1,5 @@
 ipython==8.7.0
+argh
 Cython
 autopep8
 black
