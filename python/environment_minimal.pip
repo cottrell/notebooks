@@ -32,3 +32,6 @@ numba
 duckdb
 prql-python
 jaxlib
+# useful but unused
+# xarray
+# sparse
