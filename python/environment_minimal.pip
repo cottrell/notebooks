@@ -34,4 +34,5 @@ prql-python
 jaxlib
 # useful but unused
 # xarray
+# zarr
 # sparse
