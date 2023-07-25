@@ -1,5 +1,4 @@
 ipython
-# ==8.7.0
 argh
 Cython
 autopep8
@@ -33,7 +32,3 @@ numba
 duckdb
 prql-python
 jaxlib
-# useful but unused
-# xarray
-# zarr
-# sparse

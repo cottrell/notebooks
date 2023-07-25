@@ -38,6 +38,14 @@ def glob_and_watch(dirname):
     A full listing of the directory and all subsequent changes.
     Starts the watch first, then globs.
 
+    NOTE:
+        find . -exec stat -c%n\ %y\ %s {} \;
+    or just:
+        find . -printf '%p %s %TY-%Tm-%TdT%TH:%TM:%TS\n'
+    or maybe need to use stat: name, size in bytes, time of file birth, time of last data modification
+        stat -c '%n %s %w %y'
+    plus also enrich with "now" (maybe).
+
     $ ./glob_and_watch glob-and-watch ./tmp
         ['2018-07-25T22:57:36', '/path/to/somewhere/tmp/asdf', ['glob']]
         ['2018-07-25T22:57:36', '/path/to/somewhere/tmp/jadfs', ['glob']]

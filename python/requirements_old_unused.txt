@@ -1,0 +1,5 @@
+# ipython==8.7.0
+# useful but unused
+# xarray
+# zarr
+# sparse
