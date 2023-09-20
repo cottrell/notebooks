@@ -2,6 +2,8 @@
 import os
 import tensorflow as tf
 
+# LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/TensorRT-8.6.1.6/lib'
+
 @tf.function(experimental_compile=True)
 def xla_test_function(x):
     return x * x

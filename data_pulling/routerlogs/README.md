@@ -1,3 +1,7 @@
-Manually copy paste router logs in logs using vilog for example.
+# 2023-08-30
 
-Then run the whois_dossing.sh script.
+    cd data/logs
+    vilog
+    <ctrl-v>
+    :w
+    ./whois_dossing.sh
