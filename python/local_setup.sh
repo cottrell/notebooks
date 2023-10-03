@@ -1,5 +1,7 @@
 #!/bin/bash -e
-cd $HOME/projects/notebooks/my-gym/toplevelrepo/corelib && python setup.py develop
-cd $HOME/projects/notebooks/extractors && python setup.py develop
-cd $HOME/projects/notebooks/my-gym/toplevelrepo/our && python setup.py develop
-cd $HOME/projects/notebooks/my-gym && python setup.py develop
+CMD="pip install -e ."
+cd $HOME/projects/notebooks/my-gym/toplevelrepo/corelib && $CMD
+cd $HOME/projects/notebooks/extractors && $CMD
+cd $HOME/projects/notebooks/my-gym/toplevelrepo/our && $CMD
+cd $HOME/projects/notebooks/my-gym && $CMD
+cd $HOME/projects/notebooks/my-gym/my/gym/usr/cottrell/synthetic_data_generators && $CMD

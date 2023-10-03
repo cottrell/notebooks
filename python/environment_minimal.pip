@@ -32,3 +32,4 @@ numba
 duckdb
 prql-python
 jaxlib
+timeout-decorator
