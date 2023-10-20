@@ -1,3 +1,7 @@
+# 2023-10-20
+
+Never install via snap. Use official docker page.
+
 # 2023-01-30
 
 Reminders.
