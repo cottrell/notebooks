@@ -6,6 +6,8 @@
 	docker run -d --name test_container test
 	docker exec -it test_container /bin/bash
 
+Never install via snap. Use official docker page.
+
 # 2023-01-30
 
 Reminders.
