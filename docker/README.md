@@ -1,3 +1,11 @@
+# 2023-10-20
+
+	docker stop test_container
+	docker rm test_container
+	docker build . -t test
+	docker run -d --name test_container test
+	docker exec -it test_container /bin/bash
+
 # 2023-01-30
 
 Reminders.
