@@ -11,5 +11,8 @@
         "**/data": true,
         "**/.ipynd_checkpoints/": true,
         "**/*.pyc": true
-    }
+    },
+    "python.analysis.extraPaths": [
+        "./my-gym/my/gym/usr/cottrell/equinox_utils"
+    ]
 }
