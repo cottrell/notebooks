@@ -19,7 +19,9 @@ else
     for x in $(cat $ENV_FILE); do
         pip install -U $x
     done
-    pip install --upgrade "jax[cuda11_local]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+    # 2023-10-23
+    pip install -U "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+    # pip install --upgrade "jax[cuda11_local]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
     # pip install --upgrade "jax[cuda12_local]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
     # pip install --upgrade jax[cuda12_pip] -f https://storage.googleapis.com/jax-releases/jax_releases.html
     # pip install --upgrade jax[cuda12_local] -f https://storage.googleapis.com/jax-releases/jax_releases.html  # some other alternative
