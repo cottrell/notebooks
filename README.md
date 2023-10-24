@@ -1,12 +1,24 @@
 # notes
 
-sudo apt-get install git git-lfs make
-# ssh keys on all accounts
+    sudo apt-get install git git-lfs make
 
-if possible use rsync from another machine
-rsync -Wav --progress machine:~/projects projects
+## setup
+
+To avoid github bandwidth limits, if possible use rsync from another machine.
+
+    rsync -Wav --progress machine:~/projects projects
+
+instead of
+
+    git clone --recursive
+
+but maybe git clone from machine also works.
+
+    git submodule update --init ## if anything fails part way
 
 
-# git clone --recursive
-# git submodule update --init ## if anything fails part way
-# make pull  # ensure on master globally
+## convenience
+
+    make
+    make pull
+    make push
