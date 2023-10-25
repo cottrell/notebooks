@@ -11,3 +11,5 @@ prune:
 	docker image prune -a --filter "until=168h"
 	docker system prune -a -f
 
+stop:
+	sudo systemctl stop docker
