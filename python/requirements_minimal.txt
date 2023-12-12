@@ -33,3 +33,6 @@ duckdb
 prql-python
 jaxlib
 timeout-decorator
+equinox
+beartype
+pdbpp

@@ -13,3 +13,8 @@ prune:
 
 stop:
 	sudo systemctl stop docker
+
+
+ssh:
+	docker exec -it <name_not_id> /bin/sh
+

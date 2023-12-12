@@ -1,16 +1,16 @@
 #!/bin/bash
 pip install --upgrade pip
 
-# ENV_FILE=environment.pip
-ENV_FILE=environment_minimal.pip
+# ENV_FILE=requirements.pip
+ENV_FILE=requirements_minimal.pip
 
 # if [[ $(uname) = Darwin ]]; then
 if [[ $(hostname) != bleepblop ]]; then
     echo do not use GPU on this machine
-    cat $ENV_FILE | sed -e 's/tensorflow-gpu/tensorflow/' > /tmp/environment.pip
-    echo jax >> /tmp/environment.pip
-    # pip install -r /tmp/environment.pip -U  # some conflicts causing issues
-    for x in $(cat /tmp/environment.pip); do
+    cat $ENV_FILE | sed -e 's/tensorflow-gpu/tensorflow/' > /tmp/requirements.pip
+    echo jax >> /tmp/requirements.pip
+    # pip install -r /tmp/requirements.pip -U  # some conflicts causing issues
+    for x in $(cat /tmp/requirements.pip); do
         pip install -U $x
     done
 else

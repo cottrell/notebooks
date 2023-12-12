@@ -20,7 +20,7 @@ start:
 	sudo service tor start
 
 stop:
-	sudo service tor start
+	sudo service tor stop
 
 restart:
 	sudo service tor restart

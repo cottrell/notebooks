@@ -5,3 +5,4 @@ cd $HOME/projects/notebooks/extractors && $CMD
 cd $HOME/projects/notebooks/my-gym/toplevelrepo/our && $CMD
 cd $HOME/projects/notebooks/my-gym && $CMD
 cd $HOME/projects/notebooks/my-gym/my/gym/usr/cottrell/synthetic_data_generators && $CMD
+cd $HOME/projects/notebooks/my-gym/my/gym/usr/cottrell/equinox_utils && $CMD
