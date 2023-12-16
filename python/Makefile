@@ -3,6 +3,7 @@ all:
 
 setup:
 	./setup_conda.sh
+	./local_setup.sh
 
 upgrade:
 	./upgrade.sh

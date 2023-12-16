@@ -46,7 +46,7 @@ else
     conda activate $MY_CONDA_ENV
     conda install -y pip
 fi
-conda activate $MY_CONDA_ENV
+~/anaconda3/bin/conda activate $MY_CONDA_ENV
 pip install -U pip
 
 $DIR/upgrade.sh

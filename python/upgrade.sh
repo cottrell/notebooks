@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/bash -e
 pip install --upgrade pip
 
 # ENV_FILE=requirements.pip
-ENV_FILE=requirements_minimal.pip
+ENV_FILE=requirements_minimal.txt
 
 # if [[ $(uname) = Darwin ]]; then
 if [[ $(hostname) != bleepblop ]]; then
