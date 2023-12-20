@@ -5,3 +5,7 @@
     # sudo apt install texlive-latex-full
     sudo apt-get install texlive-fonts-extra
 
+    for vscode:
+    sudo apt install latexmk
+
+
