@@ -1,3 +1,11 @@
+# 2023-12-20
+
+Official instructions on docker site no longer work.
+
+    apt install docker.io
+
+Then do the docker group thing here https://docs.docker.com/engine/install/linux-postinstall/
+
 # 2023-10-20
 
 	docker stop test_container
