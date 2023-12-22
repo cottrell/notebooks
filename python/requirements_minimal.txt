@@ -36,3 +36,4 @@ timeout-decorator
 equinox
 beartype
 pdbpp
+pylint
