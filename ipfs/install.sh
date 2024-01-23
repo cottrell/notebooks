@@ -16,7 +16,9 @@ fi
 
 echo Will run with version $version platform $platform
 
-filename=https://dist.ipfs.io/go-ipfs/$version/go-ipfs_"$version"_"$platform"-amd64.tar.gz
+# filename=https://dist.ipfs.io/go-ipfs/$version/go-ipfs_"$version"_"$platform"-amd64.tar.gz
+filename=https://dist.ipfs.tech/kubo/$version/kubo_"$version"_"$platform"-amd64.tar.gz
+
 localfile=$(basename $filename)
 if [[ -e $localfile ]]; then
     echo $localfile found will not download again
@@ -31,11 +33,13 @@ if [[ ! -e $localfile ]]; then
 fi
 
 tar -xvzf $localfile
-cd go-ipfs
+# cd go-ipfs
+cd kubo
 sudo bash install.sh
 
 ipfs --version
 
 echo Remember to delete tar file.
 echo dl $localfile
-echo dl go-ipfs
+# echo dl go-ipfs
+echo dl kubo
