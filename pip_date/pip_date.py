@@ -7,10 +7,46 @@ import pathlib
 
 import pandas as pd
 import requests
-from pip._internal.utils.misc import get_installed_distributions
+# from pip._internal.utils.misc import get_installed_distributions
+ 
 
 _mydir = os.path.dirname(os.path.realpath(__file__))
 _cache_dir = os.path.join(_mydir, 'cache')
+
+
+# NOTE: they removed this in d051a00fc57037104fca85ad8ebf2cdbd1e32d24
+from pip._internal.utils.compat import stdlib_pkgs
+from typing import cast
+
+
+def get_installed_distributions(
+    local_only=True,
+    skip=stdlib_pkgs,
+    include_editables=True,
+    editables_only=False,
+    user_only=False,
+    paths=None,
+):
+    """Return a list of installed Distribution objects.
+
+    Left for compatibility until direct pkg_resources uses are refactored out.
+    """
+    from pip._internal.metadata import get_default_environment, get_environment
+    from pip._internal.metadata.pkg_resources import Distribution as _Dist
+
+    if paths is None:
+        env = get_default_environment()
+    else:
+        env = get_environment(paths)
+    dists = env.iter_installed_distributions(
+        local_only=local_only,
+        skip=skip,
+        include_editables=include_editables,
+        editables_only=editables_only,
+        user_only=user_only,
+    )
+    return [cast(_Dist, dist)._dist for dist in dists]
+
 
 
 def cached_get_json(url, expiry_seconds=60 * 60 * 24 * 30):
@@ -33,6 +69,27 @@ def cached_get_json(url, expiry_seconds=60 * 60 * 24 * 30):
         json.dump(json_, open(filename, 'w'))
     return json.load(open(filename))
 
+
+def get_info_for_packages(*names):
+    out = list()
+    for name in names:
+        out.extend(get_info_for_package(name))
+    df = pd.DataFrame(out).sort_values(['name', 'date'], ascending=[True, False])
+
+    return df
+
+
+def get_package_version_latest(*names, max_date=None):
+    df = get_info_for_packages(*names)
+    if max_date is not None:
+        max_date = pd.to_datetime(max_date).date()
+        df = df[df['date'] <= max_date]
+    df = df.drop_duplicates(subset=['name'], keep='first')
+    strings = (df['name'] + '==' + df['version']).tolist()
+    print('')
+    print('\n'.join(strings))
+    print('')
+    return df
 
 def get_info_for_package(name):
     # each looks like this
@@ -77,13 +134,14 @@ def get_installed_available():
     packages = get_installed_distributions()
     installed = list()
     for package in packages:
-        name = package.key
+        name = package.name
+# 2024-03-21
         installed_version = package.version
         installed.append(dict(name=name, version=installed_version))
     installed = pd.DataFrame(installed)
     available = list()
     for package in packages:
-        name = package.key
+        name = package.name
         records = get_info_for_package(name)
         available.extend(records)
     available = pd.DataFrame(available)
