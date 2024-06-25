@@ -37,3 +37,4 @@ equinox
 beartype
 pdbpp
 pylint
+py7zr
