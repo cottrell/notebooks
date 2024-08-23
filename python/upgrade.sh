@@ -19,8 +19,11 @@ else
     for x in $(cat $ENV_FILE); do
         pip install -U $x
     done
+    # 2024-08-22
+    pip install -U tensorflow[and-cuda]
     # 2024-07-10
     pip install -U "jax[cuda12]"
+
     # 2023-10-23
     # pip install -U "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
     # pip install --upgrade "jax[cuda11_local]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
