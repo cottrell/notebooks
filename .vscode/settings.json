@@ -14,5 +14,6 @@
     },
     "python.analysis.extraPaths": [
         "./my-gym/my/gym/usr/cottrell/equinox_utils"
-    ]
+    ],
+    "makefile.configureOnOpen": false
 }

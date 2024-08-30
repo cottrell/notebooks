@@ -22,3 +22,8 @@ but maybe git clone from machine also works.
     make
     make pull
     make push
+
+
+## TODO: vscode
+
+https://github.com/microsoft/pyright/blob/main/docs/configuration.md
