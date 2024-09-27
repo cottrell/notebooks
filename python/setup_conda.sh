@@ -43,10 +43,14 @@ else
     # conda create -y -n $MY_CONDA_ENV python=$MY_CONDA_ENV
     # NOTE: needed conda forge for 3.11
     conda create -c conda-forge -y -n $MY_CONDA_ENV python=$MY_CONDA_ENV
+    conda init
     conda activate $MY_CONDA_ENV
     conda install -y pip
 fi
-~/anaconda3/bin/conda activate $MY_CONDA_ENV
+conda init
+conda activate $MY_CONDA_ENV
+conda info
+type pip
 pip install -U pip
 
 $DIR/upgrade.sh
