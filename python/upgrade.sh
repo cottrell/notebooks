@@ -19,6 +19,7 @@ else
     for x in $(cat $ENV_FILE); do
         pip install -U $x
     done
+    # 2024-10-01 ... jax and tensorflow can not be in same env at the moment.
     # 2024-08-22
     pip install -U tensorflow[and-cuda]
     # 2024-07-10
