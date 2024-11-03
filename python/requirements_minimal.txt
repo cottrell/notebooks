@@ -32,6 +32,7 @@ numba
 duckdb
 prql-python
 jaxlib
+parametrization_cookbook
 timeout-decorator
 equinox
 beartype
