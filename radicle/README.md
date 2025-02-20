@@ -1,31 +1,45 @@
+# setup
+
 https://radicle.xyz/
 
 curl -sSf https://radicle.xyz/install | sh
 
-see ~/.radicle ... you can delete it to start from scratch and `rad auth` to set up
+see ~/.radicle ... you can delete it to start from scratch and `rad auth` to set up.
 
+## flow
 
-Roughly (not quite)
+A
+```
+mkdir rad_example
+cd rad_example
+git init .
+echo "look" > README.md
+git add README.md
+git commit -m "first"
+rad init .
+rad .  # get repo id
+```
 
-    # 1st machine
-    mkdir a
-    cd a
-    git init
-    echo whatever > README.md
-    git add README.md
-    git commit -m 'Whatever'
-    rad init
-    git push
-    rad node start
+B
+```
+rad clone <repo_id>
+cd rad_example
+# <edit> README
+git add README.md
+git commit -m 'third'
+ssh-add ~/.radicle/keys/radicle
+git push
+git push rad  # not sure
+rad sync
+```
 
-    ...
-
-    # 2nd machine
-    rad clone id
-    ... commit something
-    rad node start
-    git push
-
-    ...
-    # now you need to add remote to 1st machin
-    rad remote add nid
+A
+```
+rad remote add <nid>
+rad sync
+git branch -a # find branch for now
+git log <branch> # see commit
+git merge <branch>
+git push rad # update rad/main
+rad sync
+```
