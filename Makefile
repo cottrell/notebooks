@@ -15,3 +15,6 @@ push:
 
 push_slow:
 	./git_checkout_master_push_all_submodules.sh
+
+list:
+	./git_list_submodules_recursive.sh
