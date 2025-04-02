@@ -1,3 +1,13 @@
+# 2025-03-20
+
+Debug (why so many running in htop?)
+
+```
+sudo apt remove --purge docker.io
+sudo apt install docker.io
+```
+
+
 # 2023-12-20
 
 Official instructions on docker site no longer work.
