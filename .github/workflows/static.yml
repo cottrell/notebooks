@@ -29,6 +29,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Verify GITHUB_TOKEN
+        run: |
+          echo "Testing GITHUB_TOKEN permissions"
+          curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/pages
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Pages
