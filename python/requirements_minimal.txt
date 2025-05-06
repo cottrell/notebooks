@@ -35,7 +35,11 @@ jaxlib
 parametrization_cookbook
 timeout-decorator
 equinox
+optax
+optimistix
+unidecode
 beartype
 pdbpp
 pylint
 py7zr
+xmltodict
