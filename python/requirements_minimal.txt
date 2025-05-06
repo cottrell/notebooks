@@ -43,3 +43,4 @@ pdbpp
 pylint
 py7zr
 xmltodict
+contourpy
