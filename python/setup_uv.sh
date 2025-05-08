@@ -1,7 +1,7 @@
 #!/bin/bash -e
 DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 # type gcc || echo no gcc installed!
-type uv || curl -LsSf https://astral.sh/uv/install.sh | sh
+type uv 2>/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # TODO: ongoing ... not really used yet
 MY_UV_ENV=3.12
