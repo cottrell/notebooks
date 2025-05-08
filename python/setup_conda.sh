@@ -7,9 +7,10 @@ DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 type gcc || echo no gcc installed!
 
 # https://repo.anaconda.com/archive
+# https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh
 function install_conda() {
     if [[ $(uname) = "Linux" ]]; then
-        filename=Anaconda3-2023.09-0-Linux-x86_64.sh
+        filename=Anaconda3-2024.10-1-Linux-x86_64.sh
     else
         filename=Anaconda3-2022.10-MacOSX-x86_64.sh
     fi
