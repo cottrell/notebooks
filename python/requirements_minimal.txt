@@ -7,8 +7,6 @@ dill
 flake8
 flit
 joblib
-jupyter
-jupyterlab
 ipympl
 matplotlib
 numpy
