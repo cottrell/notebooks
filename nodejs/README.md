@@ -1,7 +1,6 @@
-# I used to install via conda-forge see /python
+# 2025-05-06
 
-sudo apt install nodejs npm
-
+See Makefile
 
 # 2025-03-10
 

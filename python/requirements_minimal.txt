@@ -44,3 +44,4 @@ pylint
 py7zr
 xmltodict
 contourpy
+jaxtyping
