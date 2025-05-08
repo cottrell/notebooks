@@ -43,3 +43,4 @@ py7zr
 xmltodict
 contourpy
 jaxtyping
+openai
