@@ -10,10 +10,18 @@
         "./my-gym/toplevelrepo/data": true,
         "**/data": true,
         "**/.ipynd_checkpoints/": true,
-        "**/*.pyc": true
+        "**/*.pyc": true,
+        "./python/uv_*/": true,
+        "**/joblib/": true,
+        "**/joblib_cache/": true,
+        "**/data/": true,
+        "**/parsed/": true,
+        "**/temp/": true,
+        "**/duckdb.db": true
     },
     "python.analysis.extraPaths": [
-        "./my-gym/my/gym/usr/cottrell/equinox_utils"
+        "./my-gym/my/gym/usr/cottrell/equinox_utils",
+        "./my-gym/my/gym/usr/cottrell/scraper_utils"
     ],
     "makefile.configureOnOpen": false
 }
