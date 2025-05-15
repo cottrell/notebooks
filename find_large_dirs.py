@@ -56,16 +56,41 @@ def is_excluded(path, exclusion_patterns, root_dir):
     return False
 
 
-def scan_directories(root_dir, min_files=1000, exclusion_patterns=None):
+def scan_directories(root_dir, min_files=1000, exclusion_patterns=None, follow_symlinks=True):
     if exclusion_patterns is None:
         exclusion_patterns = []
 
     # Dictionary to track highest level problematic directories
     top_level_dirs = {}
 
+    # Keep track of visited real paths to prevent symlink cycles
+    visited_paths = set()
+    symlinks_found = []
+
     # First pass: find all directories with .py files
     dirs_with_py = set()
-    for dirpath, _, filenames in os.walk(root_dir):
+    for dirpath, dirnames, filenames in os.walk(root_dir, followlinks=follow_symlinks):
+        # Handle symlinks - check for cycles
+        real_path = os.path.realpath(dirpath)
+        if real_path in visited_paths:
+            print(f"Skipping symlink cycle: {dirpath} -> {real_path}")
+            dirnames[:] = []  # Don't descend further
+            continue
+        visited_paths.add(real_path)
+
+        # Check for symlinks in current directory list
+        i = len(dirnames) - 1
+        while i >= 0:
+            full_path = os.path.join(dirpath, dirnames[i])
+            if os.path.islink(full_path):
+                target = os.path.realpath(full_path)
+                symlinks_found.append((full_path, target))
+                # We keep the symlink in dirnames if follow_symlinks is True
+                # VSCode does follow symlinks, so we should too
+                if not follow_symlinks:
+                    del dirnames[i]
+            i -= 1
+
         if any(f.endswith('.py') for f in filenames):
             path = Path(dirpath)
             # Add this dir and all parents to dirs_with_py
@@ -73,8 +98,27 @@ def scan_directories(root_dir, min_files=1000, exclusion_patterns=None):
                 dirs_with_py.add(str(path))
                 path = path.parent
 
+    # Reset visited paths for second pass
+    visited_paths = set()
+
     # Second pass: find directories with many files but no .py files
-    for dirpath, dirnames, filenames in os.walk(root_dir):
+    for dirpath, dirnames, filenames in os.walk(root_dir, followlinks=follow_symlinks):
+        # Handle symlinks - check for cycles
+        real_path = os.path.realpath(dirpath)
+        if real_path in visited_paths:
+            dirnames[:] = []  # Don't descend further
+            continue
+        visited_paths.add(real_path)
+
+        # Check symlinks in this level
+        i = len(dirnames) - 1
+        while i >= 0:
+            full_path = os.path.join(dirpath, dirnames[i])
+            if os.path.islink(full_path):
+                if not follow_symlinks:
+                    del dirnames[i]
+            i -= 1
+
         path = Path(dirpath)
 
         # Skip excluded directories - check the actual path against patterns
@@ -114,10 +158,16 @@ def scan_directories(root_dir, min_files=1000, exclusion_patterns=None):
                 # Add this directory
                 top_level_dirs[dirpath] = file_count
 
+    # Print symlinks found
+    if symlinks_found:
+        print("\nSymlinks found:")
+        for src, dst in symlinks_found:
+            print(f"  {src} -> {dst}")
+
     return [{'path': d, 'file_count': c} for d, c in top_level_dirs.items()]
 
 
-def main(project_dir=_my_dir, min_files=1000):
+def main(project_dir=_my_dir, min_files=1000, follow_symlinks=True, verbose=False):
     """Find directories with many files but no Python files"""
     # Load VSCode settings
     settings = load_vscode_settings(project_dir)
@@ -128,9 +178,11 @@ def main(project_dir=_my_dir, min_files=1000):
         for pattern in settings['files.watcherExclude']:
             if settings['files.watcherExclude'][pattern]:
                 exclusion_patterns.append(pattern)
+                if verbose:
+                    print(f"Using exclusion pattern: {pattern}")
 
     print(f"Scanning {project_dir} for problematic directories...")
-    problematic = scan_directories(project_dir, min_files, exclusion_patterns)
+    problematic = scan_directories(project_dir, min_files, exclusion_patterns, follow_symlinks)
 
     print(f"\nFound {len(problematic)} potential problematic top-level directories:")
     for dir_info in sorted(problematic, key=lambda x: x['file_count'], reverse=True):
