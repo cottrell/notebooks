@@ -73,7 +73,7 @@ def scan_directories(root_dir, min_files=1000, exclusion_patterns=None, follow_s
         # Handle symlinks - check for cycles
         real_path = os.path.realpath(dirpath)
         if real_path in visited_paths:
-            print(f"Skipping symlink cycle: {dirpath} -> {real_path}")
+            print(f"Skipping already visited path (symlink): {dirpath} -> {real_path}")
             dirnames[:] = []  # Don't descend further
             continue
         visited_paths.add(real_path)
