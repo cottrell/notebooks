@@ -10,5 +10,7 @@ UV_ENV="uv_3.12_tf"
 uv venv $UV_ENV --python 3.12
 source $UV_ENV/bin/activate
 
+cd $DIR
+
 $DIR/uv_upgrade_tf_env.sh
 $DIR/uv_local_setup.sh
