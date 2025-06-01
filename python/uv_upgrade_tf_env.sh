@@ -1,7 +1,7 @@
 #!/bin/bash -e
 DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 
-. $HOME/uv_venv/uv_3.12_tf/bin/activate
+. $HOME/uv_venvs/uv_3.12_tf/bin/activate
 
 uv pip install --upgrade pip
 

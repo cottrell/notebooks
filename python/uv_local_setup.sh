@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 CMD="uv pip install -e ."
 cd $HOME/projects/notebooks/my-gym/toplevelrepo/corelib && $CMD
 cd $HOME/projects/notebooks/my-gym/toplevelrepo/our && $CMD
