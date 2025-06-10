@@ -6,6 +6,7 @@ type uv 2>/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # WARNING: maybe you need to rebash after uv install
 
+mkdir -p $HOME/uv_venvs
 cd $HOME/uv_venvs
 
 UV_ENV="uv_3.12_tf"

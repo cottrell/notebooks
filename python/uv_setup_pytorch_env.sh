@@ -4,6 +4,7 @@ DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 type gcc 2>/dev/null || echo no gcc installed!
 type uv 2>/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 
+mkdir -p $HOME/uv_venvs
 cd $HOME/uv_venvs
 
 UV_ENV="uv_3.12_pytorch"
