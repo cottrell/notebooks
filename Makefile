@@ -4,6 +4,9 @@ all:
 clean:
 	./clean.sh yes
 
+git_clean:
+	./git_clean.sh
+
 pull:
 	./git_checkout_master_pull_all_submodules_parallel.sh
 

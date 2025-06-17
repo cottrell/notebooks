@@ -6,10 +6,10 @@ find . \
 -type f -name "*.pyc" -o \
 -type d -name "__pycache__" -o \
 -type d -name "node_modules" -o \
--type d -name "build" -o \
+# -type d -name "build" -o \
 -type d -name ".ipynb_checkpoints" -o \
 -type d -name "*.egg-info" -o \
--type d -name "joblib_cache*"
+# -type d -name "joblib_cache*"
 }
 
 if [[ "$1" = yes ]]; then
