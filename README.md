@@ -35,3 +35,7 @@ https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 
     # perhaps test with this:
     git submodule foreach 'echo $name'
+
+    git config --local --get-regexp submodule\..*\.active
+
+NOTE: `.git/config` are local over-rides.

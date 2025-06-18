@@ -24,3 +24,6 @@ list:
 
 list_submodules:
 	./list_submodules.sh
+
+status:
+	git submodule status
