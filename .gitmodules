@@ -1,3 +1,12 @@
+[submodule "my-gym"]
+	path = my-gym
+	url = git@gitlab.com:david-cottrell/my-gym.git
+[submodule "extractors"]
+	path = extractors
+	url = git@gitlab.com:david-cottrell/extractors.git
+[submodule "mybin"]
+	path = mybin
+	url = git@github.com:cottrell/mybin.git
 [submodule "commoncrawlscraper"]
 	path = commoncrawlscraper
 	url = git@github.com:cottrell/commoncrawlscraper.git
@@ -14,12 +23,6 @@
 	path = uk_land_registry
 	url = git@github.com:cottrell/uk_land_registry.git
 	active = false
-[submodule "extractors"]
-	path = extractors
-	url = git@gitlab.com:david-cottrell/extractors.git
-[submodule "mybin"]
-	path = mybin
-	url = git@github.com:cottrell/mybin.git
 [submodule "djnotes"]
 	path = djnotes
 	url = git@github.com:cottrell/djnotes.git
@@ -40,9 +43,6 @@
 	path = kaggle
 	url = git@gitlab.com:david-cottrell/kaggle.git
 	active = false
-[submodule "my-gym"]
-	path = my-gym
-	url = git@gitlab.com:david-cottrell/my-gym.git
 [submodule "saxo_example"]
 	path = saxo_example
 	url = git@github.com:cottrell/saxo_example.git
