@@ -30,6 +30,8 @@ https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 
 ## Mark submodule as inactive
 
+NOTE: as of 2025-06-18 this does not really work.
+
     git config -f .gitmodules submodule.superbasic.active false
     git status # see .gitmodules is updated
 
@@ -39,3 +41,8 @@ https://github.com/microsoft/pyright/blob/main/docs/configuration.md
     git config --local --get-regexp submodule\..*\.active
 
 NOTE: `.git/config` are local over-rides.
+
+    git config -f .gitmodules --get-regexp '^submodule\..*\.active$' | while read key val; do  git config "$key" "$val"; done
+    git config --local --get-regexp submodule\..*\.active
+    cat .git/config
+    git submodule update --init --recursive  # will this work? no.

@@ -27,3 +27,4 @@ list_submodules:
 
 status:
 	git submodule status
+	git config --local --get-regexp submodule\..*\.active
