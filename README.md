@@ -32,3 +32,6 @@ https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 
     git config -f .gitmodules submodule.superbasic.active false
     git status # see .gitmodules is updated
+
+    # perhaps test with this:
+    git submodule foreach 'echo $name'

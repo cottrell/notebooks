@@ -10,9 +10,6 @@
 [submodule "uk_land_registry"]
 	path = uk_land_registry
 	url = git@github.com:cottrell/uk_land_registry.git
-[submodule "asdf/superbasic"]
-	path = superbasic
-	url = git@github.com:cottrell/superbasic.git
 [submodule "extractors"]
 	path = extractors
 	url = git@gitlab.com:david-cottrell/extractors.git
@@ -44,4 +41,6 @@
 	path = saxo_example
 	url = git@github.com:cottrell/saxo_example.git
 [submodule "superbasic"]
-	active = false
+    path = superbasic
+    url = git@github.com:cottrell/superbasic.git
+    active = false
