@@ -5,6 +5,7 @@
 [submodule "dbit"]
 	path = dbit
 	url = git@github.com:cottrell/dbit.git
+	active = false
 [submodule "consul_examples"]
 	path = consul_examples
 	url = git@github.com:cottrell/consul_examples.git
@@ -12,24 +13,25 @@
 [submodule "uk_land_registry"]
 	path = uk_land_registry
 	url = git@github.com:cottrell/uk_land_registry.git
+	active = false
 [submodule "extractors"]
 	path = extractors
 	url = git@gitlab.com:david-cottrell/extractors.git
-[submodule "mylib"]
-	path = mylib
-	url = git@github.com:cottrell/mylib.git
 [submodule "mybin"]
 	path = mybin
 	url = git@github.com:cottrell/mybin.git
 [submodule "djnotes"]
 	path = djnotes
 	url = git@github.com:cottrell/djnotes.git
+	active = false
 [submodule "C--WrappingExamples"]
 	path = C--WrappingExamples
 	url = git@github.com:cottrell/C--WrappingExamples.git
+	active = false
 [submodule "fractional-differentiation-time-series"]
 	path = fractional-differentiation-time-series
 	url = git@github.com:cottrell/fractional-differentiation-time-series.git
+	active = false
 [submodule "awesome_markdown_enrich"]
 	path = awesome_markdown_enrich
 	url = git@github.com:cottrell/awesome_markdown_enrich.git
@@ -44,6 +46,7 @@
 [submodule "saxo_example"]
 	path = saxo_example
 	url = git@github.com:cottrell/saxo_example.git
+	active = false
 [submodule "superbasic"]
 	path = superbasic
 	url = git@github.com:cottrell/superbasic.git
