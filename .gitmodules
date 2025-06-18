@@ -1,12 +1,14 @@
 [submodule "commoncrawlscraper"]
 	path = commoncrawlscraper
 	url = git@github.com:cottrell/commoncrawlscraper.git
+	active = false
 [submodule "dbit"]
 	path = dbit
 	url = git@github.com:cottrell/dbit.git
 [submodule "consul_examples"]
 	path = consul_examples
 	url = git@github.com:cottrell/consul_examples.git
+	active = false
 [submodule "uk_land_registry"]
 	path = uk_land_registry
 	url = git@github.com:cottrell/uk_land_registry.git
@@ -31,9 +33,11 @@
 [submodule "awesome_markdown_enrich"]
 	path = awesome_markdown_enrich
 	url = git@github.com:cottrell/awesome_markdown_enrich.git
+	active = false
 [submodule "kaggle"]
 	path = kaggle
 	url = git@gitlab.com:david-cottrell/kaggle.git
+	active = false
 [submodule "my-gym"]
 	path = my-gym
 	url = git@gitlab.com:david-cottrell/my-gym.git
@@ -41,6 +45,6 @@
 	path = saxo_example
 	url = git@github.com:cottrell/saxo_example.git
 [submodule "superbasic"]
-    path = superbasic
-    url = git@github.com:cottrell/superbasic.git
-    active = false
+	path = superbasic
+	url = git@github.com:cottrell/superbasic.git
+	active = false
