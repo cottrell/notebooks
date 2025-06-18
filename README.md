@@ -27,3 +27,8 @@ but maybe git clone from machine also works.
 ## TODO: vscode
 
 https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+
+## Mark submodule as inactive
+
+    git config -f .gitmodules submodule.superbasic.active false
+    git status # see .gitmodules is updated

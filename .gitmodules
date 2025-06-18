@@ -43,3 +43,5 @@
 [submodule "saxo_example"]
 	path = saxo_example
 	url = git@github.com:cottrell/saxo_example.git
+[submodule "superbasic"]
+	active = false
