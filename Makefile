@@ -21,3 +21,6 @@ push_slow:
 
 list:
 	./git_list_submodules_recursive.sh
+
+list_submodules:
+	./list_submodules.sh
