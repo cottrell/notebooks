@@ -13,6 +13,7 @@ if [[ $(hostname) != bleepblop ]]; then
     echo jax >> /tmp/requirements.pip
 else
     echo use GPU on this machine
+    # uv pip install -U "jax[cuda12]"
     echo "jax[cuda12]" >> /tmp/requirements.pip
 fi
 uv pip install -r $ENV_FILE -U
