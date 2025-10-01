@@ -6,3 +6,6 @@ install:
 
 uninstall:
 	npm uninstall codex
+
+update:
+	npm install -g @openai/codex@latest
