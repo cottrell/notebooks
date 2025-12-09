@@ -18,3 +18,7 @@ stop:
 ssh:
 	docker exec -it <name_not_id> /bin/sh
 
+
+install:
+	# sudo apt remove --purge docker.io
+	./install.sh

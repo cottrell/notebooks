@@ -1,3 +1,9 @@
+# 2025-12-09
+
+sudo apt remove --purge docker.io
+
+See ./install.sh
+
 # 2025-03-20
 
 Debug (why so many running in htop?)
