@@ -29,6 +29,5 @@ status:
 	git submodule status
 	git config --local --get-regexp submodule\..*\.active
 
-
 fsck:
 	git submodule foreach --recursive 'echo Checking $$name; git fsck --full; git lfs fsck --objects;'
