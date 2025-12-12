@@ -4,5 +4,5 @@ all:
 install:
 	curl -LsSf https://mistral.ai/vibe/install.sh | bash
 
-upgrade:
+update:
 	curl -LsSf https://mistral.ai/vibe/install.sh | bash -s -- --upgrade
