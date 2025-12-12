@@ -5,7 +5,7 @@ build:
 	cargo build --release
 
 rust:
-	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 toolchain:
 	rustup toolchain uninstall stable
