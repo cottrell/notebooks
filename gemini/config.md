@@ -107,3 +107,11 @@ To ignore specific patterns globally without using `.gitignore`, configure the `
 | **Custom Commands** | `~/.gemini/commands/` |
 
 **Would you like me to help you write a `GEMINI.md` with specific rules for your coding style?**
+
+---
+
+• I set a clink override so Gemini runs with working_dir set to this repo:
+
+  - ~/.pal/cli_clients/gemini.json now includes:
+      - "working_dir": "/home/cottrell/dev/council-data"
+
