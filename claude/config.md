@@ -98,3 +98,27 @@ So it's not "different instructions for the same Claude" — it's spawning a sub
 - `~/.claude/agents/refactor.md`
 
 Each gets its own personality, tool permissions, and focus.
+
+---
+
+I set up a user‑override config so clink’s Claude runs with full permissions.
+
+  What I changed
+
+  - Created ~/.pal/cli_clients/claude.json with --dangerously-skip-permissions and model opus.
+  - This overrides the built‑in clink config and removes the web tool denials.
+
+  You need to restart PAL
+
+  - The clink registry loads configs on server startup.
+  - Restart the PAL MCP server process (the one running ./scripts/run_pal.sh) so it picks up ~/.pal/cli_clients/claude.json.
+
+  Why this works
+
+  - PAL clink reads configs from ~/.pal/cli_clients/ and merges them with internal defaults.
+  - The prior Claude config used --permission-mode acceptEdits, which still blocks web tools.
+
+  If you want “full permissions for pal” across all CLIs too, I can add matching overrides for codex and gemini, but Claude was the only one blocked.
+
+  Want me to verify after restart by running a quick clink call that uses WebSearch/WebFetch?
+
