@@ -3,8 +3,10 @@ all:
 
 install:
 	# npx https://github.com/google-gemini/gemini-cli
-	npm install -g @google/gemini-cli
+	# npm install -g @google/gemini-cli
+	bun install -g @google/gemini-cli
 	# gemini
 
 update:
-	npm install -g @google/gemini-cli@latest
+	# npm install -g @google/gemini-cli@latest
+	bun install -g @google/gemini-cli@latest

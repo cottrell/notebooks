@@ -3,10 +3,12 @@ all:
 
 
 install:
-	type npm
-	npm install -g @anthropic-ai/claude-code
+	# type npm
+	# npm install -g @anthropic-ai/claude-code
+	bun install -g @anthropic-ai/claude-code
 	echo "run: claude"
 	echo "then: /login"
 
 update:
-	npm update -g @anthropic-ai/claude-code
+	# npm update -g @anthropic-ai/claude-code
+	bun update -g @anthropic-ai/claude-code

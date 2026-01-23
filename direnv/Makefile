@@ -2,7 +2,7 @@ all:
 	cat Makefile
 
 install:
-	curl -sfL https://direnv.net/install.sh | bash
+	sudo apt install -y direnv
 
 
 # # then do stuff like this
