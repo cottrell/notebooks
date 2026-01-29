@@ -1,0 +1,15 @@
+{
+  "include": [
+    "src"
+  ],
+
+  "exclude": [
+    "**/data",
+    "**/joblib_cache",
+    "**/node_modules",
+    "**/__pycache__"
+  ],
+
+  "ignore": [
+  ]
+}
