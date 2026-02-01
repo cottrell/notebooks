@@ -10,6 +10,7 @@ install:
 	echo "run: claude"
 	echo "then: /login"
 
-update: install
+update:
+	claude update
 	# npm update -g @anthropic-ai/claude-code
 	# bun update -g @anthropic-ai/claude-code
