@@ -5,10 +5,11 @@ all:
 install:
 	# type npm
 	# npm install -g @anthropic-ai/claude-code
-	bun install -g @anthropic-ai/claude-code
+	# bun install -g @anthropic-ai/claude-code
+	curl -fsSL https://claude.ai/install.sh | bash
 	echo "run: claude"
 	echo "then: /login"
 
-update:
+update: install
 	# npm update -g @anthropic-ai/claude-code
-	bun update -g @anthropic-ai/claude-code
+	# bun update -g @anthropic-ai/claude-code
