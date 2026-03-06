@@ -1,3 +1,42 @@
+# 2026-02-06
+
+## OOM Event Analysis - Chrome Virtual Memory Issue
+
+**Event**: OOM kill at 14:02:46, killed Chrome process (pid 1298503)
+
+**Root Cause**: Chrome renderer processes allocating excessive virtual memory (~1.4TB VSZ each)
+- Found 30+ Chrome processes with VSZ > 1TB
+- Actual RSS much smaller (300-600MB per process)
+- Chrome version: 144.0.7559.59
+- oom_score_adj=300 makes these prime targets for OOM killer
+
+**Also Found**:
+- NVIDIA GPU out-of-memory errors (Feb 2-5)
+- GPU using 1728MB/8192MB (21%)
+- Previous OOM kill: Feb 6 03:12:39 (Chrome pid 459803, 3.5GB RSS)
+
+**Monitoring Setup**:
+- Created `memory_monitor.py` - tracks RAM, Chrome VSZ, GPU memory
+- Logs to `~/.local/log/memory_monitor.log`
+- Thresholds: RAM warning 85%, critical 95%, Chrome VSZ > 1TB
+- atop running: `/var/log/atop/atop_20260206`
+
+**To investigate with atop**:
+```bash
+sudo atop -r /var/log/atop/atop_20260206
+# <t> to go forward in time to ~14:02
+# <c> to show command view
+# <m> to sort by memory
+```
+
+**Next Steps**:
+1. Try Chrome with `--disable-gpu` flag to see if GPU issues related
+2. Check for problematic extensions
+3. Consider adding systemd service for memory_monitor.py
+4. Investigate if Chrome/Wayland interaction causing VSZ bloat
+
+---
+
 # 2024-09-09
 
 More OOM.
