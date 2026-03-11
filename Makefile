@@ -37,3 +37,4 @@ update-ai:
 	cd codex && make update
 	cd mistral && make update
 	cd claude && make update
+	cd copilot && make update
