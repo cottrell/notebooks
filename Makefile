@@ -38,3 +38,4 @@ update-ai:
 	cd mistral && make update
 	cd claude && make update
 	cd copilot && make update
+	cd qwen && make update
