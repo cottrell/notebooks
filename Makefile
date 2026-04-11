@@ -39,3 +39,4 @@ update-ai:
 	cd claude && make update
 	cd copilot && make update
 	cd qwen && make update
+	cd kimi && make update
