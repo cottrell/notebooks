@@ -16,4 +16,4 @@ else
     # uv pip install -U "jax[cuda12]"
     echo "jax[cuda12]" >> /tmp/requirements.pip
 fi
-uv pip install -r $ENV_FILE -U
+uv pip install -r /tmp/requirements.pip -U

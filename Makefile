@@ -32,11 +32,16 @@ status:
 fsck:
 	git submodule foreach --recursive 'echo Checking $$name; git fsck --full; git lfs fsck --objects;'
 
-update-ai:
-	cd gemini && make update
-	cd codex && make update
-	cd mistral && make update
-	cd claude && make update
-	cd copilot && make update
-	cd qwen && make update
-	cd kimi && make update
+update-gemini:
+	cd gemini && $(MAKE) update
+
+update-codex:
+	cd codex && $(MAKE) update
+
+update-mistral:
+	cd mistral && $(MAKE) update
+
+update-claude:
+	cd claude && $(MAKE) update
+
+update-ai: update-claude update-gemini update-mistral update-codex
