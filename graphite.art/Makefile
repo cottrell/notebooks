@@ -2,7 +2,7 @@ all:
 	cat Makefile
 
 install:
-	flatpak install flathub art.graphite.Graphite
+	echo https://graphite.art/
 
 run:
-	flatpak run art.graphite.Graphite
+	xdg-open https://graphite.art/
