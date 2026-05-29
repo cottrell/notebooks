@@ -3,5 +3,5 @@ all:
 
 install:
 	# Bifrost: High-performance AI gateway by Maxim AI
-	# Requires Node.js 18+
-	npx -y @maximhq/bifrost-cli
+	# Using bunx for faster execution
+	bunx @maximhq/bifrost-cli

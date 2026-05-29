@@ -2,7 +2,7 @@ serve:
 	gitbook serve
 
 install:
-	npm install -g gitbook-cli
+	bun install -g gitbook-cli
 
 init:
 	gitbook init

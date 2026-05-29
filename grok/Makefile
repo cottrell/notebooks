@@ -4,10 +4,10 @@ all:
 	cat Makefile
 
 install:
-	npm install -g @vibe-kit/grok-cli
+	bun install -g @vibe-kit/grok-cli
 
 uninstall:
-	npm uninstall grok-cli
+	bun uninstall grok-cli
 
 update:
-	npm install -g @vibe-kit/grok-cli@latest
+	bun install -g @vibe-kit/grok-cli@latest
