@@ -45,3 +45,4 @@ contourpy
 jaxtyping
 openai
 PyQt5
+graphifyy
