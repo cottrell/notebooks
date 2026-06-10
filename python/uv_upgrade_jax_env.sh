@@ -3,6 +3,8 @@ DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 
 . $HOME/uv_venvs/uv_3.12_jax/bin/activate
 
+rustup update
+
 uv pip install --upgrade pip
 
 ENV_FILE=requirements_minimal.txt

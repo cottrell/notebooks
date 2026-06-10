@@ -32,6 +32,9 @@ status:
 fsck:
 	git submodule foreach --recursive 'echo Checking $$name; git fsck --full; git lfs fsck --objects;'
 
+update-agy:
+	cd antigravity && $(MAKE) update
+
 update-gemini:
 	cd gemini && $(MAKE) update
 
@@ -44,4 +47,4 @@ update-mistral:
 update-claude:
 	cd claude && $(MAKE) update
 
-update-ai: update-claude update-gemini update-mistral update-codex
+update-ai: update-claude update-gemini update-mistral update-codex update-agy
