@@ -117,7 +117,7 @@ tf-estimator-nightly==1.14.0.dev2019030115
 tf-nightly-gpu-2.0-preview==2.0.0.dev20190621
 -e git+https://github.com/tensorflow/probability.git@a19224985dd26004468d781c70403b4cc3dd4f19#egg=tfp_nightly
 timeout-decorator==0.4.1
-tornado==6.0.2
+tornado==6.5.5
 tqdm==4.32.1
 traitlets==4.3.2
 twilio==6.26.1
