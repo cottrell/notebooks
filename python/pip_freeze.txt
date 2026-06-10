@@ -97,7 +97,7 @@ Quandl==3.4.6
 QuantLib-Python==1.15
 rapidjson==1.0.0
 ratelimit==2.2.1
-requests==2.21.0
+requests==2.33.0
 s3transfer==0.2.1
 scikit-learn==0.20.3
 scipy==1.2.1
