@@ -47,4 +47,7 @@ update-mistral:
 update-claude:
 	cd claude && $(MAKE) update
 
-update-ai: update-claude update-gemini update-mistral update-codex update-agy
+update-grok:
+	cd grok && $(MAKE) update
+
+update-ai: update-claude update-gemini update-mistral update-codex update-agy update-grok
