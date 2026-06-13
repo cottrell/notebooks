@@ -4,10 +4,9 @@ all:
 	cat Makefile
 
 install:
-	bun install -g @vibe-kit/grok-cli
+	# bun install -g @vibe-kit/grok-cli
+	curl -fsSL https://x.ai/cli/install.sh | bash
 
-uninstall:
-	bun uninstall grok-cli
 
-update:
-	bun install -g @vibe-kit/grok-cli@latest
+update: install
+	# bun install -g @vibe-kit/grok-cli@latest
