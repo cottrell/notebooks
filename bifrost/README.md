@@ -20,7 +20,7 @@ http://bleepblop:47821  ← bifrost gateway (binds ::, yggdrasil-accessible)
 ## Quick start
 
 ```bash
-make gateway          # start gateway on :: port 8080
+make gateway          # start gateway on :: port something
 make config           # run interactive wizard to patch an agent
 ```
 

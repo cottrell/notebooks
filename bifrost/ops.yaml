@@ -1,0 +1,6 @@
+session_name: ops-bifrost
+start_directory: ./
+windows:
+  - window_name: gateway
+    panes:
+      - 'make gateway HOST=:: PORT=47821'
