@@ -7,3 +7,9 @@ install:
 
 update:
 	agentsview update
+
+HOST ?= ::
+PORT ?= 8080
+
+serve start:
+	agentsview serve --host '$(HOST)' --port $(PORT) --no-browser
