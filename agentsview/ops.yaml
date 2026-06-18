@@ -3,4 +3,4 @@ start_directory: ./
 windows:
   - window_name: serve
     panes:
-      - make serve
+      - 'make serve HOST=0.0.0.0 PORT=8088'
