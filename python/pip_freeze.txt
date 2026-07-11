@@ -104,7 +104,7 @@ scipy==1.2.1
 Send2Trash==1.5.0
 six==1.12.0
 smart-open==1.8.4
-soupsieve==1.9.1
+soupsieve==2.8.4
 -e git+https://github.com/openai/spinningup.git@97c8c342c45e5bb51005a8515df23ba9c48f0782#egg=spinup
 statsmodels==0.10.0
 tb-nightly==1.15.0a20190621
