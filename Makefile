@@ -50,4 +50,4 @@ update-claude:
 update-grok:
 	cd grok && $(MAKE) update
 
-update-ai: update-claude update-gemini update-mistral update-codex update-agy update-grok
+update-ai: update-claude update-mistral update-codex update-agy update-grok

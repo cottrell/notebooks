@@ -46,3 +46,4 @@ jaxtyping
 openai
 PyQt5
 graphifyy
+apache-hamilton
