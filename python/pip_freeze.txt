@@ -54,7 +54,7 @@ Markdown==3.1
 MarkupSafe==1.1.1
 matplotlib==3.0.3
 mccabe==0.6.1
-mistune==0.8.4
+mistune==3.3.0
 more-itertools==7.0.0
 msgpack==0.6.1
 -e git+git@gitlab.com:david-cottrell/extractors.git@30db240ece9f9a3c56dd9cc8b28ea49af01cd4ee#egg=my_extractors&subdirectory=../../extractors
