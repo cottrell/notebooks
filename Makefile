@@ -51,3 +51,18 @@ update-grok:
 	cd grok && $(MAKE) update
 
 update-ai: update-claude update-mistral update-codex update-agy update-grok
+
+update: update-ai
+	sudo apt-get update
+	sudo apt-get upgrade
+	cd bun && $(MAKE) update
+	cd agentsview && $(MAKE) update
+	# cd copilot && $(MAKE) update
+	# cd kimi && $(MAKE) update
+	# cd qwen && $(MAKE) update
+	cd backlogmd && $(MAKE) update
+	# cd typst && $(MAKE) update
+	cd gh && $(MAKE) update
+	# cd nodejs && $(MAKE) update
+	cd python && make upgrade_jax
+	cd python && make upgrade_pytorch
