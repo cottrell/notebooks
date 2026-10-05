@@ -8,5 +8,6 @@ install:
 	curl -fsSL https://x.ai/cli/install.sh | bash
 
 
-update: install
+update:
+	grok update
 	# bun install -g @vibe-kit/grok-cli@latest

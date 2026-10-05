@@ -8,7 +8,8 @@ rust:
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 toolchain:
-	rustup toolchain uninstall stable
-	rustup toolchain install stable
+	rustup update stable
+
+update: toolchain
 
 install: rust toolchain

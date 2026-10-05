@@ -6,6 +6,7 @@ install:
 	curl -fsSL https://agentsview.io/install.sh | bash
 
 update:
+	agentsview || curl -fsSL https://agentsview.io/install.sh | bash
 	agentsview update
 
 HOST ?= 0.0.0.0
@@ -13,3 +14,4 @@ PORT ?= 8088
 
 serve start:
 	agentsview serve --host '$(HOST)' --port $(PORT) --no-browser
+
