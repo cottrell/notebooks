@@ -50,11 +50,13 @@ update-claude:
 update-grok:
 	cd grok && $(MAKE) update
 
-update-ai: update-claude update-mistral update-codex update-agy update-grok
+update-ai: update-claude update-codex update-agy update-grok
 
-update: update-ai
+update:
+	sudo -v
 	sudo apt-get update
-	sudo apt-get upgrade
+	sudo apt-get upgrade -y
+	$(MAKE) update-ai
 	cd bun && $(MAKE) update
 	cd agentsview && $(MAKE) update
 	# cd copilot && $(MAKE) update
@@ -64,5 +66,5 @@ update: update-ai
 	# cd typst && $(MAKE) update
 	cd gh && $(MAKE) update
 	# cd nodejs && $(MAKE) update
-	cd python && make upgrade_jax
-	cd python && make upgrade_pytorch
+	cd python && $(MAKE) upgrade_jax
+	cd python && $(MAKE) upgrade_pytorch
