@@ -7,5 +7,6 @@ install:
 
 update:
 	# npm update -g backlog.md
+	type backlog || bun i -g backlog.md
 	bun update -g backlog.md
 

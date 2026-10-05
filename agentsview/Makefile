@@ -6,7 +6,7 @@ install:
 	curl -fsSL https://agentsview.io/install.sh | bash
 
 update:
-	agentsview || curl -fsSL https://agentsview.io/install.sh | bash
+	type agentsview || curl -fsSL https://agentsview.io/install.sh | bash
 	agentsview update
 
 HOST ?= 0.0.0.0
