@@ -57,6 +57,7 @@ update:
 	sudo apt-get update
 	sudo apt-get upgrade -y
 	$(MAKE) update-ai
+	cd rust && make toolchain
 	cd bun && $(MAKE) update
 	cd agentsview && $(MAKE) update
 	# cd copilot && $(MAKE) update
