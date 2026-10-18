@@ -1,8 +1,7 @@
 all:
 	cat Makefile
 
-# OpenRouter provides a zero-dollar pool of models tagged with :free
-# Key signup: https://openrouter.ai/keys
+LOAD_ENV = [ -f ~/.cred/ai.sh ] && . ~/.cred/ai.sh;
 
 # Inspect live free models:
 list-free:
@@ -10,7 +9,8 @@ list-free:
 
 # Test API connection with OPENROUTER_API_KEY:
 test:
-	@if [ -z "$$OPENROUTER_API_KEY" ]; then echo "Missing OPENROUTER_API_KEY. Grab from https://openrouter.ai/keys"; exit 1; fi
+	@$(LOAD_ENV) \
+	if [ -z "$$OPENROUTER_API_KEY" ]; then echo "Missing OPENROUTER_API_KEY in environment or ~/.cred/ai.sh"; exit 1; fi; \
 	curl -s https://openrouter.ai/api/v1/chat/completions \
 	  -H "Authorization: Bearer $$OPENROUTER_API_KEY" \
 	  -H "Content-Type: application/json" \
@@ -22,7 +22,7 @@ test:
 # - openrouter/google/gemma-4-31b-it:free
 
 aider-code:
-	aider --model openrouter/cohere/north-mini-code:free
+	@$(LOAD_ENV) aider --model openrouter/cohere/north-mini-code:free
 
 aider-r1:
-	aider --model openrouter/deepseek/deepseek-r1:free
+	@$(LOAD_ENV) aider --model openrouter/deepseek/deepseek-r1:free
