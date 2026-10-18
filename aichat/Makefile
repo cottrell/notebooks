@@ -11,3 +11,19 @@ update: install
 
 uninstall:
 	rm -f ~/.local/bin/aichat
+
+# Usage & model reminders:
+# Config location: ~/.config/aichat/config.yaml
+
+# Interactive REPL / TUI:
+repl:
+	aichat
+
+# Direct scratchpad queries using specific free endpoints:
+query-groq:
+	@if [ -z "$$GROQ_API_KEY" ]; then echo "Missing GROQ_API_KEY"; exit 1; fi
+	aichat -m groq:llama-3.3-70b-versatile "reply pong in one word"
+
+query-mistral:
+	@if [ -z "$$MISTRAL_API_KEY" ]; then echo "Missing MISTRAL_API_KEY"; exit 1; fi
+	aichat -m mistral:codestral-latest "reply pong in one word"

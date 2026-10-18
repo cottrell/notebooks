@@ -16,3 +16,18 @@ update:
 
 uninstall:
 	rm -f ~/.local/bin/tgpt
+
+# Zero-key tests & reminders:
+# Default provider (opencode) requires their app. Use --provider pollinations for zero-config free queries:
+
+test:
+	tgpt --provider pollinations "reply pong in one word"
+
+# Interactive TUI mode:
+interactive:
+	tgpt --provider pollinations -i
+
+# Image generation (saved to /tmp/test.jpg):
+test-img:
+	tgpt --img --out /tmp/tgpt_test.jpg "retro robot reading code"
+	@echo "Saved image to /tmp/tgpt_test.jpg"
