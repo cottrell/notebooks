@@ -1,9 +1,8 @@
 all:
 	cat Makefile
 
-# OpenRouter is a unified API gateway (not a local tool / CLI to install).
-# It provides a pool of models tagged with :free at $0.00 / 1M tokens.
-# Free API key: https://openrouter.ai/keys
+# OpenRouter provides a zero-dollar pool of models tagged with :free
+# Key signup: https://openrouter.ai/keys
 
 # Inspect live free models:
 list-free:
@@ -15,15 +14,15 @@ test:
 	curl -s https://openrouter.ai/api/v1/chat/completions \
 	  -H "Authorization: Bearer $$OPENROUTER_API_KEY" \
 	  -H "Content-Type: application/json" \
-	  -d '{"model": "google/gemma-4-31b-it:free", "messages": [{"role": "user", "content": "ping"}]}' | jq .choices[0].message.content
+	  -d '{"model": "cohere/north-mini-code:free", "messages": [{"role": "user", "content": "ping"}]}' | jq .choices[0].message.content
 
-# Model reminders for coding harnesses (aider):
+# Free pool model reminders:
+# - openrouter/cohere/north-mini-code:free (verified live)
 # - openrouter/deepseek/deepseek-r1:free
-# - openrouter/meta-llama/llama-3.3-70b-instruct:free
-# - openrouter/cohere/north-mini-code:free
+# - openrouter/google/gemma-4-31b-it:free
+
+aider-code:
+	aider --model openrouter/cohere/north-mini-code:free
 
 aider-r1:
 	aider --model openrouter/deepseek/deepseek-r1:free
-
-aider-llama:
-	aider --model openrouter/meta-llama/llama-3.3-70b-instruct:free
