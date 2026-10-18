@@ -1,6 +1,16 @@
 all:
 	cat Makefile
 
+install:
+	bun install -g openrouter-cli
+	@echo "Installed openrouter CLI as 'openrouter'"
+
+update:
+	bun install -g openrouter-cli@latest
+
+uninstall:
+	bun uninstall -g openrouter-cli
+
 # OpenRouter provides a zero-dollar pool of models tagged with :free
 # Key signup: https://openrouter.ai/keys
 

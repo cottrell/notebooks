@@ -51,6 +51,15 @@ update-grok:
 	cd grok && $(MAKE) update
 
 update-ai: update-claude update-codex update-agy update-grok
+	cd agentsview && $(MAKE) update
+	# cd copilot && $(MAKE) update
+	# cd kimi && $(MAKE) update
+	# cd qwen && $(MAKE) update
+	cd tgpt && $(MAKE) update
+	cd aichat && $(MAKE) update
+	cd groq && $(MAKE) update
+	cd openrouter && $(MAKE) update
+	cd aider && $(MAKE) update
 
 update:
 	sudo -v
@@ -59,10 +68,8 @@ update:
 	$(MAKE) update-ai
 	cd rust && make toolchain
 	cd bun && $(MAKE) update
-	cd agentsview && $(MAKE) update
-	# cd copilot && $(MAKE) update
-	# cd kimi && $(MAKE) update
-	# cd qwen && $(MAKE) update
+
+
 	cd backlogmd && $(MAKE) update
 	# cd typst && $(MAKE) update
 	cd gh && $(MAKE) update
