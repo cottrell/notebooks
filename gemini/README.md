@@ -2,27 +2,41 @@
 
 Separate from your paid Antigravity (AGY) environment, Google offers a standalone free developer tier API.
 
-## What To Try For Free
+## Free Quota
 
-- **Provider**: Google (US).
-- **Free Quota**: 15 requests/minute, 1,500 requests/day, 1M tokens/minute for free.
-- **Key Signup**: [aistudio.google.com/apikey](https://aistudio.google.com/apikey) (free Google account).
+- **15 requests / minute**
+- **1,500 requests / day**
+- **1,000,000 tokens / minute**
+- **Cost**: $0.00 (no billing account required).
 
-### Models To Test:
-- `gemini-2.0-flash`: Extremely fast, 1M context window, strong reasoning & multimodal.
+## Key & Credential Setup
 
-## Setup & Testing
-
+Your key is already stored in `~/.cred/ai.sh` as `GEMINI_API_KEY`.
+To load it:
 ```bash
-export GEMINI_API_KEY="..."
-
-# Test with aider:
-aider --model gemini/gemini-2.0-flash
+source ~/.cred/ai.sh
 ```
 
-## CLI Installation
+## Quick Commands & Usage
 
+### 1. Test Connectivity
 ```bash
-make install    # installs @google/gemini-cli via bun
-make update
+make test     # sends a curl ping to gemini-3.8-flash (returns 'pong')
 ```
+
+### 2. Agentic Coding with `aider`
+Use Gemini's massive 1M token context for free code edits in any git repo:
+```bash
+make aider    # runs: aider --model gemini/gemini-3.8-flash
+```
+
+### 3. Interactive TUI / Scratchpad with `aichat`
+```bash
+make aichat   # runs: aichat -m gemini:gemini-3.8-flash
+```
+
+### 4. Official Web UI (Browser)
+If you prefer a web playground with huge prompt files, audio, and video uploads:
+- URL: **[aistudio.google.com](https://aistudio.google.com/)**
+- Sign in with your standard Google account.
+- Free prompt prototyping with full access to Gemini models and system instructions.
