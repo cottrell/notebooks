@@ -1,15 +1,9 @@
 all:
 	cat Makefile
 
-install:
-	uv tool install groq-cli
-	@echo "Installed groq CLI as 'grc'"
-
-update:
-	uv tool upgrade groq-cli
-
-uninstall:
-	uv tool uninstall groq-cli
+# Groq Cloud is a hosted API service (not a local tool / CLI to install).
+# It serves Llama 3.3 70B, Qwen 2.5 Coder, and DeepSeek R1 distill for free.
+# Free API key: https://console.groq.com/keys
 
 # Test API connection with GROQ_API_KEY:
 test:
@@ -19,10 +13,10 @@ test:
 	  -H "Content-Type: application/json" \
 	  -d '{"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": "ping"}]}' | jq .choices[0].message.content
 
-# Model reminders:
-# - llama-3.3-70b-versatile : Fast general purpose / architecture
+# Model reminders for harnesses (aider / aichat):
+# - llama-3.3-70b-versatile : Fast general purpose
 # - qwen-2.5-coder-32b      : Dedicated coding model
-# - deepseek-r1-distill-llama-70b : Reasoning / thinking model
+# - deepseek-r1-distill-llama-70b : Reasoning model
 
 aider-llama:
 	aider --model groq/llama-3.3-70b-versatile

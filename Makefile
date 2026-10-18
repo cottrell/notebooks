@@ -58,8 +58,6 @@ update-ai: update-claude update-codex update-agy update-grok
 	cd tgpt && $(MAKE) update
 	cd aichat && $(MAKE) update
 	cd aider && $(MAKE) update
-	cd groq && $(MAKE) update
-	cd openrouter && $(MAKE) update
 
 update:
 	sudo -v
