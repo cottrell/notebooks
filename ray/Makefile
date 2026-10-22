@@ -7,7 +7,7 @@ all help:
 	@cat Makefile
 
 install:
-	$(UV) pip install numpy ray
+	$(UV) pip install ray
 
 update:
 	$(UV) pip install --upgrade ray
