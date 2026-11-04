@@ -15,6 +15,8 @@ install-dev:
 
 update:
 	@if [ -d "$(DEV_DIR)" ]; then \
+		git -C $(DEV_DIR) pull && \
+		$(MAKE) -C $(DEV_DIR) deps && \
 		$(MAKE) -C $(DEV_DIR) install-dev; \
 	else \
 		bun i -g backlog.md@latest; \
