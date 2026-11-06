@@ -19,3 +19,4 @@ else
     echo "jax[cuda12]" >> /tmp/requirements.pip
 fi
 uv pip install -r /tmp/requirements.pip -U
+uv tool upgrade graphifyy
