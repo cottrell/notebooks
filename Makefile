@@ -59,14 +59,18 @@ update-ai: update-claude update-codex update-agy update-grok
 	cd aichat && $(MAKE) update
 	cd aider && $(MAKE) update
 
-update:
+update:               ## System‑wide update (APT + snap + AI tools)
+	# 1️⃣ keep sudo alive for the whole recipe
 	sudo -v
-	sudo apt-get update
-	sudo apt-get upgrade -y
+	# 2️⃣ regular Debian/Ubuntu packages
+	sudo apt update && sudo apt upgrade -y
+	# 3️⃣ **new** snap packages (including Firefox)
+	$(MAKE) snap-update
+	# 4️⃣ AI‑related sub‑projects (unchanged from before)
 	$(MAKE) update-ai
+	# 5️⃣ language‑runtime toolchains (unchanged)
 	cd rust && make toolchain
 	cd bun && $(MAKE) update
-
 
 	cd backlogmd && $(MAKE) update
 	# cd typst && $(MAKE) update
@@ -74,3 +78,7 @@ update:
 	# cd nodejs && $(MAKE) update
 	cd python && $(MAKE) upgrade_jax
 	cd python && $(MAKE) upgrade_pytorch
+
+snap-update:            ## Refresh all snap packages (Firefox included)
+	# Snap refresh runs as root; `sudo` is required
+	sudo snap refresh
