@@ -7,10 +7,10 @@ install:
 	bun i -g backlog.md
 
 install-dev:
-	@if [ -d "$(DEV_DIR)" ]; then \
-		$(MAKE) -C $(DEV_DIR) install-dev; \
+	@if [ -x "$(DEV_DIR)/dist/backlog" ]; then \
+		ln -sfn "$(DEV_DIR)/dist/backlog" "$(HOME)/.bun/bin/backlog"; \
 	else \
-		echo "Dev directory $(DEV_DIR) not found"; exit 1; \
+		echo "No compiled Backlog CLI at $(DEV_DIR)/dist/backlog; run 'make install' for the published CLI"; exit 1; \
 	fi
 
 update:
